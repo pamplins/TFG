@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">APPTFG</string>
+    <string name="et_email">Email</string>
+    <string name="et_password">Password</string>
+    <string name="btn_signin">Sign in</string>
+    <string name="btn_signout">Sign in</string>
+    <string name="btn_register">Register</string>
+
+
+</resources>
