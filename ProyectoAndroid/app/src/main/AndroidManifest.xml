@@ -17,10 +17,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".Home">
-            android:parentActivityName=".LoginUser"
+            android:parentActivityName=".Login"
+            android:label="@string/home_name"
+
         </activity>
         <activity android:name=".Register">
-            android:parentActivityName=".LoginUser"
+            android:parentActivityName=".Login"
+            android:label="@string/register_name"
         </activity>
     </application>
 

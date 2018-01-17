@@ -1,6 +1,7 @@
 package com.example.pamplins.apptfg;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +26,6 @@ public class Login extends AppCompatActivity {
 
     private TextView tvEmail;
     private TextView tvPassword;
-    private Button btnSignin;
     private Button btnRegister;
     private ProgressBar progressBar;
 
@@ -43,9 +43,7 @@ public class Login extends AppCompatActivity {
     private void initElements() {
         tvEmail = (TextView) findViewById(R.id.tv_email);
         tvPassword = (TextView) findViewById(R.id.tv_password);
-        btnSignin = (Button) findViewById(R.id.btn_signin);
         btnRegister = (Button) findViewById(R.id.btn_register);
-
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -62,16 +60,22 @@ public class Login extends AppCompatActivity {
         String password = tvPassword.getText().toString();
         if(!email.isEmpty() && !password.isEmpty()){
             progressBar.setVisibility(View.VISIBLE);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+
+            }, 3000);
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                    updateUI(currentUser);
+                    updateUI(mAuth.getCurrentUser(),false);
                 }
             });
         }else{
-            Toast.makeText(getApplicationContext(), "ENTER EMAIL AND PASSWORD BOY", Toast.LENGTH_LONG).show();
-
+            Toast.makeText(getApplicationContext(), "ENTER VALID EMAIL AND PASSWORD", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -79,28 +83,32 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //TODO ver que si he borrado el usuario. el movil ya tiene guardado y te deja seguir entrando
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        updateUI(mAuth.getCurrentUser(), true);
     }
 
-    private void updateUI(FirebaseUser currentUser) {
+    private void updateUI(FirebaseUser currentUser, Boolean start) {
         if(currentUser != null){
-            Toast.makeText(getApplicationContext(), "CORRECT", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "WELCOME!", Toast.LENGTH_LONG).show();
             openHome();
         }else{
-            btnRegister.setVisibility(View.VISIBLE);
+            if(!start){
+                Toast.makeText(getApplicationContext(), "MAIL AND PASSWORD INCORRECT. TRY AGAIN", Toast.LENGTH_LONG).show();
+            }
         }
-        progressBar.setVisibility(View.INVISIBLE);
 
     }
 
+    /***
+     * Metodo encargado de abrir la ventana de Registro
+     *
+     * @param v
+     */
     public void openRegister(View v){
         Intent i = new Intent(this, Register.class);
         startActivity(i);
         finish();
     }
-
-
 
 }

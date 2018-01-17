@@ -43,6 +43,12 @@ public class Register extends AppCompatActivity {
         tvEmail = (TextView) findViewById(R.id.tv_emailR);
         tvPassword = (TextView) findViewById(R.id.tv_passwordR);
         btnSignin = (Button) findViewById(R.id.btn_registerR);
+        btnSignin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createAccount(v);
+            }
+        });
         //TODO hacer otro tvPassword y comprobar que existe
     }
 
@@ -59,14 +65,14 @@ public class Register extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             }else{ // usuario ya existe, limitar a este error para
-                                Toast.makeText(Register.this, "Authentication failed.",
+                                Toast.makeText(Register.this, "USER ALREADY REGISTERED",
                                         Toast.LENGTH_SHORT).show();
                             }
 
                         }
                     });
         }else{
-            Toast.makeText(Register.this, "Authentication failed.",
+            Toast.makeText(Register.this, "ENTER A VALID EMAIL AND PASSWORD",
                     Toast.LENGTH_SHORT).show();
             updateUI(null);
         }
@@ -83,7 +89,7 @@ public class Register extends AppCompatActivity {
     /**
      * validate your email address format. Ex-akhi@mani.com
      */
-    public boolean emailValidator(String email) {
+    private boolean emailValidator(String email) {
         Pattern pattern;
         Matcher matcher;
         final String EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
@@ -94,7 +100,7 @@ public class Register extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if(user != null){
-            Toast.makeText(getApplicationContext(), "CORRECT", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "CORRECT REGISTER. WELCOME", Toast.LENGTH_LONG).show();
             openHome();
         }
     }
@@ -104,4 +110,22 @@ public class Register extends AppCompatActivity {
         startActivity(i);
         finish();
     }
+
+
+    //CUANDO VOLQUEMOS LOS USUARIOS A LA BASE DE DATOS para saber si ya esta el nombre del user. se cambiara la forma de login seguramente
+    /*
+    DatabaseReference ref = Firebase.getInstance().getReference();
+    ref.child("users").child("username").addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            if(dataSnapshot.exists()){
+                // use "username" already exists
+                // Let the user know he needs to pick another username.
+            } else {
+                // User does not exist. NOW call createUserWithEmailAndPassword
+                mAuth.createUserWithPassword(...);
+                // Your previous code here.
+
+            }
+        }*/
 }

@@ -36,8 +36,7 @@
         android:layout_alignRight="@+id/til_email"
         android:layout_alignStart="@+id/til_email"
         android:layout_below="@+id/til_email"
-        android:layout_margin="10dp"
-        android:hint="@string/et_password">
+        android:layout_margin="10dp" >
 
         <EditText
             android:id="@+id/tv_password"
