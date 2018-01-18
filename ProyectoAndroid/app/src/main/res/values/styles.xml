@@ -8,4 +8,50 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="editText_style">
+        <item name="android:gravity">center</item> <!-- Posicion del Texto-->
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/edittext_background</item>
+        <item name="android:layout_width">300dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ems">10</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="editText_style2">
+        <item name="android:gravity">center</item> <!-- Posicion del Texto-->
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/edittext_background</item>
+        <item name="android:layout_width">300dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+
+        <item name="android:ems">10</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+
+    <style name="button_style">
+        <item name="android:layout_width">170dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/button_style</item>
+        <item name="android:layout_margin">70dp</item>
+    </style>
+
+    <style name="spinner_style">
+        <item name="android:gravity">center</item> <!-- Posicion del Texto-->
+        <item name="android:layout_width">293dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginLeft">60dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:background">@drawable/gradient_spinner</item>
+    </style>
+
+    <style name="spinnerDropDownItemStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+    </style>
 </resources>

@@ -1,57 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/til_emailR"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:hint="@string/et_email">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/gradient_background">
+
+        <ImageView
+            android:id="@+id/img_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+
+            app:srcCompat="@drawable/user" />
+
+    <!--<android.support.design.widget.TextInputLayout
+        android:id="@+id/til_pseudo"
+        style="@style/editText_style"
+        android:hint="@string/et_pseudonym"> -->
+
+        <EditText
+            android:id="@+id/tv_pseudo"
+            style="@style/editText_style"
+            android:hint="@string/et_pseudonym"
+            android:inputType="text" />
+    <!-- </android.support.design.widget.TextInputLayout>-->
+
 
         <EditText
             android:id="@+id/tv_emailR"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_margin="10dp"
-            android:ems="10"
+            style="@style/editText_style"
+            android:hint="@string/et_email"
             android:inputType="textEmailAddress" />
-    </android.support.design.widget.TextInputLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/til_passwordR"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/til_emailR"
-        android:layout_alignLeft="@+id/til_emailR"
-        android:layout_alignRight="@+id/til_emailR"
-        android:layout_alignStart="@+id/til_emailR"
-        android:layout_below="@+id/til_emailR"
-        android:layout_margin="10dp">
 
         <EditText
             android:id="@+id/tv_passwordR"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
+            style="@style/editText_style"
             android:hint="@string/et_password"
             android:inputType="textPassword" />
-    </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/btn_registerR"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:onClick="createAccount"
-        android:text="@string/btn_signin" />
+
+        <EditText
+            android:id="@+id/tv_cpasswordR"
+            style="@style/editText_style"
+            android:hint="@string/et_cpassword"
+            android:inputType="textPassword" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            style="@style/spinner_style"
+            android:width="2dp" />
+        <Button
+            android:id="@+id/btn_registerR"
+            style="@style/button_style"
+            android:onClick="createAccount"
+            android:text="@string/btn_createAccount" />
+
+    </LinearLayout>
 
 
 </RelativeLayout>

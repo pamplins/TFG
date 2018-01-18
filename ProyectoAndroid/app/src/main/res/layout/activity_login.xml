@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.pamplins.apptfg.Login"
-    android:focusableInTouchMode="true" >
+    android:focusableInTouchMode="true"
+    android:background="@drawable/gradient_background">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/til_email"

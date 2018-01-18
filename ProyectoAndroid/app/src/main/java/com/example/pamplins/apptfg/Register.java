@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +29,10 @@ public class Register extends AppCompatActivity {
 
     private TextView tvEmail;
     private TextView tvPassword;
+    private TextView tvCPassword;
+    private TextView tvPseudo;
     private Button btnSignin;
-
+    private Spinner spinner;
     FirebaseAuth mAuth;
 
     @Override
@@ -42,17 +46,14 @@ public class Register extends AppCompatActivity {
     private void initElements() {
         tvEmail = (TextView) findViewById(R.id.tv_emailR);
         tvPassword = (TextView) findViewById(R.id.tv_passwordR);
+        tvCPassword = (TextView) findViewById(R.id.tv_cpasswordR);
+        tvPseudo = (TextView) findViewById(R.id.tv_pseudo);
         btnSignin = (Button) findViewById(R.id.btn_registerR);
-        btnSignin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createAccount(v);
-            }
-        });
-        //TODO hacer otro tvPassword y comprobar que existe
+        spinner = (Spinner) findViewById(R.id.spinner); //TODO hacer spinner correctamente y hacer custom simple_spinner_dropdown
+        String[] curs = {"                          Curs actual","1r","2n","3r","4rt"};
+        spinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, curs));
+
     }
-
-
 
     public void createAccount(View v){
         if(checkInputs()) {
@@ -72,29 +73,61 @@ public class Register extends AppCompatActivity {
                         }
                     });
         }else{
-            Toast.makeText(Register.this, "ENTER A VALID EMAIL AND PASSWORD",
-                    Toast.LENGTH_SHORT).show();
             updateUI(null);
         }
     }
 
     private boolean checkInputs() {
-        // TODO isEmpty no, poner una funcion que compruebe las dos passwords y que no sea Empty ninguna de las 2
-        if((emailValidator(tvEmail.getText().toString())) && !(tvPassword.getText().toString().isEmpty())){
+        // TODO mirar si pseudo ya esta cogido y lo del curso
+        tvsEmpties();
+        if((emailValidator()) && (passwordValidator())){
             return true;
         }
         return false;
     }
 
+    private void tvsEmpties() {
+        if(tvPseudo.getText().toString().isEmpty()){
+            tvPseudo.setError("Input empty");
+        }
+        if(tvEmail.getText().toString().isEmpty()){
+            tvEmail.setError("Input empty");
+        }if(tvPassword.getText().toString().isEmpty()){
+            tvPassword.setError("Input empty");
+
+        }if(tvCPassword.getText().toString().isEmpty()){
+            tvCPassword.setError("Input empty");
+        }if(spinner.getSelectedItem().toString().equals("                          Curs actual")){
+        //TODO ver como mostrar error
+        }
+
+    }
+
+    private boolean passwordValidator() {
+        String passsword = tvPassword.getText().toString();
+        String cpasssword = tvCPassword.getText().toString();
+        if(passsword.length() > 6 && cpasssword.length() > 6){
+            if(!passsword.equals(cpasssword)){
+                tvCPassword.setError("Confirmation password error");
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+
+    }
+
     /**
      * validate your email address format. Ex-akhi@mani.com
      */
-    private boolean emailValidator(String email) {
+    private boolean emailValidator() {
         Pattern pattern;
         Matcher matcher;
         final String EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         pattern = Pattern.compile(EMAIL_PATTERN);
-        matcher = pattern.matcher(email);
+        matcher = pattern.matcher(this.tvEmail.getText().toString());
         return matcher.matches();
     }
 
