@@ -9,8 +9,11 @@
     </style>
 
     <style name="editText_style">
-        <item name="android:gravity">center</item> <!-- Posicion del Texto-->
+        <item name="android:gravity">left</item> <!-- Posicion del Texto-->
+        <item name="android:paddingTop">5dp</item>
+
         <item name="android:layout_gravity">center</item>
+        <item name="android:paddingLeft">15dp</item>
         <item name="android:background">@drawable/edittext_background</item>
         <item name="android:layout_width">300dp</item>
         <item name="android:layout_height">wrap_content</item>

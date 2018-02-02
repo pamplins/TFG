@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +37,7 @@ public class Register extends AppCompatActivity {
     private Button btnSignin;
     private Spinner spinner;
     FirebaseAuth mAuth;
+    private boolean showPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -46,13 +50,38 @@ public class Register extends AppCompatActivity {
     private void initElements() {
         tvEmail = (TextView) findViewById(R.id.tv_emailR);
         tvPassword = (TextView) findViewById(R.id.tv_passwordR);
-        tvCPassword = (TextView) findViewById(R.id.tv_cpasswordR);
+
+        tvPassword.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (tvPassword.getRight() - tvPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if(!showPass){
+                            tvPassword.setTransformationMethod(new PasswordTransformationMethod());
+                            showPass = true;
+                        }else {
+                            tvPassword.setTransformationMethod(null);
+                            showPass = false;
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        //tvCPassword = (TextView) findViewById(R.id.tv_cpasswordR);
         tvPseudo = (TextView) findViewById(R.id.tv_pseudo);
         btnSignin = (Button) findViewById(R.id.btn_registerR);
         spinner = (Spinner) findViewById(R.id.spinner); //TODO hacer spinner correctamente y hacer custom simple_spinner_dropdown
         String[] curs = {"                          Curs actual","1r","2n","3r","4rt"};
         spinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, curs));
-
+        showPass = false;
     }
 
     public void createAccount(View v){
@@ -105,6 +134,17 @@ public class Register extends AppCompatActivity {
 
     private boolean passwordValidator() {
         String passsword = tvPassword.getText().toString();
+
+        if(passsword.length() > 6){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /*
+    private boolean passwordValidator() {
+        String passsword = tvPassword.getText().toString();
         String cpasssword = tvCPassword.getText().toString();
         if(passsword.length() > 6 && cpasssword.length() > 6){
             if(!passsword.equals(cpasssword)){
@@ -117,7 +157,7 @@ public class Register extends AppCompatActivity {
             return false;
         }
 
-    }
+    }*/
 
     /**
      * validate your email address format. Ex-akhi@mani.com
