@@ -1,15 +1,39 @@
 package com.example.pamplins.apptfg;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,9 +43,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by PAMPLINS on 09/01/2018.
@@ -29,11 +63,10 @@ import java.util.regex.Pattern;
 
 public class Register extends AppCompatActivity {
 
-
-    private TextView tvEmail;
-    private TextView tvPassword;
-    private TextView tvCPassword;
-    private TextView tvPseudo;
+    private ImageView img;
+    private EditText etEmail;
+    private EditText etPassword;
+    private EditText etUserName;
     private Button btnSignin;
     private Spinner spinner;
     FirebaseAuth mAuth;
@@ -47,26 +80,63 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initElements() {
-        tvEmail = (TextView) findViewById(R.id.tv_emailR);
-        tvPassword = (TextView) findViewById(R.id.tv_passwordR);
+        img = findViewById(R.id.img_user);
+        etEmail = findViewById(R.id.et_emailR);
+        etPassword = findViewById(R.id.et_passwordR);
+        showPassword();
+        etUserName = findViewById(R.id.et_userName);
+        btnSignin = findViewById(R.id.btn_registerR);
+        initSpinner();
+        showPass = false;
+    }
 
-        tvPassword.setOnTouchListener(new View.OnTouchListener() {
+    private void initSpinner() {
+        spinner = findViewById(R.id.spinner);
+
+        String[] courses = new String[]{"Curso actual","1º","2º","3º","4º"};
+        final List<String> courseList = new ArrayList<>(Arrays.asList(courses));
+
+
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item,courseList){
+            @Override
+            public boolean isEnabled(int position){
+                return position == 0 ? false : true;
+            }
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                int color = position == 0 ? Color.GRAY : Color.WHITE;
+                tv.setTextColor(color);
+                return view;
+            }
+        };
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        spinner.setAdapter(spinnerArrayAdapter);
+    }
+
+
+    private void showPassword() {
+        etPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
                 final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
 
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (tvPassword.getRight() - tvPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
                         if(!showPass){
-                            tvPassword.setTransformationMethod(new PasswordTransformationMethod());
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(new PasswordTransformationMethod());
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye, 0);
                             showPass = true;
                         }else {
-                            tvPassword.setTransformationMethod(null);
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(null);
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye2, 0);
                             showPass = false;
                         }
                         return true;
@@ -75,27 +145,22 @@ public class Register extends AppCompatActivity {
                 return false;
             }
         });
-        //tvCPassword = (TextView) findViewById(R.id.tv_cpasswordR);
-        tvPseudo = (TextView) findViewById(R.id.tv_pseudo);
-        btnSignin = (Button) findViewById(R.id.btn_registerR);
-        spinner = (Spinner) findViewById(R.id.spinner); //TODO hacer spinner correctamente y hacer custom simple_spinner_dropdown
-        String[] curs = {"                          Curs actual","1r","2n","3r","4rt"};
-        spinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, curs));
-        showPass = false;
     }
 
     public void createAccount(View v){
         if(checkInputs()) {
-            mAuth.createUserWithEmailAndPassword(tvEmail.getText().toString(), tvPassword.getText().toString())
+            mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
+                                // Write a message to the database
+                                //TODO crear class user
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
-                            }else{ // usuario ya existe, limitar a este error para
-                                Toast.makeText(Register.this, "USER ALREADY REGISTERED",
+                            }else{
+                                Toast.makeText(Register.this, "Correo ya registrado",
                                         Toast.LENGTH_SHORT).show();
                             }
 
@@ -108,56 +173,36 @@ public class Register extends AppCompatActivity {
 
     private boolean checkInputs() {
         // TODO mirar si pseudo ya esta cogido y lo del curso
-        tvsEmpties();
-        if((emailValidator()) && (passwordValidator())){
+        if(!userNameValidator()){ // Mostrare error por campo vacio, porque el usuario ya existe
+            etUserName.setError("Debe contener al menos 4 caracteres");
+        }
+        if(!emailValidator()){
+            etEmail.setError("Correo incorrecto");
+        }
+        if(!passwordValidator()){
+            etPassword.setError("Debe contener al menos 6 caracteres");
+        }
+        if(cursValidator()){
+            ((TextView)spinner.getSelectedView()).setError("Selecciona curso");
+        }
+        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator()){
             return true;
         }
         return false;
     }
 
-    private void tvsEmpties() {
-        if(tvPseudo.getText().toString().isEmpty()){
-            tvPseudo.setError("Input empty");
-        }
-        if(tvEmail.getText().toString().isEmpty()){
-            tvEmail.setError("Input empty");
-        }if(tvPassword.getText().toString().isEmpty()){
-            tvPassword.setError("Input empty");
+    private boolean cursValidator() {
+        return (spinner.getSelectedItem().toString().equals("Curso actual"));
+    }
 
-        }if(tvCPassword.getText().toString().isEmpty()){
-            tvCPassword.setError("Input empty");
-        }if(spinner.getSelectedItem().toString().equals("                          Curs actual")){
-        //TODO ver como mostrar error
-        }
-
+    private boolean userNameValidator() {
+        return etUserName.getText().toString().length() > 3;
     }
 
     private boolean passwordValidator() {
-        String passsword = tvPassword.getText().toString();
-
-        if(passsword.length() > 6){
-            return true;
-        }else{
-            return false;
-        }
+        return etPassword.getText().toString().length() > 5;
     }
 
-    /*
-    private boolean passwordValidator() {
-        String passsword = tvPassword.getText().toString();
-        String cpasssword = tvCPassword.getText().toString();
-        if(passsword.length() > 6 && cpasssword.length() > 6){
-            if(!passsword.equals(cpasssword)){
-                tvCPassword.setError("Confirmation password error");
-                return false;
-            }else{
-                return true;
-            }
-        }else{
-            return false;
-        }
-
-    }*/
 
     /**
      * validate your email address format. Ex-akhi@mani.com
@@ -167,13 +212,13 @@ public class Register extends AppCompatActivity {
         Matcher matcher;
         final String EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         pattern = Pattern.compile(EMAIL_PATTERN);
-        matcher = pattern.matcher(this.tvEmail.getText().toString());
+        matcher = pattern.matcher(etEmail.getText().toString());
         return matcher.matches();
     }
 
     private void updateUI(FirebaseUser user) {
         if(user != null){
-            Toast.makeText(getApplicationContext(), "CORRECT REGISTER. WELCOME", Toast.LENGTH_LONG).show();
+            finish();
             openHome();
         }
     }
@@ -181,9 +226,35 @@ public class Register extends AppCompatActivity {
     private void openHome() {
         Intent i = new Intent(this, Home.class);
         startActivity(i);
+    }
+
+    @Override
+    public void onBackPressed() {
         finish();
     }
 
+    public void openImage(View v){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        if (resultCode == RESULT_OK) {
+            try {
+                Uri imageUri = imageReturnedIntent.getData();
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+               img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
 
     //CUANDO VOLQUEMOS LOS USUARIOS A LA BASE DE DATOS para saber si ya esta el nombre del user. se cambiara la forma de login seguramente
     /*
@@ -201,4 +272,4 @@ public class Register extends AppCompatActivity {
 
             }
         }*/
-}
+

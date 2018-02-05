@@ -1,12 +1,16 @@
 package com.example.pamplins.apptfg;
-
+//TODO quitar que se abra el teclado al abrir la App
+//TODO hacer que si tocas la pantalla y no es algun campo de texto el teclado desaparezca
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,11 +27,11 @@ import com.google.firebase.auth.FirebaseUser;
  */
 
 public class Login extends AppCompatActivity {
-
-    private TextView tvEmail;
-    private TextView tvPassword;
-    private Button btnRegister;
+    private EditText etEmail;
+    private EditText etPassword;
     private ProgressBar progressBar;
+    private TextView tvRegister;
+    private boolean showPass;
 
     FirebaseAuth mAuth;
 
@@ -41,11 +45,12 @@ public class Login extends AppCompatActivity {
 
 
     private void initElements() {
-        tvEmail = (TextView) findViewById(R.id.tv_email);
-        tvPassword = (TextView) findViewById(R.id.tv_password);
-        btnRegister = (Button) findViewById(R.id.btn_register);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        etEmail = findViewById(R.id.et_email);
+        etPassword = findViewById(R.id.et_password);
+        showPassword();
+        progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
+        tvRegister = findViewById(R.id.tv_register);
     }
 
     private void openHome() {
@@ -56,11 +61,10 @@ public class Login extends AppCompatActivity {
 
 
     public void signIn(View v){
-        String email = tvEmail.getText().toString();
-        String password = tvPassword.getText().toString();
+        String email = etEmail.getText().toString();
+        String password = etPassword.getText().toString();
         if(!email.isEmpty() && !password.isEmpty()){
             progressBar.setVisibility(View.VISIBLE);
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -75,7 +79,7 @@ public class Login extends AppCompatActivity {
                 }
             });
         }else{
-            Toast.makeText(getApplicationContext(), "ENTER VALID EMAIL AND PASSWORD", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.err_login, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -83,18 +87,16 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //TODO ver que si he borrado el usuario. el movil ya tiene guardado y te deja seguir entrando
         // Check if user is signed in (non-null) and update UI accordingly.
         updateUI(mAuth.getCurrentUser(), true);
     }
 
     private void updateUI(FirebaseUser currentUser, Boolean start) {
         if(currentUser != null){
-            Toast.makeText(getApplicationContext(), "WELCOME!", Toast.LENGTH_LONG).show();
             openHome();
         }else{
             if(!start){
-                Toast.makeText(getApplicationContext(), "MAIL AND PASSWORD INCORRECT. TRY AGAIN", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),R.string.err_login, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -108,7 +110,32 @@ public class Login extends AppCompatActivity {
     public void openRegister(View v){
         Intent i = new Intent(this, Register.class);
         startActivity(i);
-        finish();
     }
 
+    private void showPassword() {
+        etPassword.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_RIGHT = 2;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if(!showPass){
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(new PasswordTransformationMethod());
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye, 0);
+                            showPass = true;
+                        }else {
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(null);
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye2, 0);
+                            showPass = false;
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
 }

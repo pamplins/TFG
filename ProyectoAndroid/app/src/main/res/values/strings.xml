@@ -1,15 +1,16 @@
 <resources>
     <string name="app_name">APPTFG</string>
-    <string name="et_email">Email</string>
-    <string name="et_password">Password</string>
-    <string name="et_cpassword">Cofirm password</string>
-    <string name="et_pseudonym">Pseudonym</string>
-    <string name="btn_signin">SIGN IN</string>
-    <string name="btn_signout">SIGN OUT</string>
-    <string name="btn_register">SIGN UP</string>
-    <string name="btn_createAccount">CREATE ACCOUNT</string>
-    <string name="login_name">LOGIN</string>
-    <string name="register_name">REGISTER</string>
-    <string name="home_name">HOME</string>
-
+    <string name="et_password">Contraseña</string>
+    <string name="et_userName">Usuario</string>
+    <string name="btn_signin">Iniciar Sesión</string>
+    <string name="et_email">Correo</string>
+    <string name="btn_signout">Cerrar Sesión</string>
+    <string name="tv_register">Registrarse</string>
+    <string name="tv_forget">¿Has olvidado tu contraseña?</string>
+    <string name="btn_createAccount">Crear Cuenta</string>
+    <string name="register_name">Registrar</string>
+    <string name="home_name">Inicio</string>
+    <string name="tv_welcome">¡Bienvenido a tu foro!</string>
+    <string name="err_login">Correo y/o contraseña incorrecto</string>
+    <string name="hint_spinner">Curso actual</string>
 </resources>
