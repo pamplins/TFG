@@ -15,7 +15,6 @@ public class User {
     private ImageView profileImage;
 
     public User(){
-
     }
 
     public User(String uid, String userName, String email, String course, ImageView img){
