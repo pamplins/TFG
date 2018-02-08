@@ -1,5 +1,6 @@
 package com.example.pamplins.apptfg;
 
+import android.net.Uri;
 import android.widget.ImageView;
 import java.util.HashMap;
 
@@ -12,17 +13,17 @@ public class User {
     private String userName;
     private String email;
     private String course;
-    private ImageView profileImage;
+    private String urlImage;
 
     public User(){
     }
 
-    public User(String uid, String userName, String email, String course, ImageView img){
+    public User(String uid, String userName, String email, String course, String url){
         this.uid = uid;
         this.userName = userName;
         this.email = email;
         this.course = course;
-        this.profileImage = img;
+        this.urlImage = url;
     }
 
     public String getUid() {
@@ -49,21 +50,12 @@ public class User {
         this.email = email;
     }
 
-
     public String getCourse() {
         return course;
     }
 
     public void setCourse(String course) {
         this.course = course;
-    }
-
-    public ImageView getProfileImage() {
-        return profileImage;
-    }
-
-    public void setProfileImage(ImageView profileImage) {
-        this.profileImage = profileImage;
     }
 
     @Override
@@ -78,9 +70,10 @@ public class User {
 
     public HashMap<String, String> toDictionary(){
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("userName", userName);
+        hashMap.put("uid", uid);
         hashMap.put("email", email);
         hashMap.put("course", course);
+        hashMap.put("url_profile_image", urlImage);
         return hashMap;
     }
 }

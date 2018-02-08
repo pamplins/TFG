@@ -1,42 +1,31 @@
 package com.example.pamplins.apptfg;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.database.Cursor;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
+
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.Typeface;
+
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,7 +35,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -66,12 +59,10 @@ public class Register extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPassword;
     private EditText etUserName;
-    private Button btnSignin;
     private Spinner spinner;
     FirebaseAuth mAuth;
     private boolean showPass;
-    private DatabaseReference mPostReference;
-
+    private boolean freeUserName;
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -87,9 +78,9 @@ public class Register extends AppCompatActivity {
         etPassword = findViewById(R.id.et_passwordR);
         showPassword();
         etUserName = findViewById(R.id.et_userName);
-        btnSignin = findViewById(R.id.btn_registerR);
         initSpinner();
         showPass = false;
+        freeUserName = false;
     }
 
     private void initSpinner() {
@@ -122,7 +113,6 @@ public class Register extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 final int DRAWABLE_RIGHT = 2;
-
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
                         if(!showPass){
@@ -155,7 +145,7 @@ public class Register extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             }else{
-                                etEmail.setError("Correo ya registrado");
+                                etEmail.setError(getString(R.string.err_email_exist));
                             }
 
                         }
@@ -166,42 +156,37 @@ public class Register extends AppCompatActivity {
     }
 
     private boolean checkInputs() {
-        // TODO mirar si pseudo ya esta cogido y lo del curso
+        checkDB();
         if(!userNameValidator()){ // Mostrare error por campo vacio, porque el usuario ya existe
-            etUserName.setError("Debe contener al menos 4 caracteres");
+            etUserName.setError(getString(R.string.err_email_len));
         }
         if(!emailValidator()){
-            etEmail.setError("Correo incorrecto");
+            etEmail.setError(getString(R.string.err_email_format));
         }
         if(!passwordValidator()){
-            etPassword.setError("Debe contener al menos 6 caracteres");
+            etPassword.setError(getString(R.string.err_pass_len));
         }
         if(cursValidator()){
-            ((TextView)spinner.getSelectedView()).setError("Selecciona curso");
+            ((TextView)spinner.getSelectedView()).setError(getString(R.string.err_course));
         }
-        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator()){
+        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator() && freeUserName){
             return true;
         }
         return false;
     }
 
-    private void checkDB(final FirebaseUser user) {
+    private void checkDB() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         final String name = etUserName.getText().toString().trim();
-        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.child("users").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.child("userName").getValue().toString().trim().equals(name)) {
-                        writeUserDB(user.getUid());
-                        openHome();
-                        finish();
-                    }else {
-                        etUserName.setError("Nombre usuario existente");
-                    }
+                if(!dataSnapshot.exists()){
+                    freeUserName  = true;
+                }else{
+                    etUserName.setError(getString(R.string.err_user_exist));
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -235,18 +220,22 @@ public class Register extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if(user != null){
-            checkDB(user);
+            writeUserDB(user);
+            openHome();
+            finish();
         }
     }
 
-    private void writeUserDB(String uid) {
+    private void writeUserDB(FirebaseUser uid) {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
-        User user = new User(uid, userName, email, spinnerItem, img);
 
+        ImageUtils.uploadImage(userName, img, "aux_image.jpg");
+
+        User user = new User(uid.getUid(), userName, email, spinnerItem, ImageUtils.getUriImage());
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        db.child("users").child(uid).setValue(user.toDictionary());
+        db.child("users").child(userName).setValue(user.toDictionary());
     }
 
     private void openHome() {
@@ -270,6 +259,8 @@ public class Register extends AppCompatActivity {
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                 img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
+                //TODO acabar subir imagen
+                //en vez de pasar una imagen pasaremos el uri y sin complicaciones. este imageview lo tendremos para set
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -282,21 +273,3 @@ public class Register extends AppCompatActivity {
     }
 
 }
-
-    //CUANDO VOLQUEMOS LOS USUARIOS A LA BASE DE DATOS para saber si ya esta el nombre del user. se cambiara la forma de login seguramente
-    /*
-    DatabaseReference ref = Firebase.getInstance().getReference();
-    ref.child("users").child("username").addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            if(dataSnapshot.exists()){
-                // use "username" already exists
-                // Let the user know he needs to pick another username.
-            } else {
-                // User does not exist. NOW call createUserWithEmailAndPassword
-                mAuth.createUserWithPassword(...);
-                // Your previous code here.
-
-            }
-        }*/
-

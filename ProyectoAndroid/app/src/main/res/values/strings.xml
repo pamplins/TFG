@@ -13,4 +13,11 @@
     <string name="tv_welcome">¡Bienvenido a tu foro!</string>
     <string name="err_login">Correo y/o contraseña incorrecto</string>
     <string name="hint_spinner">Curso actual</string>
+    <string name="err_email_exist">Correo ya registrado</string>
+    <string name="err_email_len">Debe contener al menos 4 caracteres</string>
+    <string name="err_email_format">Correo incorrecto</string>
+    <string name="err_pass_len">Debe contener al menos 6 caracteres</string>
+    <string name="err_course">Selecciona curso</string>
+    <string name="err_user_exist">Nombre usuario existente</string>
+
 </resources>
