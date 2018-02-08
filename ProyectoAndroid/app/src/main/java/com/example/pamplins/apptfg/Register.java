@@ -32,21 +32,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.security.AccessController.getContext;
 
 /**
  * Created by PAMPLINS on 09/01/2018.
@@ -71,6 +70,7 @@ public class Register extends AppCompatActivity {
     private Spinner spinner;
     FirebaseAuth mAuth;
     private boolean showPass;
+    private DatabaseReference mPostReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -94,11 +94,8 @@ public class Register extends AppCompatActivity {
 
     private void initSpinner() {
         spinner = findViewById(R.id.spinner);
-
         String[] courses = new String[]{"Curso actual","1º","2º","3º","4º"};
         final List<String> courseList = new ArrayList<>(Arrays.asList(courses));
-
-
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item,courseList){
             @Override
@@ -155,13 +152,10 @@ public class Register extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
-                                // Write a message to the database
-                                //TODO crear class user
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             }else{
-                                Toast.makeText(Register.this, "Correo ya registrado",
-                                        Toast.LENGTH_SHORT).show();
+                                etEmail.setError("Correo ya registrado");
                             }
 
                         }
@@ -191,21 +185,44 @@ public class Register extends AppCompatActivity {
         return false;
     }
 
+    private void checkDB(final FirebaseUser user) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        final String name = etUserName.getText().toString().trim();
+        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.child("userName").getValue().toString().trim().equals(name)) {
+                        writeUserDB(user.getUid());
+                        openHome();
+                        finish();
+                    }else {
+                        etUserName.setError("Nombre usuario existente");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
     private boolean cursValidator() {
         return (spinner.getSelectedItem().toString().equals("Curso actual"));
     }
 
     private boolean userNameValidator() {
-        return etUserName.getText().toString().length() > 3;
+        return etUserName.getText().toString().trim().length() > 3;
     }
 
     private boolean passwordValidator() {
-        return etPassword.getText().toString().length() > 5;
+        return etPassword.getText().toString().trim().length() > 5;
     }
 
 
     /**
-     * validate your email address format. Ex-akhi@mani.com
+     * validate your email address format. Ex-aa1@msn.com
      */
     private boolean emailValidator() {
         Pattern pattern;
@@ -218,9 +235,18 @@ public class Register extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if(user != null){
-            finish();
-            openHome();
+            checkDB(user);
         }
+    }
+
+    private void writeUserDB(String uid) {
+        String userName = etUserName.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String spinnerItem = spinner.getSelectedItem().toString();
+        User user = new User(uid, userName, email, spinnerItem, img);
+
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        db.child("users").child(uid).setValue(user.toDictionary());
     }
 
     private void openHome() {
@@ -228,10 +254,6 @@ public class Register extends AppCompatActivity {
         startActivity(i);
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
 
     public void openImage(View v){
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -247,11 +269,16 @@ public class Register extends AppCompatActivity {
                 Uri imageUri = imageReturnedIntent.getData();
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-               img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
+                img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
 }
