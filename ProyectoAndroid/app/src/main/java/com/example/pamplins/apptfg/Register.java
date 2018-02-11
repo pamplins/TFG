@@ -55,7 +55,6 @@ import java.util.regex.Pattern;
 
 public class Register extends AppCompatActivity {
 
-    private ImageView img;
     private EditText etEmail;
     private EditText etPassword;
     private EditText etUserName;
@@ -63,6 +62,8 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     private boolean showPass;
     private boolean freeUserName;
+    private Uri uri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -73,7 +74,6 @@ public class Register extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initElements() {
-        img = findViewById(R.id.img_user);
         etEmail = findViewById(R.id.et_emailR);
         etPassword = findViewById(R.id.et_passwordR);
         showPassword();
@@ -81,6 +81,10 @@ public class Register extends AppCompatActivity {
         initSpinner();
         showPass = false;
         freeUserName = false;
+
+        etEmail.setText("gus17@gmail.com");
+        etPassword.setText("quecontra");
+        etUserName.setText("gus17");
     }
 
     private void initSpinner() {
@@ -231,11 +235,14 @@ public class Register extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
 
-        ImageUtils.uploadImage(userName, img, "aux_image.jpg");
-
-        User user = new User(uid.getUid(), userName, email, spinnerItem, ImageUtils.getUriImage());
+        User user = new User(uid.getUid(), userName, email, spinnerItem);
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         db.child("users").child(userName).setValue(user.toDictionary());
+        //TODO cambiar la image por defecto para usuarios que no registren ninguna
+        if(null == uri){
+            uri = Uri.parse("android.resource://com.example.pamplins.apptfg/" + R.drawable.user_img);
+        }
+        ImageUtils.uploadImageProfile(userName, uri, "aux_image.jpg", db);
     }
 
     private void openHome() {
@@ -253,13 +260,16 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        //TODO subir imagen mediante la camara y pedir permisos
         if (resultCode == RESULT_OK) {
             try {
-                Uri imageUri = imageReturnedIntent.getData();
-                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                uri = imageReturnedIntent.getData();
+
+                InputStream imageStream = getContentResolver().openInputStream(uri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                ImageView img = findViewById(R.id.img_user);
+
                 img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
-                //TODO acabar subir imagen
                 //en vez de pasar una imagen pasaremos el uri y sin complicaciones. este imageview lo tendremos para set
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

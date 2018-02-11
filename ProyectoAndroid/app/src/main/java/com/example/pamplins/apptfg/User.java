@@ -1,6 +1,7 @@
 package com.example.pamplins.apptfg;
 
 import android.net.Uri;
+import android.util.Log;
 import android.widget.ImageView;
 import java.util.HashMap;
 
@@ -13,17 +14,16 @@ public class User {
     private String userName;
     private String email;
     private String course;
-    private String urlImage;
 
     public User(){
     }
 
-    public User(String uid, String userName, String email, String course, String url){
+    public User(String uid, String userName, String email, String course){
         this.uid = uid;
         this.userName = userName;
         this.email = email;
         this.course = course;
-        this.urlImage = url;
+
     }
 
     public String getUid() {
@@ -73,7 +73,6 @@ public class User {
         hashMap.put("uid", uid);
         hashMap.put("email", email);
         hashMap.put("course", course);
-        hashMap.put("url_profile_image", urlImage);
         return hashMap;
     }
 }

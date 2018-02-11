@@ -8,15 +8,18 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 
 /**
  * Created by gtenorio on 05/02/2018.
@@ -24,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 
 public class ImageUtils {
 
-    private static String urlImage;
 
     public static Bitmap getCircularBitmap(Bitmap bitmap) {
         Bitmap output;
@@ -59,41 +61,32 @@ public class ImageUtils {
         return output;
     }
 
-    public static void uploadImage(String userName, ImageView img, String name) {
-        // se mejorara para que funcione con todas las imagenes. sean de perfil o foros
-        String ref = "user_images/"+userName+"/"+name;
+    public static void uploadImageProfile(final String userName, Uri uri, String path, final DatabaseReference db) {
+        String ref = "user_images/"+userName+"/"+path;
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
 
-        // Get the data from an ImageView as bytes
-        img.setDrawingCacheEnabled(true);
-        img.buildDrawingCache();
-        Bitmap bitmap = img.getDrawingCache();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
+        mStorageRef.putFile(uri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        HashMap image = new HashMap();
+                        image.put("profile_image", downloadUrl.toString());
+                        db.child("users").child(userName).updateChildren(image);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                    }
+                });
 
-        UploadTask uploadTask = mStorageRef.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-            }
-        });
-
-        //urlImage = mStorageRef.getDownloadUrl().getResult().toString();
-        urlImage = "Actualmente petando";
     }
 
-    public static String getUriImage() {
-        return urlImage;
-    }
 }
   /*
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
