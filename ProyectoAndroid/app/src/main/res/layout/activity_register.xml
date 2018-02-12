@@ -47,12 +47,20 @@
             style="@style/spinner_style"
             android:width="2dp"
             android:prompt="@string/hint_spinner"/>
+        <ProgressBar
+            android:id="@+id/progressBarR"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center" />
 
         <Button
             android:id="@+id/btn_registerR"
             style="@style/button_style"
             android:onClick="createAccount"
             android:text="@string/btn_createAccount" />
+
     </LinearLayout>
 
 </ScrollView>

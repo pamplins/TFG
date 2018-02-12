@@ -65,7 +65,6 @@ public class ImageUtils {
         String ref = "user_images/"+userName+"/"+path;
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
-
         mStorageRef.putFile(uri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -88,6 +87,7 @@ public class ImageUtils {
     }
 
 }
+
   /*
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
         int width = image.getWidth();

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">APPTFG</string>
     <string name="et_password">Contraseña</string>
-    <string name="et_userName">Usuario</string>
+    <string name="et_userName">Usuario|Correo</string>
     <string name="btn_signin">Iniciar Sesión</string>
     <string name="et_email">Correo</string>
     <string name="btn_signout">Cerrar Sesión</string>
@@ -14,10 +14,11 @@
     <string name="err_login">Correo y/o contraseña incorrecto</string>
     <string name="hint_spinner">Curso actual</string>
     <string name="err_email_exist">Correo ya registrado</string>
-    <string name="err_email_len">Debe contener al menos 4 caracteres</string>
+    <string name="err_userName_len">Debe contener al menos 4 caracteres</string>
     <string name="err_email_format">Correo incorrecto</string>
     <string name="err_pass_len">Debe contener al menos 6 caracteres</string>
     <string name="err_course">Selecciona curso</string>
     <string name="err_user_exist">Nombre usuario existente</string>
+    <string name="err_user_not_exist">Nombre usuario inexistente</string>
 
 </resources>

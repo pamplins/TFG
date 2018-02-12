@@ -1,24 +1,40 @@
 package com.example.pamplins.apptfg;
 
+import android.*;
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import android.graphics.Color;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,10 +56,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +80,8 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     private boolean showPass;
     private boolean freeUserName;
+    private ProgressBar progressBar;
+
     private Uri uri;
 
     @Override
@@ -81,10 +101,12 @@ public class Register extends AppCompatActivity {
         initSpinner();
         showPass = false;
         freeUserName = false;
-
+        progressBar = findViewById(R.id.progressBarR);
+        progressBar.setVisibility(View.INVISIBLE);
+/*
         etEmail.setText("gus17@gmail.com");
         etPassword.setText("quecontra");
-        etUserName.setText("gus17");
+        etUserName.setText("gus17");*/
     }
 
     private void initSpinner() {
@@ -140,6 +162,14 @@ public class Register extends AppCompatActivity {
 
     public void createAccount(View v){
         if(checkInputs()) {
+            progressBar.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+
+            }, 3000);
             mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -162,7 +192,7 @@ public class Register extends AppCompatActivity {
     private boolean checkInputs() {
         checkDB();
         if(!userNameValidator()){ // Mostrare error por campo vacio, porque el usuario ya existe
-            etUserName.setError(getString(R.string.err_email_len));
+            etUserName.setError(getString(R.string.err_userName_len));
         }
         if(!emailValidator()){
             etEmail.setError(getString(R.string.err_email_format));
@@ -218,7 +248,7 @@ public class Register extends AppCompatActivity {
         Matcher matcher;
         final String EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         pattern = Pattern.compile(EMAIL_PATTERN);
-        matcher = pattern.matcher(etEmail.getText().toString());
+        matcher = pattern.matcher(etEmail.getText().toString().trim());
         return matcher.matches();
     }
 
@@ -238,9 +268,8 @@ public class Register extends AppCompatActivity {
         User user = new User(uid.getUid(), userName, email, spinnerItem);
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         db.child("users").child(userName).setValue(user.toDictionary());
-        //TODO cambiar la image por defecto para usuarios que no registren ninguna
         if(null == uri){
-            uri = Uri.parse("android.resource://com.example.pamplins.apptfg/" + R.drawable.user_img);
+            uri = Uri.parse("android.resource://com.example.pamplins.apptfg/" + R.drawable.user_default);
         }
         ImageUtils.uploadImageProfile(userName, uri, "aux_image.jpg", db);
     }
@@ -250,32 +279,56 @@ public class Register extends AppCompatActivity {
         startActivity(i);
     }
 
-
     public void openImage(View v){
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent,1);
+        final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+        builder.setTitle("Añadir imagen");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Hacer foto")) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePictureIntent, 0);
+                } else if (items[item].equals("Seleccionar de galeria")) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, 1);
+                }
+            }
+
+        });
+        builder.show();
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        //TODO subir imagen mediante la camara y pedir permisos
+        //TODO coger URI desde camara y y pedir permisos
         if (resultCode == RESULT_OK) {
-            try {
-                uri = imageReturnedIntent.getData();
-
-                InputStream imageStream = getContentResolver().openInputStream(uri);
-                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+            if(requestCode == 0){
+                Bitmap bitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 ImageView img = findViewById(R.id.img_user);
+                img.setImageBitmap(ImageUtils.getCircularBitmap(bitmap));
+            }else{
+                try {
+                    uri = imageReturnedIntent.getData();
+                    Log.d("CAMERA", uri.toString());
 
-                img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
-                //en vez de pasar una imagen pasaremos el uri y sin complicaciones. este imageview lo tendremos para set
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                    InputStream imageStream = getContentResolver().openInputStream(uri);
+                    Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    ImageView img = findViewById(R.id.img_user);
+                    img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
     }
+
+
 
     @Override
     public void onBackPressed() {
