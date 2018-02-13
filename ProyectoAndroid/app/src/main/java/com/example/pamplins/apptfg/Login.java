@@ -1,38 +1,35 @@
 package com.example.pamplins.apptfg;
-//TODO quitar que se abra el teclado al abrir la App
+
 //TODO hacer que si tocas la pantalla y no es algun campo de texto el teclado desaparezca
+
+
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Debug;
-import android.os.Handler;
+
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.android.gms.tasks.Tasks;
+
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -76,21 +73,17 @@ public class Login extends AppCompatActivity {
     public void doCheckInputs(){
         String password = etPassword.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-
-        }, 3000);
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful())
                 {
                     updateUI(mAuth.getCurrentUser(),false);
+                    progressBar.setVisibility(View.GONE);
                 }else{
-                    Toast.makeText(getApplicationContext(), "Usuario|correo y/o contraseña incorrectos", Toast.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.err_login, Snackbar.LENGTH_LONG)
+                            .show();
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
@@ -99,25 +92,97 @@ public class Login extends AppCompatActivity {
 
     public void signIn(View v) {
         email = etEmail.getText().toString().trim();
-        if(email.contains("@")){
-            doCheckInputs();
-        }else {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-            ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        email = dataSnapshot.getValue().toString().trim();
+        if(checkInputs()){
+            if(email.contains("@")){
+                doCheckInputs();
+            }else {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            email = dataSnapshot.getValue().toString().trim();
+                        }
+                        doCheckInputs();
                     }
-                    doCheckInputs();
 
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
         }
+    }
+
+    private boolean checkInputs() {
+        if(etEmail.getText().toString().trim().isEmpty()){
+            etEmail.setError("Entra el usuario o correo");
+        }
+        if(etPassword.getText().toString().trim().isEmpty()){
+            etPassword.setError("Entra la contraseña");
+        }
+        if((!etEmail.getText().toString().trim().isEmpty()) && (!etPassword.getText().toString().trim().isEmpty())){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    public void forgotPassword(View v){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(R.string.email_registred);
+        final EditText email = new EditText(this);
+        email.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        email.setHint("Correo");
+        alert.setView(email);
+        alertSendEmail(alert, email);
+        alert.setNegativeButton("Cancelar", null);
+        alert.show();
+
+    }
+
+    private void alertSendEmail(AlertDialog.Builder alert, final EditText email) {
+        alert.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                progressBar.setVisibility(View.VISIBLE);
+                if(email.getText().toString().isEmpty()) {
+                    Snackbar.make(findViewById(android.R.id.content), R.string.err_notSend_email, Snackbar.LENGTH_LONG)
+                            .show();
+                    progressBar.setVisibility(View.GONE);
+                }else{
+                    final FirebaseAuth auth = FirebaseAuth.getInstance();
+                    auth.fetchProvidersForEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                            if (task.isSuccessful()) {
+                                auth.sendPasswordResetEmail(email.getText().toString())
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Snackbar.make(findViewById(android.R.id.content), R.string.restartP, Snackbar.LENGTH_LONG)
+                                                            .show();
+                                                } else {
+                                                    Snackbar.make(findViewById(android.R.id.content), R.string.err_send_email, Snackbar.LENGTH_LONG)
+                                                            .show();
+                                                }
+                                                progressBar.setVisibility(View.GONE);
+                                            }
+                                        });
+                            }else{
+                                Snackbar.make(findViewById(android.R.id.content), R.string.email_not_registred, Snackbar.LENGTH_LONG)
+                                        .show();
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        };
+
+                    });
+
+                }
+            }
+        });
     }
 
     @Override
@@ -131,8 +196,9 @@ public class Login extends AppCompatActivity {
         if(currentUser != null){
             openHome();
         }else{
-            if(!start){ // quizas quitar toad y poner error en campos de texto
-                Toast.makeText(getApplicationContext(),R.string.err_login, Toast.LENGTH_LONG).show();
+            if(!start){
+                Snackbar.make(findViewById(android.R.id.content), R.string.err_login, Snackbar.LENGTH_LONG)
+                        .show();
             }
         }
 

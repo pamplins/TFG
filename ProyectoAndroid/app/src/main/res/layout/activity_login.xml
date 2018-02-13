@@ -41,25 +41,29 @@
             android:id="@+id/btn_registerR"
             style="@style/button_style"
             android:onClick="signIn"
-            android:text="@string/btn_signin" />
+            android:text="@string/btn_signin"
+            android:layout_marginTop="60dp"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="50dp">
+
             <TextView
                 android:id="@+id/tv_forget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tv_forget"
-                android:layout_marginLeft="60dp"/>
+                android:layout_marginLeft="60dp"
+                android:onClick="forgotPassword"
+                android:text="@string/tv_forget" />
 
             <TextView
                 android:id="@+id/tv_register"

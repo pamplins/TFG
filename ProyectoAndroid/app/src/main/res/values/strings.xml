@@ -11,7 +11,7 @@
     <string name="register_name">Registrar</string>
     <string name="home_name">Inicio</string>
     <string name="tv_welcome">¡Bienvenido a tu foro!</string>
-    <string name="err_login">Correo y/o contraseña incorrecto</string>
+    <string name="err_login">Usuario|correo y/o contraseña incorrectos</string>
     <string name="hint_spinner">Curso actual</string>
     <string name="err_email_exist">Correo ya registrado</string>
     <string name="err_userName_len">Debe contener al menos 4 caracteres</string>
@@ -20,5 +20,10 @@
     <string name="err_course">Selecciona curso</string>
     <string name="err_user_exist">Nombre usuario existente</string>
     <string name="err_user_not_exist">Nombre usuario inexistente</string>
+    <string name="err_notSend_email">No se ha enviado ningun correo electronico</string>
+    <string name="restartP">Te hemos enviado las instrucciones para reestablecer la contraseña</string>
+    <string name="err_send_email">Error al enviar correo</string>
+    <string name="email_not_registred">Correo no registrado en la base de datos</string>
+    <string name="email_registred">Entra tu correo electronico registrado</string>
 
 </resources>

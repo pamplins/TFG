@@ -52,14 +52,15 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="15dp"
             android:layout_gravity="center" />
 
         <Button
             android:id="@+id/btn_registerR"
             style="@style/button_style"
             android:onClick="createAccount"
-            android:text="@string/btn_createAccount" />
+            android:text="@string/btn_createAccount"
+            android:layout_marginBottom="30dp"/>
 
     </LinearLayout>
 

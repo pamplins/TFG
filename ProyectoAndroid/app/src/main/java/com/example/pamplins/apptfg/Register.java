@@ -1,33 +1,23 @@
 package com.example.pamplins.apptfg;
 
-import android.*;
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import android.content.pm.PackageManager;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import android.graphics.Color;
 
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
+
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,11 +27,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,17 +39,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,10 +61,8 @@ public class Register extends AppCompatActivity {
     private Spinner spinner;
     FirebaseAuth mAuth;
     private boolean showPass;
-    private boolean freeUserName;
     private ProgressBar progressBar;
-
-    private Uri uri;
+    private Bitmap bit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -100,13 +80,8 @@ public class Register extends AppCompatActivity {
         etUserName = findViewById(R.id.et_userName);
         initSpinner();
         showPass = false;
-        freeUserName = false;
         progressBar = findViewById(R.id.progressBarR);
         progressBar.setVisibility(View.INVISIBLE);
-/*
-        etEmail.setText("gus17@gmail.com");
-        etPassword.setText("quecontra");
-        etUserName.setText("gus17");*/
     }
 
     private void initSpinner() {
@@ -161,37 +136,48 @@ public class Register extends AppCompatActivity {
     }
 
     public void createAccount(View v){
-        if(checkInputs()) {
-            progressBar.setVisibility(View.VISIBLE);
-            new Handler().postDelayed(new Runnable() {
+        progressBar.setVisibility(View.VISIBLE);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        String name = etUserName.getText().toString().trim();
+        if (checkInputs()) {
+            ref.child("users").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void run() {
-                    progressBar.setVisibility(View.INVISIBLE);
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()) {
+                            mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
+                                    .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (task.isSuccessful()) {
+                                                // Sign in success, update UI with the signed-in user's information
+                                                FirebaseUser user = mAuth.getCurrentUser();
+                                                updateUI(user);
+                                                progressBar.setVisibility(View.INVISIBLE);
+
+                                            } else {
+                                                etEmail.setError(getString(R.string.err_email_exist));
+                                                progressBar.setVisibility(View.INVISIBLE);
+                                            }
+
+                                        }
+                                    });
+                    }else{
+                        etUserName.setError(getString(R.string.err_user_exist));
+                        progressBar.setVisibility(View.INVISIBLE);
+
+                    }
                 }
-
-            }, 3000);
-            mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
-                            }else{
-                                etEmail.setError(getString(R.string.err_email_exist));
-                            }
-
-                        }
-                    });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }else{
-            updateUI(null);
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
     private boolean checkInputs() {
-        checkDB();
-        if(!userNameValidator()){ // Mostrare error por campo vacio, porque el usuario ya existe
+        if(!userNameValidator()){
             etUserName.setError(getString(R.string.err_userName_len));
         }
         if(!emailValidator()){
@@ -203,28 +189,10 @@ public class Register extends AppCompatActivity {
         if(cursValidator()){
             ((TextView)spinner.getSelectedView()).setError(getString(R.string.err_course));
         }
-        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator() && freeUserName){
+        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator()){
             return true;
         }
         return false;
-    }
-
-    private void checkDB() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        final String name = etUserName.getText().toString().trim();
-        ref.child("users").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    freeUserName  = true;
-                }else{
-                    etUserName.setError(getString(R.string.err_user_exist));
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
     }
 
     private boolean cursValidator() {
@@ -265,13 +233,13 @@ public class Register extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
 
-        User user = new User(uid.getUid(), userName, email, spinnerItem);
+        User user = new User(uid.getUid(), email, spinnerItem);
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        db.child("users").child(userName).setValue(user.toDictionary());
-        if(null == uri){
-            uri = Uri.parse("android.resource://com.example.pamplins.apptfg/" + R.drawable.user_default);
+        db.child("users").child(userName).setValue(user);
+        if(null == bit){
+            bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ImageUtils.uploadImageProfile(userName, uri, "aux_image.jpg", db);
+        ImageUtils.uploadImageProfile(userName, bit, "image_profile.jpg");
     }
 
     private void openHome() {
@@ -308,18 +276,20 @@ public class Register extends AppCompatActivity {
         //TODO coger URI desde camara y y pedir permisos
         if (resultCode == RESULT_OK) {
             if(requestCode == 0){
-                Bitmap bitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 ImageView img = findViewById(R.id.img_user);
-                img.setImageBitmap(ImageUtils.getCircularBitmap(bitmap));
+                img.setDrawingCacheEnabled(true);
+                img.buildDrawingCache();
+                img.setImageBitmap(ImageUtils.getCircularBitmap(bit));
             }else{
                 try {
-                    uri = imageReturnedIntent.getData();
-                    Log.d("CAMERA", uri.toString());
-
+                    Uri uri = imageReturnedIntent.getData();
                     InputStream imageStream = getContentResolver().openInputStream(uri);
-                    Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    bit = BitmapFactory.decodeStream(imageStream);
                     ImageView img = findViewById(R.id.img_user);
-                    img.setImageBitmap(ImageUtils.getCircularBitmap(selectedImage));
+                    img.setDrawingCacheEnabled(true);
+                    img.buildDrawingCache();
+                    img.setImageBitmap(ImageUtils.getCircularBitmap(bit));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }

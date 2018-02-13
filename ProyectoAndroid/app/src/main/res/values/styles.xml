@@ -40,10 +40,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/button_style</item>
-        <item name="android:layout_margin">70dp</item>
     </style>
 
     <style name="spinner_style">
+        <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item> <!-- Posicion del Texto-->
         <item name="android:layout_width">293dp</item>
         <item name="android:layout_height">40dp</item>
