@@ -1,5 +1,6 @@
 package com.example.pamplins.apptfg;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,6 +9,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.view.inputmethod.InputMethodManager;
 
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -84,6 +86,8 @@ public class ImageUtils {
     }
 
 }
+
+
 
   /*
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {

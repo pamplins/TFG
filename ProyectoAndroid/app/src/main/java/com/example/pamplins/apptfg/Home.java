@@ -26,8 +26,4 @@ public class Home extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-
-    //                 mAuth.signOut();
-  // hacer esto en un boton para exit
-
 }

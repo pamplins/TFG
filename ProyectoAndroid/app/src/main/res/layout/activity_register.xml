@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_background"
+        android:onClick="hideKeyboard"
         android:orientation="vertical">
 
         <ImageView
@@ -46,21 +47,22 @@
             android:id="@+id/spinner"
             style="@style/spinner_style"
             android:width="2dp"
-            android:prompt="@string/hint_spinner"/>
+            android:prompt="@string/hint_spinner" />
+
         <ProgressBar
             android:id="@+id/progressBarR"
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp" />
 
         <Button
             android:id="@+id/btn_registerR"
             style="@style/button_style"
+            android:layout_marginBottom="30dp"
             android:onClick="createAccount"
-            android:text="@string/btn_createAccount"
-            android:layout_marginBottom="30dp"/>
+            android:text="@string/btn_createAccount" />
 
     </LinearLayout>
 

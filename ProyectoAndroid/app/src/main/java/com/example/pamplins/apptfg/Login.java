@@ -3,6 +3,7 @@ package com.example.pamplins.apptfg;
 //TODO hacer que si tocas la pantalla y no es algun campo de texto el teclado desaparezca
 
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -15,6 +16,7 @@ import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
@@ -43,7 +45,7 @@ public class Login extends AppCompatActivity {
     private boolean showPass;
     private String email;
 
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
 
     @Override
        protected void onCreate(Bundle savedInstanceState)  {
@@ -53,7 +55,9 @@ public class Login extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
-
+    /**
+     * Metodo encargado de inicializar los elementos
+     */
     private void initElements() {
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
@@ -63,14 +67,55 @@ public class Login extends AppCompatActivity {
         email = "";
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        updateUI(mAuth.getCurrentUser(), true);
+    }
+
+    /**
+     * Metodo encargado de abrir la pantalla de home
+     */
     private void openHome() {
         Intent i = new Intent(this, Home.class);
         startActivity(i);
         finish();
     }
 
+    /**
+     * Metodo encadago de registrar el usuario. Comprueba si se hace mediante usuario o correo
+     *
+     * @param v
+     */
+    public void signIn(View v) {
+        email = etEmail.getText().toString().trim();
+        if(checkInputs()){
+            if(email.contains("@")){
+                authentication();
+            }else {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            email = dataSnapshot.getValue().toString().trim();
+                        }
+                        authentication();
+                    }
 
-    public void doCheckInputs(){
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+    }
+
+    /***
+     * Metodo encargado de autentificar que el correo y la contraseña son de un usuario existentes
+     */
+    public void authentication(){
         String password = etPassword.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -89,31 +134,11 @@ public class Login extends AppCompatActivity {
         });
     }
 
-
-    public void signIn(View v) {
-        email = etEmail.getText().toString().trim();
-        if(checkInputs()){
-            if(email.contains("@")){
-                doCheckInputs();
-            }else {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            email = dataSnapshot.getValue().toString().trim();
-                        }
-                        doCheckInputs();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-            }
-        }
-    }
-
+    /**
+     * Metodo encargado de comprobar los diferentes campos de texto
+     *
+     * @return
+     */
     private boolean checkInputs() {
         if(etEmail.getText().toString().trim().isEmpty()){
             etEmail.setError("Entra el usuario o correo");
@@ -129,6 +154,11 @@ public class Login extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo encargado de gestionar el reestablecimiento de contraseña
+     *
+     * @param v
+     */
     public void forgotPassword(View v){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(R.string.email_registred);
@@ -143,6 +173,12 @@ public class Login extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo encargado de enviar el correo para la reestablecer la contraseña
+     *
+     * @param alert
+     * @param email
+     */
     private void alertSendEmail(AlertDialog.Builder alert, final EditText email) {
         alert.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -185,13 +221,14 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        updateUI(mAuth.getCurrentUser(), true);
-    }
 
+
+    /**
+     * Metodo encargado de recargar la interfaz de usuario
+     *
+     * @param currentUser
+     * @param start
+     */
     private void updateUI(FirebaseUser currentUser, Boolean start) {
         if(currentUser != null){
             openHome();
@@ -214,6 +251,9 @@ public class Login extends AppCompatActivity {
         startActivity(i);
     }
 
+    /**
+     * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
+     */
     private void showPassword() {
         etPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -239,5 +279,10 @@ public class Login extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    public void hideKeyboard(View v){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 }

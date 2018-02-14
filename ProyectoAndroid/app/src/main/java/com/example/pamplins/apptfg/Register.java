@@ -1,6 +1,7 @@
 package com.example.pamplins.apptfg;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -21,6 +22,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -59,7 +61,7 @@ public class Register extends AppCompatActivity {
     private EditText etPassword;
     private EditText etUserName;
     private Spinner spinner;
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     private boolean showPass;
     private ProgressBar progressBar;
     private Bitmap bit;
@@ -72,7 +74,9 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    /**
+     * Metodo encargado de inicializar los elementos
+     */
     private void initElements() {
         etEmail = findViewById(R.id.et_emailR);
         etPassword = findViewById(R.id.et_passwordR);
@@ -84,6 +88,9 @@ public class Register extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Funcion encargada de inicializar el spinner para escoger el curso
+     */
     private void initSpinner() {
         spinner = findViewById(R.id.spinner);
         String[] courses = new String[]{"Curso actual","1º","2º","3º","4º"};
@@ -108,7 +115,9 @@ public class Register extends AppCompatActivity {
         spinner.setAdapter(spinnerArrayAdapter);
     }
 
-
+    /**
+     * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
+     */
     private void showPassword() {
         etPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -135,6 +144,11 @@ public class Register extends AppCompatActivity {
         });
     }
 
+    /**
+     * Funcion encargada de crear una nueva cuenta de usuario
+     *
+     * @param v
+     */
     public void createAccount(View v){
         progressBar.setVisibility(View.VISIBLE);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
@@ -176,6 +190,11 @@ public class Register extends AppCompatActivity {
         }
     }
 
+    /**
+     * Funcion encargade de comprobar los diferentes campos de texto y el spinner
+     *
+     * @return
+     */
     private boolean checkInputs() {
         if(!userNameValidator()){
             etUserName.setError(getString(R.string.err_userName_len));
@@ -195,21 +214,36 @@ public class Register extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * Funcion encargar de comprobar la eleccion del curso
+     *
+     * @return
+     */
     private boolean cursValidator() {
         return (spinner.getSelectedItem().toString().equals("Curso actual"));
     }
 
+    /**
+     * Funcion encargada de validar el nombre de usuario
+     *
+     * @return
+     */
     private boolean userNameValidator() {
         return etUserName.getText().toString().trim().length() > 3;
     }
 
+    /**
+     * Funcion encargada de validar la contraseña
+     *
+     * @return
+     */
     private boolean passwordValidator() {
         return etPassword.getText().toString().trim().length() > 5;
     }
 
 
     /**
-     * validate your email address format. Ex-aa1@msn.com
+     * Funcion encargada de validar el correo
      */
     private boolean emailValidator() {
         Pattern pattern;
@@ -220,6 +254,11 @@ public class Register extends AppCompatActivity {
         return matcher.matches();
     }
 
+    /**
+     * Metodo encargado de recargar la interfaz de usuario
+     *
+     * @param user
+     */
     private void updateUI(FirebaseUser user) {
         if(user != null){
             writeUserDB(user);
@@ -228,6 +267,11 @@ public class Register extends AppCompatActivity {
         }
     }
 
+    /**
+     * Funcion encargada de añadir a la base de datos el nuevo usuario registrado
+     *
+     * @param uid
+     */
     private void writeUserDB(FirebaseUser uid) {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -242,11 +286,19 @@ public class Register extends AppCompatActivity {
         ImageUtils.uploadImageProfile(userName, bit, "image_profile.jpg");
     }
 
+    /**
+     * Funcion encargada de abrir la pantalla de home
+     */
     private void openHome() {
         Intent i = new Intent(this, Home.class);
         startActivity(i);
     }
 
+    /**
+     * Funcion encargada de abrir la galeria o camara para subir una imagen
+     *
+     * @param v
+     */
     public void openImage(View v){
         final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
         AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
@@ -303,6 +355,12 @@ public class Register extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+
+    public void hideKeyboard(View v){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
 }
