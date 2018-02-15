@@ -1,9 +1,5 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.View;
 
-//TODO hacer que si tocas la pantalla y no es algun campo de texto el teclado desaparezca
-
-
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -13,13 +9,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -42,11 +38,11 @@ public class Login extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPassword;
     private ProgressBar progressBar;
-    private boolean showPass;
     private String email;
 
     private FirebaseAuth mAuth;
 
+    private Controller ctrl;
     @Override
        protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -59,6 +55,7 @@ public class Login extends AppCompatActivity {
      * Metodo encargado de inicializar los elementos
      */
     private void initElements() {
+        ctrl = Controller.getInstance();
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
         showPassword();
@@ -170,7 +167,6 @@ public class Login extends AppCompatActivity {
         alertSendEmail(alert, email);
         alert.setNegativeButton("Cancelar", null);
         alert.show();
-
     }
 
     /**
@@ -215,12 +211,10 @@ public class Login extends AppCompatActivity {
                         };
 
                     });
-
                 }
             }
         });
     }
-
 
 
     /**
@@ -255,34 +249,10 @@ public class Login extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        etPassword.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        if(!showPass){
-                            etPassword.setSelection(etPassword.length());
-                            etPassword.setTransformationMethod(new PasswordTransformationMethod());
-                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye, 0);
-                            showPass = true;
-                        }else {
-                            etPassword.setSelection(etPassword.length());
-                            etPassword.setTransformationMethod(null);
-                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye2, 0);
-                            showPass = false;
-                        }
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        Utils.showPassword(etPassword);
     }
 
     public void hideKeyboard(View v){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        ctrl.hideKeyboard(this);
     }
 }

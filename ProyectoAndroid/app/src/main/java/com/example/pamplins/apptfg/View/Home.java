@@ -1,10 +1,11 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.View;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.example.pamplins.apptfg.R;
 import com.google.firebase.auth.FirebaseAuth;
 /**
  * Created by PAMPLINS on 02/01/2018.

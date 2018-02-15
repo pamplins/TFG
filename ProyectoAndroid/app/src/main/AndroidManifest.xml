@@ -5,12 +5,8 @@
     <uses-feature android:name="android.hardware.camera"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -20,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         >
-        <activity android:name=".Login"
+        <activity android:name=".View.Login"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,23 +25,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Home"
-            android:parentActivityName=".Login"
+            android:name=".View.Home"
+            android:parentActivityName=".View.Login"
             android:label="@string/home_name">
              <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Login" />
+                android:value=".View.Login" />
         </activity>
         <activity
-            android:name=".Register"
-            android:parentActivityName=".Login"
+            android:name=".View.Register"
+            android:parentActivityName=".View.Login"
             android:label="@string/register_name"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Login" />
+                android:value=".View.Login" />
         </activity>
     </application>
 

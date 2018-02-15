@@ -29,5 +29,6 @@
 
     <string name="email_not_registred">Correo no registrado en la base de datos</string>
     <string name="email_registred">Entra tu correo electronico registrado</string>
+    <string name="permiss">Debes aceptar los permisos para hacer uso de esta función</string>
 
 </resources>

@@ -9,9 +9,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.method.PasswordTransformationMethod;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 
+import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -24,8 +29,8 @@ import java.io.ByteArrayOutputStream;
  * Created by gtenorio on 05/02/2018.
  */
 
-public class ImageUtils {
-
+public class Utils {
+    private static boolean showPass = false;
 
     public static Bitmap getCircularBitmap(Bitmap bitmap) {
         Bitmap output;
@@ -81,6 +86,35 @@ public class ImageUtils {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            }
+        });
+    }
+
+
+
+    public static void showPassword(final EditText etPassword) {
+        etPassword.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_RIGHT = 2;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if(!showPass){
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(new PasswordTransformationMethod());
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye, 0);
+                            showPass = true;
+                        }else {
+                            etPassword.setSelection(etPassword.length());
+                            etPassword.setTransformationMethod(null);
+                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye2, 0);
+                            showPass = false;
+                        }
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }

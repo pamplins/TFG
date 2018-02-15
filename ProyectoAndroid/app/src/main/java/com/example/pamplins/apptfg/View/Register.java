@@ -1,7 +1,6 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.View;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -16,13 +15,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.PasswordTransformationMethod;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,6 +27,9 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.Utils;
+import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 
 import com.google.android.gms.tasks.Task;
@@ -62,9 +62,10 @@ public class Register extends AppCompatActivity {
     private EditText etUserName;
     private Spinner spinner;
     private FirebaseAuth mAuth;
-    private boolean showPass;
     private ProgressBar progressBar;
     private Bitmap bit;
+
+    private Controller ctrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -78,12 +79,12 @@ public class Register extends AppCompatActivity {
      * Metodo encargado de inicializar los elementos
      */
     private void initElements() {
+        ctrl = Controller.getInstance();
         etEmail = findViewById(R.id.et_emailR);
         etPassword = findViewById(R.id.et_passwordR);
         showPassword();
         etUserName = findViewById(R.id.et_userName);
         initSpinner();
-        showPass = false;
         progressBar = findViewById(R.id.progressBarR);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -119,29 +120,7 @@ public class Register extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        etPassword.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int DRAWABLE_RIGHT = 2;
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (etPassword.getRight() - etPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        if(!showPass){
-                            etPassword.setSelection(etPassword.length());
-                            etPassword.setTransformationMethod(new PasswordTransformationMethod());
-                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye, 0);
-                            showPass = true;
-                        }else {
-                            etPassword.setSelection(etPassword.length());
-                            etPassword.setTransformationMethod(null);
-                            etPassword.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.eye2, 0);
-                            showPass = false;
-                        }
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        Utils.showPassword(etPassword);
     }
 
     /**
@@ -167,7 +146,6 @@ public class Register extends AppCompatActivity {
                                                 FirebaseUser user = mAuth.getCurrentUser();
                                                 updateUI(user);
                                                 progressBar.setVisibility(View.INVISIBLE);
-
                                             } else {
                                                 etEmail.setError(getString(R.string.err_email_exist));
                                                 progressBar.setVisibility(View.INVISIBLE);
@@ -270,20 +248,17 @@ public class Register extends AppCompatActivity {
     /**
      * Funcion encargada de añadir a la base de datos el nuevo usuario registrado
      *
-     * @param uid
+     * @param user
      */
-    private void writeUserDB(FirebaseUser uid) {
+    private void writeUserDB(FirebaseUser user) {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
-
-        User user = new User(uid.getUid(), email, spinnerItem);
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        db.child("users").child(userName).setValue(user);
+        Controller.writeUserDB(user.getUid(), userName, email, spinnerItem);
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ImageUtils.uploadImageProfile(userName, bit, "image_profile.jpg");
+        Utils.uploadImageProfile(userName, bit, "image_profile.jpg");
     }
 
     /**
@@ -295,44 +270,56 @@ public class Register extends AppCompatActivity {
     }
 
     /**
-     * Funcion encargada de abrir la galeria o camara para subir una imagen
+     * Funcion encargada de
      *
      * @param v
      */
     public void openImage(View v){
+        if(Controller.verifyPermissions(this)) {
+            openAlert();
+        }else{
+            Snackbar.make(findViewById(android.R.id.content), R.string.permiss, Snackbar.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+    /**
+     * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
+     */
+    private void openAlert() {
         final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
         AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
         builder.setTitle("Añadir imagen");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Hacer foto")) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePictureIntent, 0);
-                } else if (items[item].equals("Seleccionar de galeria")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");
-                    startActivityForResult(intent, 1);
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (items[item].equals("Hacer foto")) {
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(takePictureIntent, 0);
+
+                    } else if (items[item].equals("Seleccionar de galeria")) {
+
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        intent.setType("image/*");
+                        startActivityForResult(intent, 1);
+                    }
                 }
-            }
 
-        });
-        builder.show();
+            });
+            builder.show();
     }
-
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        //TODO coger URI desde camara y y pedir permisos
         if (resultCode == RESULT_OK) {
             if(requestCode == 0){
                 bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 ImageView img = findViewById(R.id.img_user);
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
-                img.setImageBitmap(ImageUtils.getCircularBitmap(bit));
+                img.setImageBitmap(Utils.getCircularBitmap(bit));
             }else{
                 try {
                     Uri uri = imageReturnedIntent.getData();
@@ -341,7 +328,7 @@ public class Register extends AppCompatActivity {
                     ImageView img = findViewById(R.id.img_user);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
-                    img.setImageBitmap(ImageUtils.getCircularBitmap(bit));
+                    img.setImageBitmap(Utils.getCircularBitmap(bit));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -359,8 +346,7 @@ public class Register extends AppCompatActivity {
 
 
     public void hideKeyboard(View v){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+       ctrl.hideKeyboard(this);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.Model;
 
 
 /**
