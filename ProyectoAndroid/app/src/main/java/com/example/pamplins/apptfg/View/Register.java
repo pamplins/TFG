@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -265,7 +266,7 @@ public class Register extends AppCompatActivity {
      * Funcion encargada de abrir la pantalla de home
      */
     private void openHome() {
-        Intent i = new Intent(this, Home.class);
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
 

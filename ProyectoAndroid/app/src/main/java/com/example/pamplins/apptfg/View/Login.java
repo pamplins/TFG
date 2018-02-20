@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.Fragments.HomeFragment;
+import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -75,7 +77,7 @@ public class Login extends AppCompatActivity {
      * Metodo encargado de abrir la pantalla de home
      */
     private void openHome() {
-        Intent i = new Intent(this, Home.class);
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
     }
@@ -91,6 +93,7 @@ public class Login extends AppCompatActivity {
             if(email.contains("@")){
                 authentication();
             }else {
+                //TODO aqui es donde deberia de meter el for
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                 ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

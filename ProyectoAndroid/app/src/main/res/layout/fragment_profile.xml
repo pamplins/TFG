@@ -1,0 +1,24 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.pamplins.apptfg.Fragments.ProfileFragment"
+    android:background="@drawable/gradient_background">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top"
+        android:text="PERFIL"
+        android:textSize="24sp" />
+
+
+    <Button
+        android:id="@+id/btn_signout"
+        style="@style/button_style"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+
+        android:text="@string/btn_signout" />
+
+</FrameLayout>

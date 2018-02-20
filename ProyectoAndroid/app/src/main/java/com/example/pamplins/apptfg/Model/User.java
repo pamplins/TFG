@@ -9,14 +9,24 @@ public class User {
     private String uid;
     private String email;
     private String course;
+    private String userName;
 
     public User(){
     }
 
-    public User(String uid, String email, String course){
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public User(String uid, String email, String course, String userName){
         this.uid = uid;
         this.email = email;
         this.course = course;
+        this.userName = userName;
     }
 
     public String getUid() {
