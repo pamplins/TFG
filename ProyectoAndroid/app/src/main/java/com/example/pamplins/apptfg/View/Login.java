@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Fragments.HomeFragment;
 import com.example.pamplins.apptfg.MainActivity;
+import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -93,21 +94,25 @@ public class Login extends AppCompatActivity {
             if(email.contains("@")){
                 authentication();
             }else {
-                //TODO aqui es donde deberia de meter el for
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                ref.child("users").child(email).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            email = dataSnapshot.getValue().toString().trim();
-                        }
-                        authentication();
-                    }
+                DatabaseReference users = FirebaseDatabase.getInstance().getReference("users");
+                users.orderByChild("userName").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                 @Override
+                 public void onDataChange(DataSnapshot dataSnapshot) {
+                     if(dataSnapshot.exists()){
+                         User user = null;
+                         for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                             user = childSnapshot.getValue(User.class);
+                         }
+                         email = user.getEmail();
+                     }
+                     authentication();
+                 }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                 @Override
+                 public void onCancelled(DatabaseError databaseError) {
+
+                 }
+             });
             }
         }
     }

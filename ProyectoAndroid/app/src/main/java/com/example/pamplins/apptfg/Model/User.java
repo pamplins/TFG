@@ -6,12 +6,19 @@ package com.example.pamplins.apptfg.Model;
  */
 
 public class User {
-    private String uid;
     private String email;
     private String course;
     private String userName;
 
     public User(){
+    }
+
+
+
+    public User(String userName, String email, String course){
+        this.userName = userName;
+        this.email = email;
+        this.course = course;
     }
 
     public String getUserName() {
@@ -20,21 +27,6 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public User(String uid, String email, String course, String userName){
-        this.uid = uid;
-        this.email = email;
-        this.course = course;
-        this.userName = userName;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getEmail() {
@@ -56,7 +48,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                " uid='" + uid + '\'' +
+                " userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", course='" + course + '\'' +
                 '}';

@@ -25,14 +25,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".View.Home"
-            android:parentActivityName=".View.Login"
-            android:label="@string/home_name">
-             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.Login" />
-        </activity>
-        <activity
             android:name=".View.Register"
             android:parentActivityName=".View.Login"
             android:label="@string/register_name"
@@ -48,6 +40,8 @@
             android:parentActivityName=".MainActivity"
             android:label="MAIN">
         </activity>
+        <activity android:name=".PostDetailActivity"></activity>
+
     </application>
 
 </manifest>

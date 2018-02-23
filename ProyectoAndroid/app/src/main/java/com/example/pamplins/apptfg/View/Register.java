@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.MainActivity;
+import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -131,39 +132,42 @@ public class Register extends AppCompatActivity {
      */
     public void createAccount(View v){
         progressBar.setVisibility(View.VISIBLE);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         String name = etUserName.getText().toString().trim();
         if (checkInputs()) {
-            ref.child("users").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.exists()) {
-                            mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
-                                    .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<AuthResult> task) {
-                                            if (task.isSuccessful()) {
-                                                // Sign in success, update UI with the signed-in user's information
-                                                FirebaseUser user = mAuth.getCurrentUser();
-                                                updateUI(user);
-                                                progressBar.setVisibility(View.INVISIBLE);
-                                            } else {
-                                                etEmail.setError(getString(R.string.err_email_exist));
-                                                progressBar.setVisibility(View.INVISIBLE);
-                                            }
+            DatabaseReference users = FirebaseDatabase.getInstance().getReference("users");
+            users.orderByChild("userName").equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
+                 @Override
+                 public void onDataChange(DataSnapshot dataSnapshot) {
+                     if(!dataSnapshot.exists()){
+                         mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
+                             .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                                 @Override
+                                 public void onComplete(@NonNull Task<AuthResult> task) {
+                                     if (task.isSuccessful()) {
+                                         // Sign in success, update UI with the signed-in user's information
+                                         FirebaseUser user = mAuth.getCurrentUser();
+                                         updateUI(user);
+                                         progressBar.setVisibility(View.INVISIBLE);
+                                     } else {
+                                         etEmail.setError(getString(R.string.err_email_exist));
+                                         progressBar.setVisibility(View.INVISIBLE);
+                                     }
 
-                                        }
-                                    });
-                    }else{
-                        etUserName.setError(getString(R.string.err_user_exist));
-                        progressBar.setVisibility(View.INVISIBLE);
+                                 }
+                             });
+                     }
+                     else{
+                         etUserName.setError(getString(R.string.err_user_exist));
+                         progressBar.setVisibility(View.INVISIBLE);
+                     }
+                 }
+                 @Override
+                 public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
+                 }
+
+                });
+
         }else{
             progressBar.setVisibility(View.INVISIBLE);
         }
@@ -259,7 +263,7 @@ public class Register extends AppCompatActivity {
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        Utils.uploadImageProfile(userName, bit, "image_profile.jpg");
+        Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 
     /**

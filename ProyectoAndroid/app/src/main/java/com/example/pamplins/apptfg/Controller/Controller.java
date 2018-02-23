@@ -41,11 +41,15 @@ public class Controller {
     }
 
     public static void writeUserDB(String uid, String userName, String email, String spinnerItem) {
-        user = new User(uid, email, spinnerItem, userName);
+        user = new User(userName, email, spinnerItem);
         db = FirebaseDatabase.getInstance().getReference();
-        db.child("users").child(userName).setValue(user);
+        db.child("users").child(uid).setValue(user);
     }
 
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
 
     public static FirebaseUser getCurrentUser(){
         mAuth = FirebaseAuth.getInstance().getCurrentUser();

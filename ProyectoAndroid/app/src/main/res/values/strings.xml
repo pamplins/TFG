@@ -2,6 +2,7 @@
     <string name="app_name">APPTFG</string>
     <string name="et_password">Contraseña</string>
     <string name="et_userName">Usuario|Correo</string>
+    <string name="et_userNameR">Usuario</string>
     <string name="btn_signin">Iniciar Sesión</string>
     <string name="et_email">Correo</string>
     <string name="btn_signout">Cerrar Sesión</string>
@@ -25,6 +26,7 @@
     <string name="err_notSend_email">No se ha enviado ningún correo electronico</string>
     <string name="restartP">Te hemos enviado las instrucciones para reestablecer la contraseña</string>
     <string name="err_send_email">Error al enviar correo</string>
+    <string name="err_post">Este usuario ya no se encuentra en la base de datos"</string>
 
 
     <string name="email_not_registred">Correo no registrado en la base de datos</string>
