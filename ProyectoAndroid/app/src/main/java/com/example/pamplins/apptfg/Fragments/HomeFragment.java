@@ -2,7 +2,6 @@ package com.example.pamplins.apptfg.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,23 +9,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.example.pamplins.apptfg.PostDetailActivity;
-import com.example.pamplins.apptfg.PostViewHolder;
+import com.example.pamplins.apptfg.DoubtViewHolder;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.View.Login;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 
 /**
@@ -36,11 +31,8 @@ import com.google.firebase.database.Transaction;
 public class HomeFragment extends Fragment {
     private static final String TAG = "PostListFragment";
 
-    // [START define_database_reference]
     private DatabaseReference mDatabase;
-    // [END define_database_reference]
-
-    private FirebaseRecyclerAdapter<Doubt, PostViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private Controller ctrl;
@@ -60,9 +52,7 @@ public class HomeFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference("doubts");
-        // [END create_database_reference]
 
         mRecycler = rootView.findViewById(R.id.messages_list);
         mRecycler.setHasFixedSize(true);
@@ -74,39 +64,35 @@ public class HomeFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
 
-        // Set up FirebaseRecyclerAdapter with the Query
-
+        // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
                 .setQuery(mDatabase, Doubt.class)
                 .build();
 
-        mAdapter = new FirebaseRecyclerAdapter<Doubt, PostViewHolder>(options) {
+        mAdapter = new FirebaseRecyclerAdapter<Doubt, DoubtViewHolder>(options) {
 
 
             @Override
-            public PostViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                return new PostViewHolder(inflater.inflate(R.layout.item_post, viewGroup, false));
+            public DoubtViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+                View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_post, viewGroup, false);
+                return new DoubtViewHolder(v);
             }
 
+            // Abrir una duda X de la lista de home
             @Override
-            protected void onBindViewHolder(PostViewHolder viewHolder, int position, final Doubt model) {
+            protected void onBindViewHolder(DoubtViewHolder viewHolder, int position, final Doubt model) {
                 final DatabaseReference postRef = getRef(position);
-
-                // Set click listener for the whole post view
                 final String postKey = postRef.getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Launch PostDetailActivity
-                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
+                        Intent intent = new Intent(getActivity(), DoubtDetailActivity.class);
+                        intent.putExtra(DoubtDetailActivity.EXTRA_POST_KEY, postKey);
                         startActivity(intent);
                     }
                 });
@@ -118,9 +104,7 @@ public class HomeFragment extends Fragment {
                     viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
                 }*/
 
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-
-
+                // Poner los valores en la caja de duda de home
                viewHolder.bindToPost(model, new View.OnClickListener() {
                     @Override
                     public void onClick(View starView) {
@@ -188,10 +172,4 @@ public class HomeFragment extends Fragment {
             mAdapter.stopListening();
         }
     }
-
-
-    public Query getQuery(DatabaseReference databaseReference) {
-        return null;
-    }
-
 }

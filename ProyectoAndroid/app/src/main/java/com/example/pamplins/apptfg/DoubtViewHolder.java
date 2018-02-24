@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Model.Doubt;
 
-public class PostViewHolder extends RecyclerView.ViewHolder {
+public class DoubtViewHolder extends RecyclerView.ViewHolder {
 
     public TextView titleView;
     public TextView authorView;
@@ -19,7 +19,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     public TextView numStarsView;
     public TextView bodyView;
 
-    public PostViewHolder(View itemView) {
+    public DoubtViewHolder(View itemView) {
         super(itemView);
 
         titleView = itemView.findViewById(R.id.post_title);

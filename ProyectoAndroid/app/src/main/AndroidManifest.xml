@@ -40,7 +40,8 @@
             android:parentActivityName=".MainActivity"
             android:label="MAIN">
         </activity>
-        <activity android:name=".PostDetailActivity"></activity>
+        <activity android:name=".DoubtDetailActivity"
+            android:windowSoftInputMode="stateHidden"></activity>
 
     </application>
 
