@@ -10,31 +10,48 @@
     tools:context=".DoubtDetailActivity"
     android:background="@drawable/gradient_background">
 
-    <include
-        android:id="@+id/post_author_layout"
-        layout="@layout/include_post_author"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true" />
+        android:orientation="vertical"
+        android:id="@+id/linear_doubt"
+        android:background="@color/borderColor">
 
-    <include
-        android:id="@+id/post_text_layout"
-        layout="@layout/include_post_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/post_author_layout"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="10dp" />
+        <include
+            android:id="@+id/post_author_layout"
+            layout="@layout/include_doubt_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true" />
+
+        <include
+            android:id="@+id/post_text_layout"
+            layout="@layout/include_doubt_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/post_author_layout"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_comments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linear_doubt"
+        tools:listitem="@layout/item_comment" />
 
     <LinearLayout
         android:id="@+id/comment_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@+id/post_text_layout"
         android:layout_marginTop="20dp"
-        android:weightSum="1.0">
+        android:weightSum="1.0"
+
+        android:layout_alignParentBottom="true" >
 
         <EditText
             android:id="@+id/field_comment_text"
@@ -49,15 +66,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/send_button"
-          />
+            />
 
     </LinearLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_comments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/comment_form"
-        tools:listitem="@layout/item_comment" />
-
 </RelativeLayout>

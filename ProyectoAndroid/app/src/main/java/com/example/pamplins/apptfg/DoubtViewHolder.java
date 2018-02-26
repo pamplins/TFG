@@ -33,8 +33,8 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getAuthor());
         numStarsView.setText(String.valueOf(doubt.getLikesCount()));
+        //TODO limitar el nombre de palabras cuando se muestra en el HOME
         bodyView.setText(doubt.getDescription());
-
         starView.setOnClickListener(starClickListener);
     }
 }
