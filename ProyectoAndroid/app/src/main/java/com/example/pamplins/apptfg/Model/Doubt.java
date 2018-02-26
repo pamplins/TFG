@@ -9,6 +9,9 @@ public class Doubt {
     private String title;
     private String description;
     private int likesCount = 0;
+    //private String timeAgo; //quizas es calendar o data
+    //private String course;
+    //private int dislikesCount;
     //private Map<String, Boolean> stars = new HashMap<>();
 
     public Doubt() {

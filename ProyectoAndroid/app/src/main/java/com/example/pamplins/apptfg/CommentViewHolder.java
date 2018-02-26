@@ -2,7 +2,6 @@ package com.example.pamplins.apptfg;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,134 +23,112 @@ import java.util.List;
 
 public class CommentViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView authorView;
-    public TextView bodyView;
+    public TextView tvAuthor;
+    public TextView tvDescription;
+
 
     public CommentViewHolder(View itemView) {
         super(itemView);
 
-        authorView = itemView.findViewById(R.id.comment_author);
-        bodyView = itemView.findViewById(R.id.comment_body);
+        tvAuthor = itemView.findViewById(R.id.comment_author);
+        tvDescription = itemView.findViewById(R.id.comment_body);
     }
 
 
     public static class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
 
-        private Context mContext;
-        private DatabaseReference mDatabaseReference;
-        private ChildEventListener mChildEventListener;
+        private Context ctx;
+        private DatabaseReference databaseReference;
+        private ChildEventListener childEventListener;
 
-        private List<String> mCommentIds = new ArrayList<>();
-        private List<Comment> mComments = new ArrayList<>();
+        private List<String> commentIds = new ArrayList<>();
+        private List<Comment> comments = new ArrayList<>();
 
         public CommentAdapter(final Context context, DatabaseReference ref) {
-            mContext = context;
-            mDatabaseReference = ref;
+            ctx = context;
+            databaseReference = ref;
 
-            // Create child event listener
-            // [START child_event_listener_recycler]
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
 
-                    // A new comment has been added, add it to the displayed list
                     Comment comment = dataSnapshot.getValue(Comment.class);
 
-                    // [START_EXCLUDE]
-                    // Update RecyclerView
-                    mCommentIds.add(dataSnapshot.getKey());
-                    mComments.add(comment);
-                    notifyItemInserted(mComments.size() - 1);
-                    // [END_EXCLUDE]
+                    commentIds.add(dataSnapshot.getKey());
+                    comments.add(comment);
+                    notifyItemInserted(comments.size() - 1);
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-
-                    // A comment has changed, use the key to determine if we are displaying this
-                    // comment and if so displayed the changed comment.
                     Comment newComment = dataSnapshot.getValue(Comment.class);
                     String commentKey = dataSnapshot.getKey();
 
-                    // [START_EXCLUDE]
-                    int commentIndex = mCommentIds.indexOf(commentKey);
+                    int commentIndex = commentIds.indexOf(commentKey);
                     if (commentIndex > -1) {
-                        // Replace with the new data
-                        mComments.set(commentIndex, newComment);
+                        comments.set(commentIndex, newComment);
 
-                        // Update the RecyclerView
                         notifyItemChanged(commentIndex);
                     } else {
                     }
-                    // [END_EXCLUDE]
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    // A comment has changed, use the key to determine if we are displaying this
-                    // comment and if so remove it.
                     String commentKey = dataSnapshot.getKey();
 
-                    // [START_EXCLUDE]
-                    int commentIndex = mCommentIds.indexOf(commentKey);
+                    int commentIndex = commentIds.indexOf(commentKey);
                     if (commentIndex > -1) {
-                        // Remove data from the list
-                        mCommentIds.remove(commentIndex);
-                        mComments.remove(commentIndex);
+                        commentIds.remove(commentIndex);
+                        comments.remove(commentIndex);
 
-                        // Update the RecyclerView
                         notifyItemRemoved(commentIndex);
                     }
-                    // [END_EXCLUDE]
                 }
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
 
-                    // A comment has changed position, use the key to determine if we are
-                    // displaying this comment and if so move it.
+                    // Ver que si un comentario tiene muchos votos. ponerlo como primera posicion en el foro ya que es la top response
                     Comment movedComment = dataSnapshot.getValue(Comment.class);
                     String commentKey = dataSnapshot.getKey();
 
-                    // ...
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(mContext, "Failed to load comments.",
+                    Toast.makeText(ctx, "Failed to load comments.",
                             Toast.LENGTH_SHORT).show();
                 }
             };
             ref.addChildEventListener(childEventListener);
-            // [END child_event_listener_recycler]
 
-            // Store reference to listener so it can be removed on app stop
-            mChildEventListener = childEventListener;
+            this.childEventListener = childEventListener;
         }
 
         @Override
         public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
+            LayoutInflater inflater = LayoutInflater.from(ctx);
             View view = inflater.inflate(R.layout.item_comment, parent, false);
             return new CommentViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(CommentViewHolder holder, int position) {
-            Comment comment = mComments.get(position);
-            holder.authorView.setText(comment.author);
-            holder.bodyView.setText(comment.text);
+            Comment comment = comments.get(position);
+            holder.tvAuthor.setText(comment.author);
+            holder.tvDescription.setText(comment.text);
         }
 
         @Override
         public int getItemCount() {
-            return mComments.size();
+            return comments.size();
         }
 
         public void cleanupListener() {
-            if (mChildEventListener != null) {
-                mDatabaseReference.removeEventListener(mChildEventListener);
+            if (childEventListener != null) {
+                databaseReference.removeEventListener(childEventListener);
             }
         }
 
