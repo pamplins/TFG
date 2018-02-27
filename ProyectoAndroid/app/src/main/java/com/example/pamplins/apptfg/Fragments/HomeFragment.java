@@ -1,7 +1,10 @@
 package com.example.pamplins.apptfg.Fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,20 +12,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.DoubtViewHolder;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
+import com.example.pamplins.apptfg.View.Login;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by Gustavo on 17/02/2018.
@@ -42,9 +53,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -76,7 +85,6 @@ public class HomeFragment extends Fragment {
 
         mAdapter = new FirebaseRecyclerAdapter<Doubt, DoubtViewHolder>(options) {
 
-
             @Override
             public DoubtViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
                 View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_doubt, viewGroup, false);
@@ -105,7 +113,7 @@ public class HomeFragment extends Fragment {
                 }*/
 
                 // Poner los valores en la caja de duda de home
-               viewHolder.bindToPost(model, new View.OnClickListener() {
+               viewHolder.bindToPost(model, getActivity(), new View.OnClickListener() {
                     @Override
                     public void onClick(View starView) {
                         // Need to write to both places the post is stored

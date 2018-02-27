@@ -3,13 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.pamplins.apptfg.Fragments.SearchFragment"
-    android:background="@drawable/gradient_background">
+    android:background="@color/backGround">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:text="BUSCAR"
         android:textSize="24sp"
-        android:text="BUSCAR" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity = "center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorName" />
 
 </FrameLayout>

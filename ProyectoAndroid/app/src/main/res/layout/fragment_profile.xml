@@ -3,14 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.pamplins.apptfg.Fragments.ProfileFragment"
-    android:background="@drawable/gradient_background">
+    android:background="@color/backGround">
 
     <TextView
+        android:text="MI PERFIL"
+        android:textSize="24sp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity = "center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="top"
-        android:text="PERFIL"
-        android:textSize="24sp" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorName" />
 
 
     <Button
@@ -18,7 +21,6 @@
         style="@style/button_style"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-
         android:text="@string/btn_signout" />
 
 </FrameLayout>

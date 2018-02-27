@@ -1,6 +1,9 @@
 package com.example.pamplins.apptfg.Fragments;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -14,13 +17,20 @@ import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -59,7 +69,7 @@ public class NewDoubtFragment extends Fragment {
                 container, false);
 
         etTitle = view.findViewById(R.id.et_title_new_post);
-        etDescription = view.findViewById(R.id.et_description_new_post);
+        etDescription = view.findViewById(R.id.description);
 
         Button button = view.findViewById(R.id.btn_newDoubt);
         button.setOnClickListener(new View.OnClickListener()
@@ -80,33 +90,69 @@ public class NewDoubtFragment extends Fragment {
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
 
-        // habra comprobacion de minimo y maximo para cada uno
+         if (checkInputs(title, description)){
+            // habra comprobacion de minimo y maximo para cada uno
 
-        mDatabase.child("users").child(ctrl.getUid()).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                        if (user != null) {
-                            writeNewDoubt(ctrl.getUid(), user.getUserName(), title, description);
-                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente" , Snackbar.LENGTH_LONG)
-                                    .show();
-                        } else {
-                            Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
-                                    .show();
+            mDatabase.child("users").child(ctrl.getUid()).addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            final User user = dataSnapshot.getValue(User.class);
+
+                            // Reference to an image file in Firebase Storage
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("user_images/"+ctrl.getUid()+"/image_profile.jpg");
+                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+
+
+                                    if (user != null) {
+                                        writeNewDoubt(ctrl.getUid(), user.getUserName(), title, description, uri.toString());
+                                        ctrl.hideKeyboard(getActivity());
+                                        Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente" , Snackbar.LENGTH_LONG)
+                                                .show();
+                                    } else {
+                                        Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
+                                                .show();
+                                    }
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+
+                                }
+                            });
+
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+        }
+
 
     }
 
-    private void writeNewDoubt(String userId, String username, String title, String body) {
+    private boolean checkInputs(String title, String description){
+        if(title.isEmpty()){
+            etTitle.setError("Entra titulo");
+        }
+        if(description.isEmpty()){
+            etDescription.setError("Entra descripcion");
+        }
+
+        if((!title.isEmpty()) && (!title.isEmpty())){
+            return true;
+        }
+        return false;
+
+    }
+    private void writeNewDoubt(String userId, String username, String title, String body, String uri) {
         String key = mDatabase.child("doubts").push().getKey();
-        Doubt doubt = new Doubt(userId, username, title, body);
+        String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        Doubt doubt = new Doubt(userId, username, title, body, date, uri);
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/doubts/" + key, doubt);
         childUpdates.put("/user_doubts/" + userId + "/" + key, doubt);

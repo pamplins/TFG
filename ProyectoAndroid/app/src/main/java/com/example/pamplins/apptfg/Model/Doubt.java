@@ -9,7 +9,9 @@ public class Doubt {
     private String title;
     private String description;
     private int likesCount = 0;
-    //private String timeAgo; //quizas es calendar o data
+    private String date;
+
+    private String urlImagePerfil;
     //private String course;
     //private int dislikesCount;
     //private Map<String, Boolean> stars = new HashMap<>();
@@ -17,11 +19,13 @@ public class Doubt {
     public Doubt() {
     }
 
-    public Doubt(String uid, String author, String title, String description) {
+    public Doubt(String uid, String author, String title, String description, String date, String urlImagePerfil) {
         this.uid = uid;
         this.author = author;
         this.title = title;
         this.description = description;
+        this.date = date;
+        this.urlImagePerfil = urlImagePerfil;
     }
 
 
@@ -63,6 +67,22 @@ public class Doubt {
 
     public void setLikesCount(int likesCount) {
         this.likesCount = likesCount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getUrlImagePerfil() {
+        return urlImagePerfil;
+    }
+
+    public void setUrlImagePerfil(String urlImagePerfil) {
+        this.urlImagePerfil = urlImagePerfil;
     }
 
     @Override

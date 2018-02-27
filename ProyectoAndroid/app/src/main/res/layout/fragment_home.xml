@@ -4,16 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.pamplins.apptfg.Fragments.HomeFragment"
-    android:background="@drawable/gradient_background"
+    android:background="@color/backGround"
     android:orientation="vertical">
     <TextView
         android:text="ULTIMOS FOROS"
         android:textSize="24sp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:gravity = "center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorName" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"

@@ -7,5 +7,6 @@
     <color name="colorButton">#716c6c</color>
     <color name="borderColor">#ffffff</color>
     <color name="colorName">#4173be</color>
-    <color name="colorTextDoubt">#c1c3c6</color>
+    <color name="colorTextDoubt">#5c5d5e</color>
+    <color name="backGround">#f2f3f5</color>
 </resources>

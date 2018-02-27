@@ -1,13 +1,20 @@
 package com.example.pamplins.apptfg;
 
+import android.app.Activity;
+import android.arch.lifecycle.HolderFragment;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,13 +32,14 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
 
     public TextView tvAuthor;
     public TextView tvDescription;
-
+    public ImageView img;
 
     public CommentViewHolder(View itemView) {
         super(itemView);
 
         tvAuthor = itemView.findViewById(R.id.comment_author);
         tvDescription = itemView.findViewById(R.id.comment_body);
+        img = itemView.findViewById(R.id.comment_photo);
     }
 
 
@@ -43,11 +51,12 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
 
         private List<String> commentIds = new ArrayList<>();
         private List<Comment> comments = new ArrayList<>();
+        private Activity activity;
 
-        public CommentAdapter(final Context context, DatabaseReference ref) {
+        public CommentAdapter(final Context context, Activity activity, DatabaseReference ref) {
             ctx = context;
             databaseReference = ref;
-
+            this.activity = activity;
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -119,6 +128,14 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
             Comment comment = comments.get(position);
             holder.tvAuthor.setText(comment.author);
             holder.tvDescription.setText(comment.text);
+
+            Bitmap bit = loadBitmapFromView(holder.img);
+
+            holder.img.setImageBitmap(Utils.getCircularBitmap(bit));
+            // Load the image using Glide
+            Glide.with(activity)
+                    .load(comment.getUrlImagePerfil())
+                    .into(holder.img);
         }
 
         @Override
@@ -131,6 +148,15 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
                 databaseReference.removeEventListener(childEventListener);
             }
         }
+
+        private static Bitmap loadBitmapFromView(View v) {
+            Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(b);
+            v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
+            v.draw(c);
+            return b;
+        }
+
 
     }
 

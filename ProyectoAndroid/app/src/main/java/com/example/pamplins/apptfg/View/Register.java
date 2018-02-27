@@ -259,7 +259,7 @@ public class Register extends AppCompatActivity {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
-        Controller.writeUserDB(user.getUid(), userName, email, spinnerItem);
+        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem);
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
@@ -280,7 +280,7 @@ public class Register extends AppCompatActivity {
      * @param v
      */
     public void openImage(View v){
-        if(Controller.verifyPermissions(this)) {
+        if(ctrl.verifyPermissions(this)) {
             openAlert();
         }else{
             Snackbar.make(findViewById(android.R.id.content), R.string.permiss, Snackbar.LENGTH_LONG)

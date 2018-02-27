@@ -10,15 +10,18 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class Comment { public String uid;
     public String author;
     public String text;
+    private String urlImagePerfil;
+
     //private int likesCount; // determinara la mejor respuesta a mas votos
     //private int dislikeCount;
     public Comment() {
     }
 
-    public Comment(String uid, String author, String text) {
+    public Comment(String uid, String author, String text, String urlImagePerfil) {
         this.uid = uid;
         this.author = author;
         this.text = text;
+        this.urlImagePerfil = urlImagePerfil;
     }
 
     public String getUid() {
@@ -43,6 +46,14 @@ public class Comment { public String uid;
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getUrlImagePerfil() {
+        return urlImagePerfil;
+    }
+
+    public void setUrlImagePerfil(String urlImagePerfil) {
+        this.urlImagePerfil = urlImagePerfil;
     }
 
     @Override

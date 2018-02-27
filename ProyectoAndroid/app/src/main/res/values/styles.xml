@@ -14,7 +14,7 @@
 
         <item name="android:layout_gravity">center</item>
         <item name="android:paddingLeft">15dp</item>
-        <item name="android:background">@drawable/edittext_background</item>
+        <item name="android:background">@drawable/edittext_login</item>
         <item name="android:layout_width">300dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:ems">10</item>
@@ -26,7 +26,7 @@
     <style name="editText_style2">
         <item name="android:gravity">center</item> <!-- Posicion del Texto-->
         <item name="android:layout_gravity">center</item>
-        <item name="android:background">@drawable/edittext_background</item>
+        <item name="android:background">@drawable/edittext_login</item>
         <item name="android:layout_width">300dp</item>
         <item name="android:layout_height">wrap_content</item>
 
@@ -53,5 +53,10 @@
     </style>
 
     <style name="spinnerDropDownItemStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+    </style>
+
+    <style name="MyEditText" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorButton</item>
+        <item name="colorControlActivated">@color/colorName</item>
     </style>
 </resources>
