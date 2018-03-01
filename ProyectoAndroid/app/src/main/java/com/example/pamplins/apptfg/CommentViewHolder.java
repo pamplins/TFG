@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Comment;
+import com.example.pamplins.apptfg.Model.User;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,17 +55,16 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         private List<String> commentIds = new ArrayList<>();
         private List<Comment> comments = new ArrayList<>();
         private Activity activity;
-
+        public Controller ctrl;
         public CommentAdapter(final Context context, Activity activity, DatabaseReference ref) {
             ctx = context;
             databaseReference = ref;
+            ctrl = Controller.getInstance();
             this.activity = activity;
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-
                     Comment comment = dataSnapshot.getValue(Comment.class);
-
                     commentIds.add(dataSnapshot.getKey());
                     comments.add(comment);
                     notifyItemInserted(comments.size() - 1);
@@ -122,20 +124,13 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
             View view = inflater.inflate(R.layout.item_comment, parent, false);
             return new CommentViewHolder(view);
         }
-
+        //
         @Override
-        public void onBindViewHolder(CommentViewHolder holder, int position) {
-            Comment comment = comments.get(position);
+        public void onBindViewHolder(final CommentViewHolder holder, int position) {
+            final Comment comment = comments.get(position);
             holder.tvAuthor.setText(comment.author);
             holder.tvDescription.setText(comment.text);
-
-            Bitmap bit = loadBitmapFromView(holder.img);
-
-            holder.img.setImageBitmap(Utils.getCircularBitmap(bit));
-            // Load the image using Glide
-            Glide.with(activity)
-                    .load(comment.getUrlImagePerfil())
-                    .into(holder.img);
+            ctrl.drawImage(activity, holder.img, comment.uid);
         }
 
         @Override
@@ -148,15 +143,6 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
                 databaseReference.removeEventListener(childEventListener);
             }
         }
-
-        private static Bitmap loadBitmapFromView(View v) {
-            Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(b);
-            v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
-            v.draw(c);
-            return b;
-        }
-
 
     }
 

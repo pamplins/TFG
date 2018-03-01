@@ -10,8 +10,7 @@
         android:id="@+id/post_author_photo"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_perfil"/>
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/post_author"

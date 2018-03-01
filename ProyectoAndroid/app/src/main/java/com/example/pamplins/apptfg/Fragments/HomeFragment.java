@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
 
             // Abrir una duda X de la lista de home
             @Override
-            protected void onBindViewHolder(DoubtViewHolder viewHolder, int position, final Doubt model) {
+            protected void onBindViewHolder(final DoubtViewHolder viewHolder, int position, final Doubt doubt) {
                 final DatabaseReference postRef = getRef(position);
                 final String postKey = postRef.getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -113,12 +113,13 @@ public class HomeFragment extends Fragment {
                 }*/
 
                 // Poner los valores en la caja de duda de home
-               viewHolder.bindToPost(model, getActivity(), new View.OnClickListener() {
+
+                viewHolder.bindToPost(doubt, getActivity(), ctrl, doubt.getUid(), new View.OnClickListener() {
                     @Override
                     public void onClick(View starView) {
                         // Need to write to both places the post is stored
                         DatabaseReference globalPostRef = mDatabase.child("doubts").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(model.getUid()).child(postRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(postRef.getKey());
 
                         // Run two transactions
                         onStarClicked(globalPostRef);

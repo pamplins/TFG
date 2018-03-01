@@ -26,9 +26,9 @@
             android:id="@+id/et_title_new_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/description"
+            android:layout_alignLeft="@+id/et_description_new_post"
             android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/description"
+            android:layout_alignStart="@+id/et_description_new_post"
             android:layout_marginTop="82dp"
             android:hint="Título"
             android:maxLines="1"
@@ -40,41 +40,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/et_title_new_post"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/border"
             android:hint="Descripción"
             android:inputType="textMultiLine"
-            android:maxLines="10"
-            android:textColor="@color/colorTextDoubt"
+            android:lines="5"
+            android:maxLines="6"
             android:scrollHorizontally="false"
+            android:gravity="left"
+
+            android:textColor="@color/colorTextDoubt"
             android:theme="@style/MyEditText" />-->
 
-        <EditText
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:gravity="left"
-            android:layout_below="@id/et_title_new_post"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:hint="Descripción"
-            android:lines="10"
-            android:padding="5dp"
-            android:textSize="18dp"
-            android:textColor="@color/colorTextDoubt"
-            android:textColorHint="@color/colorButton"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"  />
+           <EditText
+               android:id="@+id/et_description_new_post"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:background="@drawable/border"
+               android:gravity="left"
+               android:layout_below="@id/et_title_new_post"
+               android:layout_marginLeft="16dp"
+               android:layout_marginRight="16dp"
+               android:hint="Descripción"
+               android:lines="10"
+               android:padding="5dp"
+               android:textSize="18dp"
+               android:textColor="@color/colorTextDoubt"
+               android:textColorHint="@color/colorButton"
+               android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+               android:scrollHorizontally="false"
+               />
 
-        <Button
-            android:layout_marginTop="80dp"
-            android:id="@+id/btn_newDoubt"
-            style="@style/button_style"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/description"
-            android:layout_centerVertical="true"
-            android:text="Nueva duda" />
-    </RelativeLayout>
-</FrameLayout>
+           <Button
+               android:layout_marginTop="80dp"
+               android:id="@+id/btn_newDoubt"
+               style="@style/button_style"
+               android:layout_centerHorizontal="true"
+               android:layout_below="@id/et_description_new_post"
+               android:layout_centerVertical="true"
+               android:text="Nueva duda" />
+       </RelativeLayout>
+   </FrameLayout>

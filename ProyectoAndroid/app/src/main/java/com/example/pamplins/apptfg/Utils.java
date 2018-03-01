@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -65,8 +66,8 @@ public class Utils {
         return output;
     }
 
-    public static void uploadImageProfile(final String userName, Bitmap bit, String path) {
-        String ref = "user_images/" + userName + "/" + path;
+    public static void uploadImageProfile(final String uid, Bitmap bit, String path) {
+        String ref = "user_images/" + uid + "/" + path;
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
 
@@ -89,7 +90,6 @@ public class Utils {
             }
         });
     }
-
 
 
     public static void showPassword(final EditText etPassword) {

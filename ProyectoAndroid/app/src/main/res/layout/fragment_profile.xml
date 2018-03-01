@@ -5,6 +5,13 @@
     tools:context="com.example.pamplins.apptfg.Fragments.ProfileFragment"
     android:background="@color/backGround">
 
+    <ImageView
+        android:id="@+id/img_user_profile"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/user_img" />
     <TextView
         android:text="MI PERFIL"
         android:textSize="24sp"
@@ -13,12 +20,22 @@
         android:gravity = "center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorName" />
+        android:textColor="@color/colorName"
+        />
+
+
+    <Button
+        android:id="@+id/btn_changeImg"
+        style="@style/button_style"
+        android:layout_marginTop="90dp"
+        android:text="CAMBIAR IMAGEN" />
+
 
 
     <Button
         android:id="@+id/btn_signout"
         style="@style/button_style"
+        android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:text="@string/btn_signout" />

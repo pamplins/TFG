@@ -4,28 +4,30 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Model.User;
-import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Gustavo on 15/02/2018.
@@ -51,26 +53,24 @@ public class Controller {
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
-    public void writeUserDB(String uid, String userName, String email, String spinnerItem) {
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+
+    public Query getUsersbyUserName(){
+        return FirebaseDatabase.getInstance().getReference("users").orderByChild("userName");
+
+    }
+
+
+    public static void writeUserDB(String uid, String userName, String email, String spinnerItem) {
         user = new User(userName, email, spinnerItem);
         db = FirebaseDatabase.getInstance().getReference();
         db.child("users").child(uid).setValue(user);
     }
 
-
-    public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
-    }
-
-    public static FirebaseUser getCurrentUser(){
-        mAuth = FirebaseAuth.getInstance().getCurrentUser();
-        if(mAuth != null){
-            return mAuth;
-        }
-        return null;
-    }
-    /*
-    public static User getUser(){
+    /*public static User getUser(){
         mAuth = FirebaseAuth.getInstance().getCurrentUser();
         ValueEventListener eventListener = new ValueEventListener() {
             @Override
@@ -112,30 +112,33 @@ public class Controller {
         }
     }
 
-    /*
-    public void drawImage(final Activity activity, final int component){
+    public void drawImage(final Activity activity, final ImageView img, String uid){
 
-        // Reference to an image file in Firebase Storage
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("user_images/"+getUid()+"/image_profile.jpg");
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        String ref = "user_images/"+uid+"/image_profile.jpg";
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        storageRef.child(ref).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                ImageView img = activity.findViewById(component);
-                img.buildDrawingCache();
-                Bitmap bit = img.getDrawingCache();
-
+                Bitmap bit = loadBitmapFromView(img);
                 img.setImageBitmap(Utils.getCircularBitmap(bit));
                 // Load the image using Glide
-                Glide.with(activity.getBaseContext())
-                        .load(uri)
+                Glide.with(activity)
+                        .load(uri.toString())
                         .into(img);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-
+                // Handle any errors
             }
         });
-    } */
+    }
 
+    private static Bitmap loadBitmapFromView(View v) {
+        Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
+        v.draw(c);
+        return b;
+    }
 }

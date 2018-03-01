@@ -11,7 +11,6 @@ public class Doubt {
     private int likesCount = 0;
     private String date;
 
-    private String urlImagePerfil;
     //private String course;
     //private int dislikesCount;
     //private Map<String, Boolean> stars = new HashMap<>();
@@ -19,13 +18,12 @@ public class Doubt {
     public Doubt() {
     }
 
-    public Doubt(String uid, String author, String title, String description, String date, String urlImagePerfil) {
+    public Doubt(String uid, String author, String title, String description, String date) {
         this.uid = uid;
         this.author = author;
         this.title = title;
         this.description = description;
         this.date = date;
-        this.urlImagePerfil = urlImagePerfil;
     }
 
 
@@ -77,13 +75,6 @@ public class Doubt {
         this.date = date;
     }
 
-    public String getUrlImagePerfil() {
-        return urlImagePerfil;
-    }
-
-    public void setUrlImagePerfil(String urlImagePerfil) {
-        this.urlImagePerfil = urlImagePerfil;
-    }
 
     @Override
     public String toString() {

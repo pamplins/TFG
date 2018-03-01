@@ -4,12 +4,8 @@ package com.example.pamplins.apptfg;
  * Created by Gustavo on 21/02/2018.
  */
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,20 +17,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 public class DoubtDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,8 +68,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         commentsReference = FirebaseDatabase.getInstance().getReference()
                 .child("post-comments").child(doubtKey);
 
-
-
         tvAuthor = findViewById(R.id.post_author);
         tvTitle = findViewById(R.id.post_title);
         tvDate = findViewById(R.id.tv_date_comment);
@@ -97,24 +86,16 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     public void onStart() {
         super.onStart();
         ValueEventListener postListener = new ValueEventListener() {
-            // Aqui se actualiza la informacion del comentario
+            // Aqui se actualiza la informacion de la duda al abrirla
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                final Doubt doubt = dataSnapshot.getValue(Doubt.class);
                 tvAuthor.setText(doubt.getAuthor());
                 tvTitle.setText(doubt.getTitle());
                 tvDescription.setText(doubt.getDescription());
                 tvDate.setText(doubt.getDate());
-                Bitmap bit = loadBitmapFromView(img);
-
-                img.setImageBitmap(Utils.getCircularBitmap(bit));
-                // Load the image using Glide
-                Glide.with(DoubtDetailActivity.this)
-                        .load(doubt.getUrlImagePerfil())
-                        .into(img);
-
+                ctrl.drawImage(DoubtDetailActivity.this, img, doubt.getUid());
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
@@ -149,15 +130,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-
-    private static Bitmap loadBitmapFromView(View v) {
-        Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
-        v.draw(c);
-        return b;
-    }
-
     private void postComment() {
         final String uid = ctrl.getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
@@ -172,24 +144,25 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                             etComment.setError("Entra comentario");
                         }
                         if(!commentText.isEmpty()){
-                            // Reference to an image file in Firebase Storage
-                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("user_images/"+ctrl.getUid()+"/image_profile.jpg");
-                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            ctrl.getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onSuccess(Uri uri) {
-
-                                    Comment comment = new Comment(uid, authorName, commentText, uri.toString());
-                                    commentsReference.push().setValue(comment);
-                                    etComment.setText(null);
-                                    ctrl.hideKeyboard(DoubtDetailActivity.this);
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                                        User user = childSnapshot.getValue(User.class);
+                                        if(user.getUserName().equals(authorName)){
+                                            Comment comment = new Comment(uid, authorName, commentText);
+                                            commentsReference.push().setValue(comment);
+                                            etComment.setText(null);
+                                            ctrl.hideKeyboard(DoubtDetailActivity.this);
+                                            break;
+                                        }
+                                    }
                                 }
-                            }).addOnFailureListener(new OnFailureListener() {
                                 @Override
-                                public void onFailure(@NonNull Exception exception) {
+                                public void onCancelled(DatabaseError databaseError) {
 
                                 }
                             });
-
                         }
 
                     }

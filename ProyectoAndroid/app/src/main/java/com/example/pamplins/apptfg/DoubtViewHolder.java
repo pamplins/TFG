@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Fragments.HomeFragment;
 import com.example.pamplins.apptfg.Model.Doubt;
 
@@ -38,22 +39,28 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         img = itemView.findViewById(R.id.post_author_photo);
     }
 
-    public void bindToPost(Doubt doubt, Activity activity, View.OnClickListener starClickListener) {
+    public void bindToPost(Doubt doubt, Activity activity, Controller ctrl, String uid, View.OnClickListener starClickListener) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getAuthor());
         //numStarsView.setText(String.valueOf(doubt.getLikesCount()));
-        if(doubt.getDescription().trim().length() > 100){
-            bodyView.setText(doubt.getDescription().substring(0,100));
-        }else{
+        if (doubt.getDescription().trim().length() > 100) {
+            bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
+        } else {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
-        Bitmap bit = loadBitmapFromView(img);
 
+        ctrl.drawImage(activity, img, uid);
+
+
+    }
+       /*
+        Bitmap bit = loadBitmapFromView(img);
+        // TODO ver tambien aqui lo de ponerr eso
         img.setImageBitmap(Utils.getCircularBitmap(bit));
         // Load the image using Glide
         Glide.with(activity.getBaseContext())
-                .load(doubt.getUrlImagePerfil())
+                .load("https://firebasestorage.googleapis.com/v0/b/app-tfg-gati1304.appspot.com/o/user_images%2FCxfW0ucTDFgOvGh1SPCfMGUWm5u2%2Fimage_profile.jpg?alt=media&token=05095ccf-0488-4396-8a2b-46d10b6eac42")
                 .into(img);
         //starView.setOnClickListener(starClickListener);
     }
@@ -64,5 +71,5 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
         v.draw(c);
         return b;
-    }
+    }*/
 }

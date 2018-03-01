@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -34,6 +35,8 @@ import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +46,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -259,10 +264,10 @@ public class Register extends AppCompatActivity {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String spinnerItem = spinner.getSelectedItem().toString();
-        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem);
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
+        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem);
         Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 
@@ -330,6 +335,7 @@ public class Register extends AppCompatActivity {
                     Uri uri = imageReturnedIntent.getData();
                     InputStream imageStream = getContentResolver().openInputStream(uri);
                     bit = BitmapFactory.decodeStream(imageStream);
+                    Log.i("URL",imageStream.toString());
                     ImageView img = findViewById(R.id.img_user);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
