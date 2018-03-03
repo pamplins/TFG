@@ -4,6 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -117,39 +122,19 @@ public class ProfileFragment extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        Bitmap bit = null;
         if (resultCode == RESULT_OK) {
             if(requestCode == 0){
-                Bitmap bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
                 img.setImageBitmap(Utils.getCircularBitmap(bit));
-                String ref = "user_images/" + FirebaseAuth.getInstance().getUid()+ "/" + "image_profile.jpg";
-                StorageReference mStorageRef;
-                mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bit.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] data = baos.toByteArray();
-                mStorageRef.putBytes(data);
-
-                UploadTask uploadTask = mStorageRef.putBytes(data);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-
-                    }
-                });
             }else{
                 try {
                     Uri uri = imageReturnedIntent.getData();
                     InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
-                    Bitmap bit = BitmapFactory.decodeStream(imageStream);
+                    bit = BitmapFactory.decodeStream(imageStream);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
                     img.setImageBitmap(Utils.getCircularBitmap(bit));
@@ -163,9 +148,56 @@ public class ProfileFragment extends Fragment {
         }
 
 
+        String ref = "user_images/" + FirebaseAuth.getInstance().getUid()+ "/" + "image_profile.jpg";
+        StorageReference mStorageRef;
+        mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bit = Utils.getCircularBitmap(bit);
+        getCroppedBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        mStorageRef.putBytes(data);
+
+        UploadTask uploadTask = mStorageRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+
+            }
+        });
 
 
 
+    }
+
+
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
     }
 
 }

@@ -4,13 +4,16 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_marginLeft="16dp">
 
     <ImageView
         android:id="@+id/post_author_photo"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:background="#00000000"
+        android:backgroundTint="#00000000"/>
 
     <TextView
         android:id="@+id/post_author"

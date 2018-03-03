@@ -335,7 +335,6 @@ public class Register extends AppCompatActivity {
                     Uri uri = imageReturnedIntent.getData();
                     InputStream imageStream = getContentResolver().openInputStream(uri);
                     bit = BitmapFactory.decodeStream(imageStream);
-                    Log.i("URL",imageStream.toString());
                     ImageView img = findViewById(R.id.img_user);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
