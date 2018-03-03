@@ -36,6 +36,11 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
     public TextView tvAuthor;
     public TextView tvDescription;
     public ImageView img;
+    public TextView numLikes;
+    public ImageView like;
+    public TextView numDisLikes;
+    public ImageView dislike;
+
 
     public CommentViewHolder(View itemView) {
         super(itemView);
@@ -43,6 +48,11 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         tvAuthor = itemView.findViewById(R.id.comment_author);
         tvDescription = itemView.findViewById(R.id.comment_body);
         img = itemView.findViewById(R.id.comment_photo);
+        like = itemView.findViewById(R.id.like_comment);
+        numLikes = itemView.findViewById(R.id.num_likes_comment);
+
+        /*dislike = itemView.findViewById(R.id.dislike_comment);
+        numDisLikes = itemView.findViewById(R.id.num_dislikes_comment);*/
     }
 
 
@@ -131,6 +141,14 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
             holder.tvAuthor.setText(comment.author);
             holder.tvDescription.setText(comment.text);
             ctrl.drawImage(activity, holder.img, comment.uid);
+            //TODO hacer comments likes dislikes
+            /*holder.numLikes.setText(String.valueOf(comment.getLikesCount()));
+            holder.like.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });*/
         }
 
         @Override

@@ -5,6 +5,7 @@ package com.example.pamplins.apptfg;
  */
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,13 @@ import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Fragments.HomeFragment;
 import com.example.pamplins.apptfg.Model.Doubt;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 public class DoubtViewHolder extends RecyclerView.ViewHolder {
 
@@ -26,9 +34,15 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
     public TextView bodyView;
     public TextView date;
     public ImageView img;
+    public TextView numLikes;
+    public ImageView like;
+    public TextView numDisLikes;
+    public ImageView dislike;
+    public TextView numComments;
 
     public DoubtViewHolder(View itemView) {
         super(itemView);
+        //TODO code a organizar
 
         titleView = itemView.findViewById(R.id.post_title);
         authorView = itemView.findViewById(R.id.post_author);
@@ -37,39 +51,57 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         bodyView = itemView.findViewById(R.id.post_description);
         date = itemView.findViewById(R.id.tv_date);
         img = itemView.findViewById(R.id.post_author_photo);
+        like = itemView.findViewById(R.id.like);
+        numLikes = itemView.findViewById(R.id.num_likes);
+
+        dislike = itemView.findViewById(R.id.dislike);
+        numDisLikes = itemView.findViewById(R.id.num_dislikes);
+
+        numComments = itemView.findViewById(R.id.num_comments);
+
     }
 
-    public void bindToPost(Doubt doubt, Activity activity, Controller ctrl, String uid, View.OnClickListener starClickListener) {
+    public void bindToPost(final Doubt doubt, final Activity activity, Controller ctrl, String uid, final DatabaseReference postRef) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getAuthor());
-        //numStarsView.setText(String.valueOf(doubt.getLikesCount()));
+
+        //TODO code a organizar
+
+        final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(postRef.getKey());
+        globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         if (doubt.getDescription().trim().length() > 100) {
             bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
         } else {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
-
         ctrl.drawImage(activity, img, uid);
-
-
-    }
-       /*
-        Bitmap bit = loadBitmapFromView(img);
-        // TODO ver tambien aqui lo de ponerr eso
-        img.setImageBitmap(Utils.getCircularBitmap(bit));
-        // Load the image using Glide
-        Glide.with(activity.getBaseContext())
-                .load("https://firebasestorage.googleapis.com/v0/b/app-tfg-gati1304.appspot.com/o/user_images%2FCxfW0ucTDFgOvGh1SPCfMGUWm5u2%2Fimage_profile.jpg?alt=media&token=05095ccf-0488-4396-8a2b-46d10b6eac42")
-                .into(img);
-        //starView.setOnClickListener(starClickListener);
     }
 
-    private static Bitmap loadBitmapFromView(View v) {
-        Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
-        v.draw(c);
-        return b;
-    }*/
+
+
+    public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
+        numLikes.setText(String.valueOf(doubt.getLikesCount()));
+        like.setOnClickListener(clickListener);
+
+    }
+
+    public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){
+        numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
+
+        dislike.setOnClickListener(clickListener);
+
+    }
+
 }

@@ -61,7 +61,7 @@ public class HomeFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("doubts");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mRecycler = rootView.findViewById(R.id.messages_list);
         mRecycler.setHasFixedSize(true);
@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment {
 
         // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
-                .setQuery(mDatabase, Doubt.class)
+                .setQuery(mDatabase.child("doubts"), Doubt.class)
                 .build();
 
         mAdapter = new FirebaseRecyclerAdapter<Doubt, DoubtViewHolder>(options) {
@@ -106,33 +106,60 @@ public class HomeFragment extends Fragment {
                 });
 
                 // Determine if the current user has liked this post and set UI accordingly
-                /*if (model.getLikesCount().containsKey(ctrl.getUid())) {
-                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
+                if (doubt.getLikes().containsKey(ctrl.getUid())) {
+                    viewHolder.like.setImageResource(R.drawable.like_ac);
                 } else {
-                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
-                }*/
+                    viewHolder.like.setImageResource(R.drawable.like);
+                }
+                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+                    viewHolder.dislike.setImageResource(R.drawable.dislike_ac);
+                } else {
+                    viewHolder.dislike.setImageResource(R.drawable.dislike);
+                }
 
                 // Poner los valores en la caja de duda de home
 
-                viewHolder.bindToPost(doubt, getActivity(), ctrl, doubt.getUid(), new View.OnClickListener() {
-                    @Override
+                viewHolder.bindToPost(doubt, getActivity(), ctrl, doubt.getUid(), postRef);//{
+                   /* @Override
                     public void onClick(View starView) {
                         // Need to write to both places the post is stored
                         DatabaseReference globalPostRef = mDatabase.child("doubts").child(postRef.getKey());
                         DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(postRef.getKey());
-
                         // Run two transactions
                         onStarClicked(globalPostRef);
                         onStarClicked(userPostRef);
                     }
+                });*/
+                viewHolder.bindLikes(doubt, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(postRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(postRef.getKey());
+                        // Run two transactions
+                        onLikeClicked(globalPostRef);
+                        onLikeClicked(userPostRef);
+                    }
                 });
+
+                viewHolder.bindDisLikes(doubt, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(postRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(postRef.getKey());
+                        // Run two transactions
+                        onDisLikeClicked(globalPostRef);
+                        onDisLikeClicked(userPostRef);
+                    }
+                });
+
+
             }
         };
         mRecycler.setAdapter(mAdapter);
     }
 
     // [START post_stars_transaction]
-    private void onStarClicked(DatabaseReference postRef) {
+    private void onLikeClicked(DatabaseReference postRef) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -140,16 +167,15 @@ public class HomeFragment extends Fragment {
                 if (doubt == null) {
                     return Transaction.success(mutableData);
                 }
-                /*
-                if (doubt.getLikesCount().containsKey(ctrl.getUid())) {
+                if (doubt.getLikes().containsKey(ctrl.getUid())) {
                     // Unstar the post and remove self from stars
-                    doubt.starCount = doubt.starCount - 1;
-                    doubt.stars.remove(ctrl.getUid());
+                    doubt.setLikesCount(doubt.getLikesCount() - 1);
+                    doubt.getLikes().remove(ctrl.getUid());
                 } else {
                     // Star the post and add self to stars
-                    doubt.starCount = doubt.starCount + 1;
-                    doubt.stars.put(ctrl.getUid(), true);
-                }*/
+                    doubt.setLikesCount(doubt.getLikesCount() + 1);
+                    doubt.getLikes().put(ctrl.getUid(), true);
+                }
 
                 // Set value and report transaction success
                 mutableData.setValue(doubt);
@@ -165,6 +191,41 @@ public class HomeFragment extends Fragment {
         });
     }
     // [END post_stars_transaction]
+
+    // [START post_stars_transaction]
+    private void onDisLikeClicked(DatabaseReference postRef) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Doubt doubt = mutableData.getValue(Doubt.class);
+                if (doubt == null) {
+                    return Transaction.success(mutableData);
+                }
+                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+                    // Unstar the post and remove self from stars
+                    doubt.setDislikesCount(doubt.getDislikesCount() - 1);
+                    doubt.getDislikes().remove(ctrl.getUid());
+                } else {
+                    // Star the post and add self to stars
+                    doubt.setDislikesCount(doubt.getDislikesCount() + 1);
+                    doubt.getDislikes().put(ctrl.getUid(), true);
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(doubt);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
+    }
+    // [END post_stars_transaction]
+
 
     @Override
     public void onStart() {

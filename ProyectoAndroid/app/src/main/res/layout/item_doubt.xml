@@ -11,9 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:paddingBottom="45dp"
-        android:background="@color/borderColor"
-        >
+        android:background="@color/borderColor" >
 
         <include
             android:id="@+id/post_author_layout"
@@ -77,6 +75,7 @@
         </LinearLayout>-->
 
         <include
+            android:id="@+id/doubt_description"
             layout="@layout/include_doubt_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -84,6 +83,71 @@
             android:layout_below="@+id/post_author_layout"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/doubt_description"
+            android:padding="10dp"
+            >
+
+            <ImageView
+                android:id="@+id/like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/like" />
+
+            <TextView
+                android:id="@+id/num_likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                tools:text="45"
+                android:textColor="@color/colorButton"
+                android:layout_marginRight="10dp"/>
+            <ImageView
+                android:id="@+id/dislike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/dislike"
+                />
+
+            <TextView
+                android:id="@+id/num_dislikes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                tools:text="45"
+                android:textColor="@color/colorButton"
+                android:layout_marginRight="10dp"/>
+
+            <ImageView
+                android:id="@+id/iv_comments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/n_comments"
+                />
+
+            <TextView
+                android:id="@+id/num_comments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                tools:text="45"
+                android:textColor="@color/colorButton"
+                android:layout_marginRight="10dp"/>
+        </LinearLayout>
 
     </RelativeLayout>
 

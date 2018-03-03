@@ -25,7 +25,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 
 public class DoubtDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -48,6 +55,12 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     private Button btnComment;
     private RecyclerView commentsRecycler;
 
+    public TextView numLikes;
+    public ImageView like;
+    public TextView numDisLikes;
+    public ImageView dislike;
+    public TextView numComments;
+
     private Controller ctrl;
 
     @Override
@@ -67,15 +80,23 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                 .child("doubts").child(doubtKey);
         commentsReference = FirebaseDatabase.getInstance().getReference()
                 .child("post-comments").child(doubtKey);
+        //TODO code a organizar
 
         tvAuthor = findViewById(R.id.post_author);
         tvTitle = findViewById(R.id.post_title);
-        tvDate = findViewById(R.id.tv_date_comment);
+        tvDate = findViewById(R.id.tv_date); //modificado
         tvDescription = findViewById(R.id.post_description);
         etComment = findViewById(R.id.field_comment_text);
         img = findViewById(R.id.post_author_photo);
         btnComment = findViewById(R.id.button_post_comment);
         commentsRecycler = findViewById(R.id.recycler_comments);
+
+        like = findViewById(R.id.like);
+        numLikes = findViewById(R.id.num_likes);
+
+        dislike = findViewById(R.id.dislike);
+        numDisLikes = findViewById(R.id.num_dislikes);
+        numComments = findViewById(R.id.num_comments);
 
         btnComment.setOnClickListener(this);
         commentsRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -95,6 +116,58 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                 tvDescription.setText(doubt.getDescription());
                 tvDate.setText(doubt.getDate());
                 ctrl.drawImage(DoubtDetailActivity.this, img, doubt.getUid());
+
+                if (doubt.getLikes().containsKey(ctrl.getUid())) {
+                    like.setImageResource(R.drawable.like_ac);
+                } else {
+                    like.setImageResource(R.drawable.like);
+                }
+                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+                    dislike.setImageResource(R.drawable.dislike_ac);
+                } else {
+                    dislike.setImageResource(R.drawable.dislike);
+                }
+
+                //TODO code a organizar
+                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                bindLikes(doubt, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
+                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
+                        // Run two transactions
+                        onLikeClicked(globalPostRef);
+                        onLikeClicked(userPostRef);
+                    }
+                });
+
+                bindDisLikes(doubt, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
+                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
+                        // Run two transactions
+                        onDisLikeClicked(globalPostRef);
+                        onDisLikeClicked(userPostRef);
+                    }
+                });
+
+
+                final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
+                globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -130,6 +203,87 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
+        numLikes.setText(String.valueOf(doubt.getLikesCount()));
+        like.setOnClickListener(clickListener);
+
+    }
+
+    public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){
+        numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
+
+        dislike.setOnClickListener(clickListener);
+
+    }
+
+    // [START post_stars_transaction]
+    private void onLikeClicked(DatabaseReference postRef) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Doubt doubt = mutableData.getValue(Doubt.class);
+                if (doubt == null) {
+                    return Transaction.success(mutableData);
+                }
+                if (doubt.getLikes().containsKey(ctrl.getUid())) {
+                    // Unstar the post and remove self from stars
+                    doubt.setLikesCount(doubt.getLikesCount() - 1);
+                    doubt.getLikes().remove(ctrl.getUid());
+                } else {
+                    // Star the post and add self to stars
+                    doubt.setLikesCount(doubt.getLikesCount() + 1);
+                    doubt.getLikes().put(ctrl.getUid(), true);
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(doubt);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
+    }
+    // [END post_stars_transaction]
+
+    // [START post_stars_transaction]
+    private void onDisLikeClicked(DatabaseReference postRef) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Doubt doubt = mutableData.getValue(Doubt.class);
+                if (doubt == null) {
+                    return Transaction.success(mutableData);
+                }
+                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+                    // Unstar the post and remove self from stars
+                    doubt.setDislikesCount(doubt.getDislikesCount() - 1);
+                    doubt.getDislikes().remove(ctrl.getUid());
+                } else {
+                    // Star the post and add self to stars
+                    doubt.setDislikesCount(doubt.getDislikesCount() + 1);
+                    doubt.getDislikes().put(ctrl.getUid(), true);
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(doubt);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
+    }
+    // [END post_stars_transaction]
+
     private void postComment() {
         final String uid = ctrl.getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
@@ -150,10 +304,29 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                                     for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
                                         User user = childSnapshot.getValue(User.class);
                                         if(user.getUserName().equals(authorName)){
-                                            Comment comment = new Comment(uid, authorName, commentText);
-                                            commentsReference.push().setValue(comment);
+                                            String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+                                            Comment comment = new Comment(uid, authorName, commentText, date);
+                                            Map<String, Object> commentValues = comment.toMap();
+
+                                            commentsReference.push().setValue(commentValues);
                                             etComment.setText(null);
                                             ctrl.hideKeyboard(DoubtDetailActivity.this);
+
+                                            //TODO code a organizar
+                                            final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
+                                            globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+
                                             break;
                                         }
                                     }
@@ -173,5 +346,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                     }
                 });
     }
+
+
 
 }

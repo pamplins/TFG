@@ -123,7 +123,7 @@ public class NewDoubtFragment extends Fragment {
             etDescription.setError("Entra descripcion");
         }
 
-        if((!title.isEmpty()) && (!title.isEmpty())){
+        if((!title.isEmpty()) && (!description.isEmpty())){
             return true;
         }
         return false;
@@ -133,9 +133,12 @@ public class NewDoubtFragment extends Fragment {
         String key = mDatabase.child("doubts").push().getKey();
         String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         Doubt doubt = new Doubt(userId, username, title, body, date);
+        Map<String, Object> postValues = doubt.toMap();
+
+
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/doubts/" + key, doubt);
-        childUpdates.put("/user_doubts/" + userId + "/" + key, doubt);
+        childUpdates.put("/doubts/" + key, postValues);
+        childUpdates.put("/user_doubts/" + userId + "/" + key, postValues);
         mDatabase.updateChildren(childUpdates);
     }
 

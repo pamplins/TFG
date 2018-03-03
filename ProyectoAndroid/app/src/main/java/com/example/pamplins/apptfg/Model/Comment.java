@@ -1,6 +1,10 @@
 package com.example.pamplins.apptfg.Model;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Gustavo on 19/02/2018.
@@ -11,15 +15,22 @@ public class Comment { public String uid;
     public String author;
     public String text;
 
-    //private int likesCount; // determinara la mejor respuesta a mas votos
-    //private int dislikeCount;
+    public int likesCount = 0;
+    public int dislikesCount = 0;
+    public Map<String, Boolean> likes = new HashMap<>();
+
+    public  String date;
+
     public Comment() {
     }
 
-    public Comment(String uid, String author, String text) {
+
+
+    public Comment(String uid, String author, String text, String date) {
         this.uid = uid;
         this.author = author;
         this.text = text;
+        this.date = date;
     }
 
     public String getUid() {
@@ -46,6 +57,48 @@ public class Comment { public String uid;
         this.text = text;
     }
 
+    public int getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public int getDislikesCount() {
+        return dislikesCount;
+    }
+
+    public void setDislikesCount(int dislikesCount) {
+        this.dislikesCount = dislikesCount;
+    }
+
+    public Map<String, Boolean> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Map<String, Boolean> likes) {
+        this.likes = likes;
+    }
+
+    public Map<String, Boolean> getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(Map<String, Boolean> dislikes) {
+        this.dislikes = dislikes;
+    }
+
+    public Map<String, Boolean> dislikes = new HashMap<>();
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
@@ -53,6 +106,20 @@ public class Comment { public String uid;
                 ", author='" + author + '\'' +
                 ", text='" + text + '\'' +
                 '}';
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> comment = new HashMap<>();
+        comment.put("uid", uid);
+        comment.put("author", author);
+        comment.put("text", text);
+        comment.put("likesCount", likesCount);
+        comment.put("disLikesCount", dislikesCount);
+        comment.put("date", date);
+        comment.put("likes", likes);
+        comment.put("dislikes", dislikes);
+        return comment;
     }
 }
 
