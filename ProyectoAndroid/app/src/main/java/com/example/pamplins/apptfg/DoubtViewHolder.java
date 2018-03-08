@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.w3c.dom.Text;
 
@@ -61,7 +64,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindToPost(final Doubt doubt, final Activity activity, Controller ctrl, String uid, final DatabaseReference postRef) {
+    public void bindToPost(final Doubt doubt, final Activity activity, final Controller ctrl, final String uid, final DatabaseReference postRef) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getAuthor());
 
@@ -86,10 +89,11 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
+
         ctrl.drawImage(activity, img, uid);
+
+
     }
-
-
 
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));

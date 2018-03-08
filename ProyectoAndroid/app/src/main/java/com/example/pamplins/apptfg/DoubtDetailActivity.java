@@ -42,6 +42,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     private DatabaseReference doubtReference;
     private DatabaseReference commentsReference;
+    private DatabaseReference mDatabase;
     private ValueEventListener doubtListener;
     private String doubtKey;
     private CommentViewHolder.CommentAdapter commentAdapter;
@@ -72,15 +73,16 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         if (doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
+        initElements();
+    }
 
+    private void initElements(){
         ctrl = Controller.getInstance();
-
-
         doubtReference = FirebaseDatabase.getInstance().getReference()
                 .child("doubts").child(doubtKey);
         commentsReference = FirebaseDatabase.getInstance().getReference()
                 .child("post-comments").child(doubtKey);
-        //TODO code a organizar
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         tvAuthor = findViewById(R.id.post_author);
         tvTitle = findViewById(R.id.post_title);
@@ -100,7 +102,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
         btnComment.setOnClickListener(this);
         commentsRecycler.setLayoutManager(new LinearLayoutManager(this));
-
     }
 
     @Override
@@ -111,63 +112,10 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final Doubt doubt = dataSnapshot.getValue(Doubt.class);
-                tvAuthor.setText(doubt.getAuthor());
-                tvTitle.setText(doubt.getTitle());
-                tvDescription.setText(doubt.getDescription());
-                tvDate.setText(doubt.getDate());
-                ctrl.drawImage(DoubtDetailActivity.this, img, doubt.getUid());
-
-                if (doubt.getLikes().containsKey(ctrl.getUid())) {
-                    like.setImageResource(R.drawable.like_ac);
-                } else {
-                    like.setImageResource(R.drawable.like);
-                }
-                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
-                    dislike.setImageResource(R.drawable.dislike_ac);
-                } else {
-                    dislike.setImageResource(R.drawable.dislike);
-                }
-
-                //TODO code a organizar
-                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                bindLikes(doubt, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
-                        // Run two transactions
-                        onLikeClicked(globalPostRef);
-                        onLikeClicked(userPostRef);
-                    }
-                });
-
-                bindDisLikes(doubt, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
-                        // Run two transactions
-                        onDisLikeClicked(globalPostRef);
-                        onDisLikeClicked(userPostRef);
-                    }
-                });
-
-
-                final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
-                globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-
+                setElementsDoubt(doubt);
+                putLikes(doubt);
+                putDisLikes(doubt);
+                putNComments();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -177,11 +125,69 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             }
         };
         doubtReference.addValueEventListener(postListener);
-
         doubtListener = postListener;
-
         commentAdapter = new CommentViewHolder.CommentAdapter(this, DoubtDetailActivity.this, commentsReference);
         commentsRecycler.setAdapter(commentAdapter);
+    }
+
+    private void putDisLikes(final Doubt doubt){
+        bindDisLikes(doubt, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
+                // Run two transactions
+                onDisLikeClicked(globalPostRef);
+                onDisLikeClicked(userPostRef);
+            }
+        });
+    }
+
+    private void putLikes(final Doubt doubt){
+        bindLikes(doubt, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
+                // Run two transactions
+                onLikeClicked(globalPostRef);
+                onLikeClicked(userPostRef);
+            }
+        });
+    }
+
+    private void putNComments(){
+        final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
+        globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setElementsDoubt(final Doubt doubt){
+        tvAuthor.setText(doubt.getAuthor());
+        tvTitle.setText(doubt.getTitle());
+        tvDescription.setText(doubt.getDescription());
+        tvDate.setText(doubt.getDate());
+        ctrl.drawImage(DoubtDetailActivity.this, img, doubt.getUid());
+
+        if (doubt.getLikes().containsKey(ctrl.getUid())) {
+            like.setImageResource(R.drawable.like_ac);
+        } else {
+            like.setImageResource(R.drawable.like);
+        }
+        if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+            dislike.setImageResource(R.drawable.dislike_ac);
+        } else {
+            dislike.setImageResource(R.drawable.dislike);
+        }
     }
 
     @Override

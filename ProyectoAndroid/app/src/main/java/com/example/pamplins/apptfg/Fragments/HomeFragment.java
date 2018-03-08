@@ -64,10 +64,18 @@ public class HomeFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mRecycler = rootView.findViewById(R.id.messages_list);
-        mRecycler.setHasFixedSize(true);
+        //mRecycler.setHasFixedSize(true);
         ctrl = Controller.getInstance();
+        //TODO ver si hacemos una nueva database "imagenes"
+        // TODO quizas leer todos los datos de base de datos y ya luego si que hacer el adapter.
+        /* este to do podria ser con el uid y url de la imagen a la hora de subirlo desde registrar o profile.
+        si voy a actualizar pues simplemente cambiar el url del bjecto de la base de datos cuando suba la nueva
+        asi nos ahorraremos estar buscando la foto y poniendo solo el url. Quizas hacer un objeto Imagen que contenga esta informacion */
         return rootView;
     }
+
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -94,7 +102,7 @@ public class HomeFragment extends Fragment {
             // Abrir una duda X de la lista de home
             @Override
             protected void onBindViewHolder(final DoubtViewHolder viewHolder, int position, final Doubt doubt) {
-                final DatabaseReference postRef = getRef(position);
+                final DatabaseReference postRef = getRef(viewHolder.getAdapterPosition());
                 final String postKey = postRef.getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -105,7 +113,9 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
+
                 // Determine if the current user has liked this post and set UI accordingly
+                //TODO no dar posibilidad de dar like y dislike a la vez. si uno esta activo. el otro esta deshabilitado
                 if (doubt.getLikes().containsKey(ctrl.getUid())) {
                     viewHolder.like.setImageResource(R.drawable.like_ac);
                 } else {
@@ -118,18 +128,8 @@ public class HomeFragment extends Fragment {
                 }
 
                 // Poner los valores en la caja de duda de home
+                viewHolder.bindToPost(doubt, getActivity(), ctrl, doubt.getUid(), postRef);
 
-                viewHolder.bindToPost(doubt, getActivity(), ctrl, doubt.getUid(), postRef);//{
-                   /* @Override
-                    public void onClick(View starView) {
-                        // Need to write to both places the post is stored
-                        DatabaseReference globalPostRef = mDatabase.child("doubts").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(postRef.getKey());
-                        // Run two transactions
-                        onStarClicked(globalPostRef);
-                        onStarClicked(userPostRef);
-                    }
-                });*/
                 viewHolder.bindLikes(doubt, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
