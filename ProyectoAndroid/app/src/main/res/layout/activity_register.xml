@@ -20,7 +20,7 @@
             android:layout_marginBottom="30dp"
             android:layout_marginTop="30dp"
             android:onClick="openImage"
-            app:srcCompat="@drawable/user_img" />
+            android:src="@drawable/user_img" />
 
         <EditText
             android:id="@+id/et_userName"

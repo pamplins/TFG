@@ -30,82 +30,65 @@ import org.w3c.dom.Text;
 
 public class DoubtViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView titleView;
-    public TextView authorView;
-    //public ImageView starView;
-    //public TextView numStarsView;
-    public TextView bodyView;
-    public TextView date;
-    public ImageView img;
-    public TextView numLikes;
-    public ImageView like;
-    public TextView numDisLikes;
-    public ImageView dislike;
-    public TextView numComments;
+    private TextView titleView;
+    private TextView authorView;
+    private TextView bodyView;
+    private TextView date;
+    private ImageView img;
+    private TextView numLikes;
+    private ImageView like;
+    private TextView numDisLikes;
+    private ImageView dislike;
+    private TextView numComments;
 
     public DoubtViewHolder(View itemView) {
         super(itemView);
-        //TODO code a organizar
+        initElements(itemView);
+    }
 
+    private void initElements(View itemView){
         titleView = itemView.findViewById(R.id.post_title);
         authorView = itemView.findViewById(R.id.post_author);
-        //starView = itemView.findViewById(R.id.likes);
-        //numStarsView = itemView.findViewById(R.id.post_num_likes);
         bodyView = itemView.findViewById(R.id.post_description);
         date = itemView.findViewById(R.id.tv_date);
         img = itemView.findViewById(R.id.post_author_photo);
         like = itemView.findViewById(R.id.like);
         numLikes = itemView.findViewById(R.id.num_likes);
-
         dislike = itemView.findViewById(R.id.dislike);
         numDisLikes = itemView.findViewById(R.id.num_dislikes);
-
         numComments = itemView.findViewById(R.id.num_comments);
-
     }
 
-    public void bindToPost(final Doubt doubt, final Activity activity, final Controller ctrl, final String uid, final DatabaseReference postRef) {
+
+    public ImageView getLike() {
+        return like;
+    }
+
+    public ImageView getDislike() {
+        return dislike;
+    }
+
+    public void bindToPost(final Doubt doubt, Activity activity, Controller ctrl) {
         titleView.setText(doubt.getTitle());
-        authorView.setText(doubt.getAuthor());
-
-        //TODO code a organizar
-
-        final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(postRef.getKey());
-        globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        if (doubt.getDescription().trim().length() > 100) {
+        authorView.setText(doubt.getUser().getUserName());
+        numComments.setText(String.valueOf(doubt.getnComments()));
+         if (doubt.getDescription().trim().length() > 100) {
             bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
         } else {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
-
-        ctrl.drawImage(activity, img, uid);
-
-
+        ctrl.showImage(activity, doubt, img);
     }
 
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));
         like.setOnClickListener(clickListener);
-
     }
 
     public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){
         numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
-
         dislike.setOnClickListener(clickListener);
-
     }
 
 }

@@ -55,15 +55,10 @@ public class NewDoubtFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    private void initElements() {
-
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ctrl = Controller.getInstance();
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         View view = inflater.inflate(R.layout.fragment_new_doubt,
                 container, false);
@@ -78,7 +73,6 @@ public class NewDoubtFragment extends Fragment {
             public void onClick(View v)
             {
                 submitPost();
-
             }
         });
         return view;
@@ -95,7 +89,8 @@ public class NewDoubtFragment extends Fragment {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final User user = dataSnapshot.getValue(User.class);
                                 if (user != null) {
-                                    writeNewDoubt(ctrl.getUid(), user.getUserName(), title, description);
+                                   //writeNewDoubt(ctrl.getUid(), user.getUserName(), title, description);
+                                    writeNewDoubt(ctrl.getUid(), title, description, user);
                                     ctrl.hideKeyboard(getActivity());
                                     Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente" , Snackbar.LENGTH_LONG)
                                             .show();
@@ -111,8 +106,6 @@ public class NewDoubtFragment extends Fragment {
                         }
                     });
         }
-
-
     }
 
     private boolean checkInputs(String title, String description){
@@ -129,16 +122,14 @@ public class NewDoubtFragment extends Fragment {
         return false;
 
     }
-    private void writeNewDoubt(String userId, String username, String title, String body) {
+    private void writeNewDoubt(String userId, String title, String body, User user) {
         String key = mDatabase.child("doubts").push().getKey();
         String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        Doubt doubt = new Doubt(userId, username, title, body, date);
+        Doubt doubt = new Doubt(userId, title, body, date, user);
         Map<String, Object> postValues = doubt.toMap();
-
-
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/doubts/" + key, postValues);
-        childUpdates.put("/user_doubts/" + userId + "/" + key, postValues);
+        childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
         mDatabase.updateChildren(childUpdates);
     }
 

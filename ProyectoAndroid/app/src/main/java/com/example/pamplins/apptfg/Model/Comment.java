@@ -11,26 +11,25 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Comment { public String uid;
-    public String author;
+public class Comment {
+
+    public String uid;
     public String text;
-
-    public int likesCount = 0;
-    public int dislikesCount = 0;
-    public Map<String, Boolean> likes = new HashMap<>();
-
-    public  String date;
+    private int likesCount = 0;
+    private int dislikesCount = 0;
+    private Map<String, Boolean> likes = new HashMap<>();
+    private Map<String, Boolean> dislikes = new HashMap<>();
+    private String date;
+    private User user;
 
     public Comment() {
     }
 
-
-
-    public Comment(String uid, String author, String text, String date) {
+    public Comment(String uid,String text, String date, User user) {
         this.uid = uid;
-        this.author = author;
         this.text = text;
         this.date = date;
+        this.user = user;
     }
 
     public String getUid() {
@@ -39,14 +38,6 @@ public class Comment { public String uid;
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public String getText() {
@@ -89,8 +80,6 @@ public class Comment { public String uid;
         this.dislikes = dislikes;
     }
 
-    public Map<String, Boolean> dislikes = new HashMap<>();
-
     public String getDate() {
         return date;
     }
@@ -99,12 +88,25 @@ public class Comment { public String uid;
         this.date = date;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
                 "uid='" + uid + '\'' +
-                ", author='" + author + '\'' +
                 ", text='" + text + '\'' +
+                ", likesCount=" + likesCount +
+                ", dislikesCount=" + dislikesCount +
+                ", likes=" + likes +
+                ", dislikes=" + dislikes +
+                ", date='" + date + '\'' +
+                ", user=" + user +
                 '}';
     }
 
@@ -112,37 +114,13 @@ public class Comment { public String uid;
     public Map<String, Object> toMap() {
         HashMap<String, Object> comment = new HashMap<>();
         comment.put("uid", uid);
-        comment.put("author", author);
         comment.put("text", text);
         comment.put("likesCount", likesCount);
         comment.put("disLikesCount", dislikesCount);
         comment.put("date", date);
         comment.put("likes", likes);
         comment.put("dislikes", dislikes);
+        comment.put("user", user);
         return comment;
     }
 }
-
-/*
-    Ver donde meter esto
-        // Reference to an image file in Firebase Storage
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("user_images/"+uid+"/image_profile.jpg");
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                img.buildDrawingCache();
-                Bitmap bit = img.getDrawingCache();
-
-                img.setImageBitmap(Utils.getCircularBitmap(bit));
-                // Load the image using Glide
-                Glide.with(DoubtDetailActivity.this)
-                        .load(uri)
-                        .into(img);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(DoubtDetailActivity.this, "ERROOR",
-                        Toast.LENGTH_SHORT).show();                    }
-        });
- */

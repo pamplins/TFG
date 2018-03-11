@@ -9,8 +9,8 @@ import java.util.Map;
  * Created by Gustavo on 19/02/2018.
  */
 public class Doubt {
+    private User user;
     private String uid;
-    private String author;
     private String title;
     private String description;
     private int likesCount = 0;
@@ -19,22 +19,18 @@ public class Doubt {
     private String date;
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> dislikes = new HashMap<>();
-
-
-    //private String course;
-    //private int dislikesCount;
-    //private Map<String, Boolean> stars = new HashMap<>();
+    private long nComments;
 
     public Doubt() {
     }
 
-
-    public Doubt(String uid, String author, String title, String description, String date) {
+    public Doubt(String uid, String title, String description, String date, User user) {
         this.uid = uid;
-        this.author = author;
         this.title = title;
         this.description = description;
         this.date = date;
+        this.user = user;
+        this.nComments = 0;
     }
 
 
@@ -44,14 +40,6 @@ public class Doubt {
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public String getTitle() {
@@ -110,16 +98,35 @@ public class Doubt {
         this.dislikes = dislikes;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public long getnComments() {
+        return nComments;
+    }
+
+    public void setnComments(long nComments) {
+        this.nComments = nComments;
+    }
+
     @Override
     public String toString() {
         return "Doubt{" +
-                "uid='" + uid + '\'' +
-                ", author='" + author + '\'' +
+                "user=" + user +
+                ", uid='" + uid + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", likesCount=" + likesCount +
+                ", dislikesCount=" + dislikesCount +
                 ", date='" + date + '\'' +
                 ", likes=" + likes +
+                ", dislikes=" + dislikes +
+                ", nComments=" + nComments +
                 '}';
     }
 
@@ -127,7 +134,6 @@ public class Doubt {
     public Map<String, Object> toMap() {
         HashMap<String, Object> doubt = new HashMap<>();
         doubt.put("uid", uid);
-        doubt.put("author", author);
         doubt.put("title", title);
         doubt.put("description", description);
         doubt.put("likesCount", likesCount);
@@ -135,6 +141,8 @@ public class Doubt {
         doubt.put("date", date);
         doubt.put("likes", likes);
         doubt.put("dislikes", dislikes);
+        doubt.put("nComments", nComments);
+        doubt.put("user", user);
         return doubt;
     }
 }

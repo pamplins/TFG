@@ -39,9 +39,9 @@
         <Button
             android:id="@+id/btn_registerR"
             style="@style/button_style"
+            android:layout_marginTop="60dp"
             android:onClick="signIn"
-            android:text="@string/btn_signin"
-            android:layout_marginTop="60dp"/>
+            android:text="@string/btn_signin" />
 
         <ProgressBar
             android:id="@+id/progressBar"

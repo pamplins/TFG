@@ -261,8 +261,8 @@ public class Register extends AppCompatActivity {
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem);
-        Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
+        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem, bit, "image_profile.jpg");
+        //Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 
     /**

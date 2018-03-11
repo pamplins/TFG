@@ -4,7 +4,6 @@ package com.example.pamplins.apptfg;
  * Created by Gustavo on 21/02/2018.
  */
 
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
@@ -35,8 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class DoubtDetailActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private static final String TAG = "DoubtDetailActivity";
 
     public static final String EXTRA_POST_KEY = "post_key";
 
@@ -64,11 +62,12 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     private Controller ctrl;
 
+    private Doubt currentdDoubt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments_doubt);
-
         doubtKey = getIntent().getStringExtra(EXTRA_POST_KEY);
         if (doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
@@ -111,17 +110,13 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             // Aqui se actualiza la informacion de la duda al abrirla
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                final Doubt doubt = dataSnapshot.getValue(Doubt.class);
-                setElementsDoubt(doubt);
-                putLikes(doubt);
-                putDisLikes(doubt);
-                putNComments();
+                currentdDoubt = dataSnapshot.getValue(Doubt.class);
+                setElementsDoubt();
+                putLikes();
+                putDisLikes();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                Toast.makeText(DoubtDetailActivity.this, "Failed to load post.",
-                        Toast.LENGTH_SHORT).show();
             }
         };
         doubtReference.addValueEventListener(postListener);
@@ -130,25 +125,24 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         commentsRecycler.setAdapter(commentAdapter);
     }
 
-    private void putDisLikes(final Doubt doubt){
-        bindDisLikes(doubt, new View.OnClickListener() {
+    private void putDisLikes(){
+        bindDisLikes(currentdDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
-                // Run two transactions
+                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(currentdDoubt.getUid()).child(doubtKey);
                 onDisLikeClicked(globalPostRef);
                 onDisLikeClicked(userPostRef);
             }
         });
     }
 
-    private void putLikes(final Doubt doubt){
-        bindLikes(doubt, new View.OnClickListener() {
+    private void putLikes(){
+        bindLikes(currentdDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(doubt.getUid()).child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(currentdDoubt.getUid()).child(doubtKey);
                 // Run two transactions
                 onLikeClicked(globalPostRef);
                 onLikeClicked(userPostRef);
@@ -156,34 +150,24 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
-    private void putNComments(){
-        final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
-        globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
-            }
+    private void setElementsDoubt(){
+        tvAuthor.setText(currentdDoubt.getUser().getUserName());
+        tvTitle.setText(currentdDoubt.getTitle());
+        tvDescription.setText(currentdDoubt.getDescription());
+        tvDate.setText(currentdDoubt.getDate());
+        numComments.setText(String.valueOf(currentdDoubt.getnComments()));
+        ctrl.showImage(this, currentdDoubt, img);
+        checkLikesDis();
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
-    private void setElementsDoubt(final Doubt doubt){
-        tvAuthor.setText(doubt.getAuthor());
-        tvTitle.setText(doubt.getTitle());
-        tvDescription.setText(doubt.getDescription());
-        tvDate.setText(doubt.getDate());
-        ctrl.drawImage(DoubtDetailActivity.this, img, doubt.getUid());
-
-        if (doubt.getLikes().containsKey(ctrl.getUid())) {
+    private void checkLikesDis() {
+        if (currentdDoubt.getLikes().containsKey(ctrl.getUid())) {
             like.setImageResource(R.drawable.like_ac);
         } else {
             like.setImageResource(R.drawable.like);
         }
-        if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+        if (currentdDoubt.getDislikes().containsKey(ctrl.getUid())) {
             dislike.setImageResource(R.drawable.dislike_ac);
         } else {
             dislike.setImageResource(R.drawable.dislike);
@@ -193,11 +177,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onStop() {
         super.onStop();
-
         if (doubtListener != null) {
             doubtReference.removeEventListener(doubtListener);
         }
-
         commentAdapter.cleanupListener();
     }
 
@@ -217,12 +199,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){
         numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
-
         dislike.setOnClickListener(clickListener);
-
     }
 
-    // [START post_stars_transaction]
     private void onLikeClicked(DatabaseReference postRef) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
@@ -249,14 +228,10 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
-                // Transaction completed
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
             }
         });
     }
-    // [END post_stars_transaction]
 
-    // [START post_stars_transaction]
     private void onDisLikeClicked(DatabaseReference postRef) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
@@ -283,12 +258,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
-                // Transaction completed
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
             }
         });
     }
-    // [END post_stars_transaction]
 
     private void postComment() {
         final String uid = ctrl.getUid();
@@ -312,27 +284,14 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                                         if(user.getUserName().equals(authorName)){
                                             String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-                                            Comment comment = new Comment(uid, authorName, commentText, date);
+                                            Comment comment = new Comment(uid ,commentText, date, user);
                                             Map<String, Object> commentValues = comment.toMap();
 
                                             commentsReference.push().setValue(commentValues);
                                             etComment.setText(null);
+                                            currentdDoubt.setnComments(currentdDoubt.getnComments()+1);
+                                            doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
                                             ctrl.hideKeyboard(DoubtDetailActivity.this);
-
-                                            //TODO code a organizar
-                                            final DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child("post-comments").child(doubtKey);
-                                            globalPostRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                    numComments.setText(String.valueOf(dataSnapshot.getChildrenCount()));
-                                                }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                }
-                                            });
-
                                             break;
                                         }
                                     }
@@ -352,7 +311,4 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                     }
                 });
     }
-
-
-
 }
