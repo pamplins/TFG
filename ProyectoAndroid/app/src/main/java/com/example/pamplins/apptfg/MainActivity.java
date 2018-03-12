@@ -18,6 +18,8 @@ import com.example.pamplins.apptfg.Fragments.SearchFragment;
  * Created by Gustavo on 17/02/2018.
  */
 
+//TODO ver que mientras carga de poner un mensaje
+
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;

@@ -8,19 +8,20 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.HoldersAdapters.CommentAdapter;
+import com.example.pamplins.apptfg.HoldersAdapters.CommentViewHolder;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,15 +36,10 @@ import java.util.Locale;
 import java.util.Map;
 
 public class DoubtDetailActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public static final String EXTRA_POST_KEY = "post_key";
-
     private DatabaseReference doubtReference;
     private DatabaseReference commentsReference;
-    private DatabaseReference mDatabase;
     private ValueEventListener doubtListener;
     private String doubtKey;
-    private CommentViewHolder.CommentAdapter commentAdapter;
 
     private TextView tvAuthor;
     private TextView tvTitle;
@@ -52,7 +48,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     private EditText etComment;
     private ImageView img;
     private Button btnComment;
-    private RecyclerView commentsRecycler;
 
     public TextView numLikes;
     public ImageView like;
@@ -63,34 +58,37 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     private Controller ctrl;
 
     private Doubt currentdDoubt;
+    private RecyclerView mRecycler;
+    private LinearLayoutManager mManager;
+    private FirebaseRecyclerAdapter<Comment, CommentViewHolder> mAdapter;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments_doubt);
-        doubtKey = getIntent().getStringExtra(EXTRA_POST_KEY);
+        doubtKey = getIntent().getStringExtra(Constants.KEY_DOUBT);
         if (doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
         initElements();
     }
 
+
     private void initElements(){
         ctrl = Controller.getInstance();
         doubtReference = FirebaseDatabase.getInstance().getReference()
-                .child("doubts").child(doubtKey);
+                .child(Constants.REF_DOUBTS).child(doubtKey);
         commentsReference = FirebaseDatabase.getInstance().getReference()
-                .child("post-comments").child(doubtKey);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+                .child(Constants.REF_POST_COMMENTS).child(doubtKey);
 
         tvAuthor = findViewById(R.id.post_author);
         tvTitle = findViewById(R.id.post_title);
-        tvDate = findViewById(R.id.tv_date); //modificado
+        tvDate = findViewById(R.id.tv_date);
         tvDescription = findViewById(R.id.post_description);
         etComment = findViewById(R.id.field_comment_text);
         img = findViewById(R.id.post_author_photo);
         btnComment = findViewById(R.id.button_post_comment);
-        commentsRecycler = findViewById(R.id.recycler_comments);
 
         like = findViewById(R.id.like);
         numLikes = findViewById(R.id.num_likes);
@@ -100,7 +98,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         numComments = findViewById(R.id.num_comments);
 
         btnComment.setOnClickListener(this);
-        commentsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -114,6 +112,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                 setElementsDoubt();
                 putLikes();
                 putDisLikes();
+                iniCommentSection();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -121,16 +120,34 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         };
         doubtReference.addValueEventListener(postListener);
         doubtListener = postListener;
-        commentAdapter = new CommentViewHolder.CommentAdapter(this, DoubtDetailActivity.this, commentsReference);
-        commentsRecycler.setAdapter(commentAdapter);
+    }
+
+
+    private void iniCommentSection() {
+        mRecycler = this.findViewById(R.id.recycler_comments);
+        mManager = new LinearLayoutManager(this);
+        mManager.setReverseLayout(false);
+        mManager.setStackFromEnd(true);
+        mRecycler.setLayoutManager(mManager);
+        final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Comment>()
+                .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey), Comment.class)
+                .build();
+        setCommentAdapter(options);
+    }
+
+    private void setCommentAdapter(FirebaseRecyclerOptions options) {
+        mAdapter = new CommentAdapter(options, this, doubtKey, mDatabase, ctrl);
+        mRecycler.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+        mAdapter.startListening();
     }
 
     private void putDisLikes(){
         bindDisLikes(currentdDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(currentdDoubt.getUid()).child(doubtKey);
+                DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
                 onDisLikeClicked(globalPostRef);
                 onDisLikeClicked(userPostRef);
             }
@@ -141,9 +158,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         bindLikes(currentdDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseReference globalPostRef = mDatabase.child("doubts").child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child("user_doubts").child(currentdDoubt.getUid()).child(doubtKey);
-                // Run two transactions
+                DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
                 onLikeClicked(globalPostRef);
                 onLikeClicked(userPostRef);
             }
@@ -180,7 +196,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         if (doubtListener != null) {
             doubtReference.removeEventListener(doubtListener);
         }
-        commentAdapter.cleanupListener();
+        if (mAdapter != null) {
+            mAdapter.stopListening();
+        }
     }
 
     @Override
@@ -194,7 +212,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));
         like.setOnClickListener(clickListener);
-
     }
 
     public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){

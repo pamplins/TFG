@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.Utils;
@@ -133,8 +134,8 @@ public class Register extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         String name = etUserName.getText().toString().trim();
         if (checkInputs()) {
-            DatabaseReference users = FirebaseDatabase.getInstance().getReference("users");
-            users.orderByChild("userName").equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
+            DatabaseReference users = FirebaseDatabase.getInstance().getReference(Constants.REF_USERS);
+            users.orderByChild(Constants.REF_USERNAME).equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
                  @Override
                  public void onDataChange(DataSnapshot dataSnapshot) {
                      if(!dataSnapshot.exists()){

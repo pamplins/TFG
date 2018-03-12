@@ -1,32 +1,19 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.HoldersAdapters;
 
 /**
  * Created by Gustavo on 21/02/2018.
  */
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.os.SystemClock;
+
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.Fragments.HomeFragment;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import org.w3c.dom.Text;
+import com.example.pamplins.apptfg.R;
 
 public class DoubtViewHolder extends RecyclerView.ViewHolder {
 

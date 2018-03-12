@@ -1,10 +1,7 @@
 package com.example.pamplins.apptfg.Fragments;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,19 +10,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -83,7 +77,7 @@ public class NewDoubtFragment extends Fragment {
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
          if (checkInputs(title, description)){
-            mDatabase.child("users").child(ctrl.getUid()).addListenerForSingleValueEvent(
+            mDatabase.child(Constants.REF_USERS).child(ctrl.getUid()).addListenerForSingleValueEvent(
                     new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -123,7 +117,7 @@ public class NewDoubtFragment extends Fragment {
 
     }
     private void writeNewDoubt(String userId, String title, String body, User user) {
-        String key = mDatabase.child("doubts").push().getKey();
+        String key = mDatabase.child(Constants.REF_DOUBTS).push().getKey();
         String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         Doubt doubt = new Doubt(userId, title, body, date, user);
         Map<String, Object> postValues = doubt.toMap();

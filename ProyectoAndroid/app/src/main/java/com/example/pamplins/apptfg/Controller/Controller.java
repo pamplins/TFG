@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
@@ -58,7 +59,7 @@ public class Controller {
 
 
     public Query getUsersbyUserName(){
-        return FirebaseDatabase.getInstance().getReference("users").orderByChild("userName");
+        return FirebaseDatabase.getInstance().getReference(Constants.REF_USERS).orderByChild(Constants.REF_USERNAME);
     }
 
     public static void writeUserDB(String uid, String userName, String email, String spinnerItem, Bitmap bit, String imagePath) {
