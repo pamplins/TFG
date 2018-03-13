@@ -70,9 +70,9 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
                 // Run two transactions
-                onLikeClicked(globalPostRef);
-                onLikeClicked(userPostRef);
-            }
+                onLikeClicked(globalPostRef,true);
+                onLikeClicked(userPostRef, true);
+        }
         });
 
         viewHolder.bindDisLikes(doubt, new View.OnClickListener() {
@@ -81,14 +81,13 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
                 // Run two transactions
-                onDisLikeClicked(globalPostRef);
-                onDisLikeClicked(userPostRef);
+                onDisLikeClicked(globalPostRef, true);
+                onDisLikeClicked(userPostRef, true);
             }
         });
     }
 
     private void checkLikesDis(Doubt doubt, DoubtViewHolder viewHolder) {
-        // TODO si le da like y el dislike estaba ya activo. qitar dislike (restando de la mapHash) y activar like (+1 hashMap)
         if (doubt.getLikes().containsKey(ctrl.getUid())) {
             viewHolder.getLike().setImageResource(R.drawable.like_ac);
         } else {
@@ -101,7 +100,7 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
         }
     }
 
-    private void onLikeClicked(DatabaseReference postRef) {
+    private void onLikeClicked(final DatabaseReference postRef, final boolean checkDisLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -110,16 +109,14 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
                     return Transaction.success(mutableData);
                 }
                 if (doubt.getLikes().containsKey(ctrl.getUid())) {
-                    // Unstar the post and remove self from stars
+                    // si la duda tiene like se la quitamos
                     doubt.setLikesCount(doubt.getLikesCount() - 1);
                     doubt.getLikes().remove(ctrl.getUid());
                 } else {
-                    // Star the post and add self to stars
                     doubt.setLikesCount(doubt.getLikesCount() + 1);
                     doubt.getLikes().put(ctrl.getUid(), true);
                 }
 
-                // Set value and report transaction success
                 mutableData.setValue(doubt);
                 return Transaction.success(mutableData);
             }
@@ -127,11 +124,17 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
+                if(checkDisLike){ //comprobaremos si tiene dislike para asi quitarlo o ponerlo. Enviamos falso para no comprobar de nuevo el like. solo Dislike
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getDislikes().containsKey(ctrl.getUid())){
+                        onDisLikeClicked(postRef, false);
+                    }
+                }
             }
         });
     }
 
-    private void onDisLikeClicked(DatabaseReference postRef) {
+    private void onDisLikeClicked(final DatabaseReference postRef, final boolean checkLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -140,16 +143,12 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
                     return Transaction.success(mutableData);
                 }
                 if (doubt.getDislikes().containsKey(ctrl.getUid())) {
-                    // Unstar the post and remove self from stars
                     doubt.setDislikesCount(doubt.getDislikesCount() - 1);
                     doubt.getDislikes().remove(ctrl.getUid());
                 } else {
-                    // Star the post and add self to stars
                     doubt.setDislikesCount(doubt.getDislikesCount() + 1);
                     doubt.getDislikes().put(ctrl.getUid(), true);
                 }
-
-                // Set value and report transaction success
                 mutableData.setValue(doubt);
                 return Transaction.success(mutableData);
             }
@@ -157,6 +156,13 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
+                if(checkLike){
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getLikes().containsKey(ctrl.getUid())){
+                        onLikeClicked(postRef, false);
+                    }
+                }
+
             }
         });
     }

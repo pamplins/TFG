@@ -148,8 +148,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
-                onDisLikeClicked(globalPostRef);
-                onDisLikeClicked(userPostRef);
+                onDisLikeClicked(globalPostRef, true);
+                onDisLikeClicked(userPostRef, true);
             }
         });
     }
@@ -160,8 +160,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
-                onLikeClicked(globalPostRef);
-                onLikeClicked(userPostRef);
+                onLikeClicked(globalPostRef, true);
+                onLikeClicked(userPostRef, true);
             }
         });
     }
@@ -219,7 +219,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         dislike.setOnClickListener(clickListener);
     }
 
-    private void onLikeClicked(DatabaseReference postRef) {
+    private void onLikeClicked(final DatabaseReference postRef, final boolean checkDisLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -228,16 +228,12 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                     return Transaction.success(mutableData);
                 }
                 if (doubt.getLikes().containsKey(ctrl.getUid())) {
-                    // Unstar the post and remove self from stars
                     doubt.setLikesCount(doubt.getLikesCount() - 1);
                     doubt.getLikes().remove(ctrl.getUid());
                 } else {
-                    // Star the post and add self to stars
                     doubt.setLikesCount(doubt.getLikesCount() + 1);
                     doubt.getLikes().put(ctrl.getUid(), true);
                 }
-
-                // Set value and report transaction success
                 mutableData.setValue(doubt);
                 return Transaction.success(mutableData);
             }
@@ -245,11 +241,17 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
+                if(checkDisLike){
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getDislikes().containsKey(ctrl.getUid())){
+                        onDisLikeClicked(postRef, false);
+                    }
+                }
             }
         });
     }
 
-    private void onDisLikeClicked(DatabaseReference postRef) {
+    private void onDisLikeClicked(final DatabaseReference postRef, final boolean checkLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -258,16 +260,12 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                     return Transaction.success(mutableData);
                 }
                 if (doubt.getDislikes().containsKey(ctrl.getUid())) {
-                    // Unstar the post and remove self from stars
                     doubt.setDislikesCount(doubt.getDislikesCount() - 1);
                     doubt.getDislikes().remove(ctrl.getUid());
                 } else {
-                    // Star the post and add self to stars
                     doubt.setDislikesCount(doubt.getDislikesCount() + 1);
                     doubt.getDislikes().put(ctrl.getUid(), true);
                 }
-
-                // Set value and report transaction success
                 mutableData.setValue(doubt);
                 return Transaction.success(mutableData);
             }
@@ -275,6 +273,12 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
+                if(checkLike){
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getLikes().containsKey(ctrl.getUid())){
+                        onLikeClicked(postRef, false);
+                    }
+                }
             }
         });
     }
