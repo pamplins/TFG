@@ -13,6 +13,8 @@ public class Constants {
     public static final String REF_POST_COMMENTS = "post-comments";
     public static final String KEY_DOUBT = "doubtKey";
 
+    public static final String REF_PROFILE_IMAGES = "user_images/";
+
 
 
 }

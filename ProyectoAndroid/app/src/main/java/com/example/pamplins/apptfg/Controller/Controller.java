@@ -63,7 +63,7 @@ public class Controller {
     }
 
     public static void writeUserDB(String uid, String userName, String email, String spinnerItem, Bitmap bit, String imagePath) {
-        uploadImageProfile(uid, bit, imagePath, userName, email, spinnerItem, 0);
+        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, spinnerItem, 0);
 
     }
 
@@ -79,8 +79,8 @@ public class Controller {
         }
     }
 
-    public static void uploadImageProfile(final String uid, Bitmap bit, String path, final String userName, final String email, final String spinnerItem, final int action) {
-        String ref = "user_images/" + uid + "/" + path; // string de la ruta a la que ira
+    public static void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final String spinnerItem, final int action) {
+        String ref = folder + uid + "/" + path; // string de la ruta a la que ira
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -102,6 +102,9 @@ public class Controller {
                     db = FirebaseDatabase.getInstance().getReference();
                     db.child("users").child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
+                else{
+
+                }
             }
         });
     }
@@ -139,7 +142,26 @@ public class Controller {
         return output;
     }
 
-    public void showImage(Activity activity, Object obj, ImageView img) {
+    public void showImage(Activity activity, Object obj, ImageView img, int option) {
+        switch (option){
+            case 0:
+                urlProfile(activity, obj, img);
+                break;
+            case 1:
+                doubtImage(activity, obj, img);
+                break;
+        }
+
+    }
+
+    private void doubtImage(Activity activity, Object obj, ImageView img) {
+        String url = ((Doubt)obj).getUrlImage();
+        Glide.with(activity)
+                .load(url)
+                .into(img);
+    }
+
+    private void urlProfile(Activity activity, Object obj, ImageView img) {
         String url;
         if(obj.getClass().equals(Doubt.class)){
             url = ((Doubt)obj).getUser().getUrlProfileImage();
@@ -150,7 +172,9 @@ public class Controller {
                 .load(url)
                 .into(img);
     }
+
 }
+
 
 
 /*public static User getUser(){

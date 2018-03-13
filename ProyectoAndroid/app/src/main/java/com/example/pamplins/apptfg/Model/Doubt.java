@@ -20,17 +20,19 @@ public class Doubt {
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> dislikes = new HashMap<>();
     private long nComments;
+    private String urlImage;
 
     public Doubt() {
     }
 
-    public Doubt(String uid, String title, String description, String date, User user) {
+    public Doubt(String uid, String title, String description, String date, User user, String urlImage) {
         this.uid = uid;
         this.title = title;
         this.description = description;
         this.date = date;
         this.user = user;
         this.nComments = 0;
+        this.urlImage = urlImage;
     }
 
 
@@ -114,6 +116,14 @@ public class Doubt {
         this.nComments = nComments;
     }
 
+    public String getUrlImage() {
+        return urlImage;
+    }
+
+    public void setUrlImage(String urlImage) {
+        this.urlImage = urlImage;
+    }
+
     @Override
     public String toString() {
         return "Doubt{" +
@@ -127,6 +137,7 @@ public class Doubt {
                 ", likes=" + likes +
                 ", dislikes=" + dislikes +
                 ", nComments=" + nComments +
+                ", urlImage='" + urlImage + '\'' +
                 '}';
     }
 
@@ -143,6 +154,7 @@ public class Doubt {
         doubt.put("dislikes", dislikes);
         doubt.put("nComments", nComments);
         doubt.put("user", user);
+        doubt.put("urlImage", urlImage);
         return doubt;
     }
 }

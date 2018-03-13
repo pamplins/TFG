@@ -48,6 +48,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     private EditText etComment;
     private ImageView img;
     private Button btnComment;
+    private ImageView imgDoubt;
 
     public TextView numLikes;
     public ImageView like;
@@ -99,6 +100,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
         btnComment.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        imgDoubt = findViewById(R.id.iv_imageDoubtDetails);
     }
 
     @Override
@@ -172,7 +175,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         tvDescription.setText(currentdDoubt.getDescription());
         tvDate.setText(currentdDoubt.getDate());
         numComments.setText(String.valueOf(currentdDoubt.getnComments()));
-        ctrl.showImage(this, currentdDoubt, img);
+        ctrl.showImage(this, currentdDoubt, img, 0);
+        ctrl.showImage(this, currentdDoubt, imgDoubt, 1);
         checkLikesDis();
 
     }

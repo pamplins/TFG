@@ -65,7 +65,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
-        ctrl.showImage(activity, doubt, img);
+        ctrl.showImage(activity, doubt, img, 0);
     }
 
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){

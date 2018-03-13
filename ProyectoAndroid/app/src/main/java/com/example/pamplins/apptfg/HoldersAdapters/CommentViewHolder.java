@@ -74,7 +74,7 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         tvAuthor.setText(comment.getUser().getUserName());
         tvDescription.setText(comment.getText());
         date.setText(comment.getDate());
-        ctrl.showImage(activity, comment, img);
+        ctrl.showImage(activity, comment, img, 0);
     }
 
     public void bindLikes (Comment comment, View.OnClickListener clickListener){

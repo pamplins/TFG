@@ -4,17 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="16dp"
-    tools:context=".HoldersAdapters.DoubtDetailActivity"
+    tools:context=".DoubtDetailActivity"
     android:background="@color/backGround">
 
+    <LinearLayout
+        android:id="@+id/post_author_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <include
-        android:id="@+id/post_author_layout"
         layout="@layout/item_doubt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         />
+        <ImageView
+            android:id="@+id/iv_imageDoubtDetails"
+            android:layout_width="250px"
+            android:layout_height="250px"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+
     <!--
     <RelativeLayout
         android:id="@+id/linear_doubt"
@@ -96,7 +107,7 @@
         android:id="@+id/layout_recycler"
         android:layout_above="@id/comment_form">
 
-        <android.support.v7.widget.RecyclerView
+         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
