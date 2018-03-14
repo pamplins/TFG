@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
@@ -156,6 +157,9 @@ public class Controller {
 
     private void doubtImage(Activity activity, Object obj, ImageView img) {
         String url = ((Doubt)obj).getUrlImage();
+        if(url.equals("")){
+            img.setVisibility(View.GONE);
+        }
         Glide.with(activity)
                 .load(url)
                 .into(img);

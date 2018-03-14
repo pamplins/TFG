@@ -216,6 +216,7 @@ public class NewDoubtFragment extends Fragment {
         if(bit != null){
             uploadImageProfile(userId, bit, "doubt_images/", "image-doubt.jpg", title, body, user);
         }else{
+
             String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
             String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
             Doubt doubt = new Doubt(userId, title, body, date, user, "");
@@ -253,7 +254,6 @@ public class NewDoubtFragment extends Fragment {
                 childUpdates.put("/doubts/" + key, postValues);
                 childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
                 FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-
             }
         });
     }

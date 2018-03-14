@@ -4,16 +4,20 @@ package com.example.pamplins.apptfg;
  * Created by Gustavo on 21/02/2018.
  */
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.CommentAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.CommentViewHolder;
@@ -60,6 +64,8 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     private Doubt currentdDoubt;
     private RecyclerView mRecycler;
+    private RecyclerView mRecycler_items;
+
     private LinearLayoutManager mManager;
     private FirebaseRecyclerAdapter<Comment, CommentViewHolder> mAdapter;
     private DatabaseReference mDatabase;
@@ -128,10 +134,13 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void iniCommentSection() {
         mRecycler = this.findViewById(R.id.recycler_comments);
+
         mManager = new LinearLayoutManager(this);
         mManager.setReverseLayout(false);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
+
+
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Comment>()
                 .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey), Comment.class)
                 .build();
@@ -176,10 +185,28 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         tvDate.setText(currentdDoubt.getDate());
         numComments.setText(String.valueOf(currentdDoubt.getnComments()));
         ctrl.showImage(this, currentdDoubt, img, 0);
+
         ctrl.showImage(this, currentdDoubt, imgDoubt, 1);
+        //TODO recycleView fotos
         checkLikesDis();
 
     }
+
+    private class CustomViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView description;
+        private ImageView imageButton;
+
+        public CustomViewHolder(View itemView) {
+            super(itemView);
+            imageButton =  itemView.findViewById(R.id.iv_imageDoubtDetails);
+            description =   itemView.findViewById(R.id.tv_image_doubt_details);
+        }
+    }
+
+
+
+
 
     private void checkLikesDis() {
         if (currentdDoubt.getLikes().containsKey(ctrl.getUid())) {

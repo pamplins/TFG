@@ -18,12 +18,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
-        <ImageView
-            android:id="@+id/iv_imageDoubtDetails"
-            android:layout_width="250px"
-            android:layout_height="250px"
-            android:layout_gravity="center" />
+
+
     </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_items_doubt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/items_carousel"
+        android:paddingLeft="16dp"
+        android:layout_below="@+id/post_author_layout"
+        android:layout_gravity="center"
+        />
 
 
     <!--
@@ -96,7 +102,7 @@
         android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="16dp"
-        android:layout_below="@id/post_author_layout"
+        android:layout_below="@id/recycle_items_doubt"
         android:id="@+id/comments"
         android:textColor="@color/colorName"/>
 
