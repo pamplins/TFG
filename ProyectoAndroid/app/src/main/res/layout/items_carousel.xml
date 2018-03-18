@@ -8,22 +8,14 @@ android:layout_marginBottom="10dp">
 
 <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/backGround">
 
 
     <ImageView
         android:id="@+id/iv_imageDoubtDetails"
         android:layout_width="250px"
-        android:layout_height="250px"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:text="HOLAA"
-        android:id="@+id/tv_image_doubt_details"
-        android:layout_gravity="center"
-        android:layout_below="@id/iv_imageDoubtDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="250px"/>
 
 </RelativeLayout>
 

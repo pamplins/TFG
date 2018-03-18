@@ -5,22 +5,38 @@ package com.example.pamplins.apptfg;
  */
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.CommentAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.CommentViewHolder;
+import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
@@ -107,7 +123,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         btnComment.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        imgDoubt = findViewById(R.id.iv_imageDoubtDetails);
+        //imgDoubt = findViewById(R.id.iv_imageDoubtDetails);
+
+
     }
 
     @Override
@@ -185,28 +203,21 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         tvDate.setText(currentdDoubt.getDate());
         numComments.setText(String.valueOf(currentdDoubt.getnComments()));
         ctrl.showImage(this, currentdDoubt, img, 0);
+        //ctrl.showImage(this, currentdDoubt, imgDoubt, 1);
 
-        ctrl.showImage(this, currentdDoubt, imgDoubt, 1);
-        //TODO recycleView fotos
+        // Mostrar imagen de la duda en el carousel
+        mRecycler_items = findViewById(R.id.recycle_items_doubt);
+        mRecycler_items.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRecycler_items.setLayoutManager(linearLayoutManager);
+
+        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(this, currentdDoubt);
+        mRecycler_items.setAdapter(imageViewAdapter);
+
+
         checkLikesDis();
 
     }
-
-    private class CustomViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView description;
-        private ImageView imageButton;
-
-        public CustomViewHolder(View itemView) {
-            super(itemView);
-            imageButton =  itemView.findViewById(R.id.iv_imageDoubtDetails);
-            description =   itemView.findViewById(R.id.tv_image_doubt_details);
-        }
-    }
-
-
-
-
 
     private void checkLikesDis() {
         if (currentdDoubt.getLikes().containsKey(ctrl.getUid())) {
