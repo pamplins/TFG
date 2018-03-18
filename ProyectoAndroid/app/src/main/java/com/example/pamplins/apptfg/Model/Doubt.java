@@ -2,6 +2,7 @@ package com.example.pamplins.apptfg.Model;
 
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,19 +21,19 @@ public class Doubt {
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> dislikes = new HashMap<>();
     private long nComments;
-    private String urlImage;
+    private ArrayList<String> urlsImages;
 
     public Doubt() {
     }
 
-    public Doubt(String uid, String title, String description, String date, User user, String urlImage) {
+    public Doubt(String uid, String title, String description, String date, User user, ArrayList<String> urlsImages) {
         this.uid = uid;
         this.title = title;
         this.description = description;
         this.date = date;
         this.user = user;
         this.nComments = 0;
-        this.urlImage = urlImage;
+        this.urlsImages = urlsImages;
     }
 
 
@@ -116,12 +117,12 @@ public class Doubt {
         this.nComments = nComments;
     }
 
-    public String getUrlImage() {
-        return urlImage;
+    public ArrayList<String> getUrlsImages() {
+        return urlsImages;
     }
 
-    public void setUrlImage(String urlImage) {
-        this.urlImage = urlImage;
+    public void setUrlsImages(ArrayList<String> urlsImages) {
+        this.urlsImages = urlsImages;
     }
 
     @Override
@@ -137,7 +138,7 @@ public class Doubt {
                 ", likes=" + likes +
                 ", dislikes=" + dislikes +
                 ", nComments=" + nComments +
-                ", urlImage='" + urlImage + '\'' +
+                ", urlImage='" + urlsImages + '\'' +
                 '}';
     }
 
@@ -154,7 +155,7 @@ public class Doubt {
         doubt.put("dislikes", dislikes);
         doubt.put("nComments", nComments);
         doubt.put("user", user);
-        doubt.put("urlImage", urlImage);
+        doubt.put("urlsImages", urlsImages);
         return doubt;
     }
 }

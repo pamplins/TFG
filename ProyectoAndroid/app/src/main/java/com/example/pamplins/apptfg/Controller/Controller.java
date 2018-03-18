@@ -143,26 +143,8 @@ public class Controller {
         return output;
     }
 
-    public void showImage(Activity activity, Object obj, ImageView img, int option) {
-        switch (option){
-            case 0:
-                urlProfile(activity, obj, img);
-                break;
-            case 1:
-                doubtImage(activity, obj, img);
-                break;
-        }
-
-    }
-
-    private void doubtImage(Activity activity, Object obj, ImageView img) {
-        String url = ((Doubt)obj).getUrlImage();
-        if(url.equals("")){
-            img.setVisibility(View.GONE);
-        }
-        Glide.with(activity)
-                .load(url)
-                .into(img);
+    public void showProfileImage(Activity activity, Object obj, ImageView img) {
+        urlProfile(activity, obj, img);
     }
 
     private void urlProfile(Activity activity, Object obj, ImageView img) {

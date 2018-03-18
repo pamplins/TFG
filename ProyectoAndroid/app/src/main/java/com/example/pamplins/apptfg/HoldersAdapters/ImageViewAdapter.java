@@ -9,24 +9,24 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.ceylonlabs.imageviewpopup.ImagePopup;
-import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by Gustavo on 18/03/2018.
  */
 public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.ImageViewHolder> {
     private Activity activity;
-    private Doubt currentDoubt;
+    private ArrayList<String> urlImagesDoubt;
 
-    public ImageViewAdapter(Activity activity, Doubt currentDoubt){
+    public ImageViewAdapter(Activity activity, ArrayList<String> urlImagesDoubt){
         this.activity = activity;
-        this.currentDoubt = currentDoubt;
+        this.urlImagesDoubt = urlImagesDoubt;
     }
 
     @Override
     public ImageViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.items_carousel
                 , viewGroup, false);
         return new ImageViewHolder(view);
@@ -35,31 +35,25 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
 
     @Override
     public void onBindViewHolder(ImageViewHolder viewHolder, int position) {
+        String url = urlImagesDoubt.get(position);
+        Glide.with(activity)
+                .load(url)
+                .into(viewHolder.img);
         final ImagePopup imagePopup = new ImagePopup(activity);
-        imagePopup.initiatePopupWithGlide(currentDoubt.getUrlImage());
+        imagePopup.initiatePopupWithGlide(url);
         imagePopup.setFullScreen(true);
+        imagePopup.setImageOnClickClose(true);
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 imagePopup.viewPopup();
             }
         });
-        try{
-            if(!currentDoubt.getUrlImage().equals("")){
-                Glide.with(activity)
-                        .load(currentDoubt.getUrlImage())
-                        .into(viewHolder.img);
-            }else{
-
-            }
-        }catch (Exception ex){
-
-        }
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        return urlImagesDoubt.size();
     }
 
     class ImageViewHolder extends RecyclerView.ViewHolder {

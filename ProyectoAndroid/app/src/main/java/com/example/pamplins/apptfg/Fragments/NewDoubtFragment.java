@@ -3,15 +3,20 @@ package com.example.pamplins.apptfg.Fragments;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +24,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
@@ -42,8 +50,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -62,14 +72,18 @@ public class NewDoubtFragment extends Fragment {
     private EditText etTitle;
     private EditText etDescription;
     private Controller ctrl;
-    private ImageView imImageDoubte;
-    private Bitmap bit;
+
+    private RecyclerView mRecycler_items;
+    private ArrayList<String> urlsImages;
+    private ArrayList<String> donwloadurlsImages;
+
     public NewDoubtFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        urlsImages = new ArrayList<>();
     }
 
 
@@ -82,8 +96,6 @@ public class NewDoubtFragment extends Fragment {
 
         etTitle = view.findViewById(R.id.et_title_new_post);
         etDescription = view.findViewById(R.id.et_description_new_post);
-        imImageDoubte = view.findViewById(R.id.iv_imageDoubt);
-        bit = null;
         Button btnUpload = view.findViewById(R.id.btn_upload);
         btnUpload.setOnClickListener(new View.OnClickListener()
         {
@@ -103,6 +115,7 @@ public class NewDoubtFragment extends Fragment {
                 submitPost();
             }
         });
+
         return view;
 
     }
@@ -120,52 +133,39 @@ public class NewDoubtFragment extends Fragment {
      * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
      */
     private void openAlert() {
-        final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Añadir imagen");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Hacer foto")) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePictureIntent, 0);
-
-                } else if (items[item].equals("Seleccionar de galeria")) {
-
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");
-                    startActivityForResult(intent, 1);
-                }
-            }
-
-        });
-        builder.show();
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
     }
 
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        if (resultCode == RESULT_OK) {
-            if(requestCode == 0){
-                bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
-                imImageDoubte.setDrawingCacheEnabled(true);
-                imImageDoubte.buildDrawingCache();
-                imImageDoubte.setImageBitmap(Utils.getCircularBitmap(bit));
-            }else{
-                try {
-                    Uri uri = imageReturnedIntent.getData();
-                    InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
-                    bit = BitmapFactory.decodeStream(imageStream);
-                    imImageDoubte.setDrawingCacheEnabled(true);
-                    imImageDoubte.buildDrawingCache();
-                    imImageDoubte.setImageBitmap(Utils.getCircularBitmap(bit));
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == RESULT_OK){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if(data.getClipData() != null){
+                    int totalItemsSelected = data.getClipData().getItemCount();
+
+                    Uri fileUri;
+                    for(int i = 0; i < totalItemsSelected; i++){
+                        fileUri = data.getClipData().getItemAt(i).getUri();
+                        urlsImages.add(fileUri.toString());
+                    }
+                    mRecycler_items = getActivity().findViewById(R.id.recycle_items_doubt_nd);
+                    mRecycler_items.setHasFixedSize(true);
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+                    mRecycler_items.setLayoutManager(linearLayoutManager);
+
+                    ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
+                    mRecycler_items.setAdapter(imageViewAdapter);
+
                 }
             }
 
         }
+
     }
 
     private void submitPost() {
@@ -213,13 +213,12 @@ public class NewDoubtFragment extends Fragment {
 
     }
     private void writeNewDoubt(String userId, String title, String body, User user) {
-        if(bit != null){
-            uploadImageProfile(userId, bit, "doubt_images/", "image-doubt.jpg", title, body, user);
+        if(!urlsImages.isEmpty()){
+            uploadImageProfile(userId, "doubt_images/", "image-doubt", title, body, user);
         }else{
-
             String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
             String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-            Doubt doubt = new Doubt(userId, title, body, date, user, "");
+            Doubt doubt = new Doubt(userId, title, body, date, user, urlsImages);
             Map<String, Object> postValues = doubt.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/doubts/" + key, postValues);
@@ -228,37 +227,32 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
-    public static void uploadImageProfile(final String uid, Bitmap bit, String folder, final String path, final String title, final String body, final User user) {
-        String ref = folder + uid + "/" + path; // string de la ruta a la que ira
-        StorageReference mStorageRef;
-        mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bit.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-        mStorageRef.putBytes(data);
-        UploadTask uploadTask = mStorageRef.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                //TODO el usuario no se ha podido registrar porque no se ha podido subir la foto
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-                String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-                Doubt doubt = new Doubt(uid, title, body, date, user, downloadUrl.toString());
-                Map<String, Object> postValues = doubt.toMap();
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("/doubts/" + key, postValues);
-                childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
-                FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-            }
-        });
+    public void uploadImageProfile(final String uid, String folder, final String path, final String title, final String body, final User user) {
+        donwloadurlsImages = new ArrayList<>();
+        for(int i = 0; i < urlsImages.size(); i++){
+            String ref = folder + uid + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
+            StorageReference fileToUpload;
+            fileToUpload = FirebaseStorage.getInstance().getReference().child(ref);
+
+            final int finalI = i;
+            fileToUpload.putFile(Uri.parse(urlsImages.get(i))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                    donwloadurlsImages.add(downloadUrl.toString());
+                    if(finalI == urlsImages.size()-1){
+                        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
+                        String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                        Doubt doubt = new Doubt(uid, title, body, date, user, donwloadurlsImages);
+                        Map<String, Object> postValues = doubt.toMap();
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/doubts/" + key, postValues);
+                        childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
+                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                    }
+                }
+            });
+        }
     }
-
-
-
 
 }

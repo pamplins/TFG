@@ -46,7 +46,6 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         numComments = itemView.findViewById(R.id.num_comments);
     }
 
-
     public ImageView getLike() {
         return like;
     }
@@ -65,7 +64,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
             bodyView.setText(doubt.getDescription());
         }
         date.setText(doubt.getDate());
-        ctrl.showImage(activity, doubt, img, 0);
+        ctrl.showProfileImage(activity, doubt, img);
     }
 
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){

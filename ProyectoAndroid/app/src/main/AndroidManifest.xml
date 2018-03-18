@@ -39,10 +39,12 @@
         <activity
             android:name=".MainActivity"
             android:parentActivityName=".MainActivity"
-            android:label="MAIN">
+            android:label="MAIN"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
         </activity>
         <activity android:name=".DoubtDetailActivity"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden">
+        </activity>
 
     </application>
 

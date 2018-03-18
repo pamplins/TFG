@@ -62,7 +62,7 @@
                android:layout_marginLeft="16dp"
                android:layout_marginRight="16dp"
                android:hint="Descripción"
-               android:lines="8"
+               android:lines="5"
                android:padding="5dp"
                android:textSize="18dp"
                android:textColor="@color/colorTextDoubt"
@@ -71,31 +71,33 @@
                android:scrollHorizontally="false"
                />
 
+
         <Button
             android:id="@+id/btn_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/et_description_new_post"
             android:layout_alignStart="@+id/et_description_new_post"
-            android:layout_below="@+id/et_description_new_post" />
+            android:layout_below="@+id/et_description_new_post"
+            android:background="@mipmap/ic_select_images_doubt"
+            android:layout_marginBottom="20dp"/>
 
-        <ImageView
-            android:id="@+id/iv_imageDoubt"
-            android:layout_marginTop="10px"
-            android:layout_width="250px"
-            android:layout_height="250px"
-            android:layout_marginLeft="200px"
-            android:layout_alignLeft="@+id/et_description_new_post"
-            android:layout_alignStart="@+id/et_description_new_post"
-            android:layout_below="@+id/et_description_new_post" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycle_items_doubt_nd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/items_carousel"
+            android:paddingLeft="16dp"
+            android:layout_below="@+id/btn_upload"
+            android:layout_gravity="center" />
 
         <Button
-               android:layout_marginTop="140dp"
-               android:id="@+id/btn_newDoubt"
-               style="@style/button_style"
-               android:layout_centerHorizontal="true"
-               android:layout_below="@id/et_description_new_post"
-               android:layout_centerVertical="true"
-               android:text="Nueva duda" />
+            android:layout_marginTop="20dp"
+            android:id="@+id/btn_newDoubt"
+            style="@style/button_style"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/recycle_items_doubt_nd"
+            android:layout_centerVertical="true"
+            android:text="Nueva duda" />
        </RelativeLayout>
    </FrameLayout>
