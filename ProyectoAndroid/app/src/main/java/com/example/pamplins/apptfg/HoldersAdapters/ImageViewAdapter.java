@@ -1,6 +1,10 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +38,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
     }
 
     @Override
-    public void onBindViewHolder(ImageViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final ImageViewHolder viewHolder, int position) {
         String url = urlImagesDoubt.get(position);
         Glide.with(activity)
                 .load(url)
@@ -43,13 +47,33 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         imagePopup.initiatePopupWithGlide(url);
         imagePopup.setFullScreen(true);
         imagePopup.setImageOnClickClose(true);
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 imagePopup.viewPopup();
             }
         });
+
+        viewHolder.img.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Snackbar.make(activity.findViewById(android.R.id.content), activity.getClass().getName(), Snackbar.LENGTH_LONG)
+                        .show();
+                if(activity.getClass().getName().contains("MainActivity")) {
+                    removeItem(viewHolder.getAdapterPosition());
+                }
+                return true;
+
+            }
+        });
     }
+
+    private void removeItem(int adapterPosition) {
+        urlImagesDoubt.remove(adapterPosition);
+        notifyItemRemoved(adapterPosition);
+        notifyItemRangeChanged(adapterPosition, urlImagesDoubt.size());
+    }
+
 
     @Override
     public int getItemCount() {
@@ -58,12 +82,10 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
         private ImageView img;
-
         public ImageViewHolder(View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.iv_imageDoubtDetails);
         }
-
     }
 }
 

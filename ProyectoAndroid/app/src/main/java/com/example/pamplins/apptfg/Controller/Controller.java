@@ -46,7 +46,10 @@ public class Controller {
     }
 
     public static Controller getInstance(){
-        return ctrl == null ? new Controller() : ctrl;
+        if(ctrl == null){
+            ctrl = new Controller();
+        }
+        return ctrl;
     }
 
     public void hideKeyboard(Activity activity){

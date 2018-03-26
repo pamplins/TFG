@@ -60,7 +60,7 @@
                 android:id="@+id/tv_forget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
+                android:layout_marginLeft="40dp"
                 android:onClick="forgotPassword"
                 android:text="@string/tv_forget" />
 

@@ -53,11 +53,15 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mRecycler = getActivity().findViewById(R.id.messages_list);
+        mRecycler.setVisibility(View.GONE);
         showDoubtsHome();
     }
 
     private void showDoubtsHome() {
-        mRecycler = getActivity().findViewById(R.id.messages_list);
+        //  mRecycler = getActivity().findViewById(R.id.messages_list);
+        //mRecycler.setVisibility(View.VISIBLE);
+
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
@@ -74,13 +78,18 @@ public class HomeFragment extends Fragment {
         mRecycler.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mAdapter.startListening();
+        mRecycler.setVisibility(View.VISIBLE);
+
+
     }
 
-
+/*
     @Override
     public void onStart() {
         super.onStart();
         if (mAdapter != null) {
+            // mAdapter.startListening();
+
             mAdapter.notifyDataSetChanged();
             mAdapter.startListening();
             mRecycler.setAdapter(mAdapter);
@@ -91,9 +100,9 @@ public class HomeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if (mAdapter != null) {
-            mAdapter.stopListening();
+            //mAdapter.stopListening();
         }
-    }
+    }*/
 
 
 }

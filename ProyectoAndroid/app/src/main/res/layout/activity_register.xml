@@ -12,15 +12,17 @@
         android:onClick="hideKeyboard"
         android:orientation="vertical">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/img_user"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
+            android:src="@drawable/user_img"
             android:onClick="openImage"
-            android:src="@drawable/user_img" />
+            app:civ_border_width="0dp"/>
 
         <EditText
             android:id="@+id/et_userName"
@@ -46,7 +48,7 @@
         <Spinner
             android:id="@+id/spinner"
             style="@style/spinner_style"
-            android:width="2dp"
+            android:width="0dp"
             android:prompt="@string/hint_spinner" />
 
         <ProgressBar
