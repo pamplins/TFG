@@ -88,6 +88,8 @@
             android:layout_height="wrap_content"
             tools:listitem="@layout/items_carousel"
             android:paddingLeft="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
             android:layout_below="@+id/btn_upload"
             android:layout_gravity="center" />
 

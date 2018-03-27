@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -47,18 +48,18 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         ctrl = Controller.getInstance();
+        mRecycler = rootView.findViewById(R.id.messages_list);
+        mRecycler.setVisibility(View.GONE);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mRecycler = getActivity().findViewById(R.id.messages_list);
-        mRecycler.setVisibility(View.GONE);
         showDoubtsHome();
     }
 
-    private void showDoubtsHome() {
+    public void showDoubtsHome() {
         //  mRecycler = getActivity().findViewById(R.id.messages_list);
         //mRecycler.setVisibility(View.VISIBLE);
 
@@ -74,13 +75,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void setDoubtAdapter(FirebaseRecyclerOptions options){
+
         mAdapter = new DoubtAdapter(options, getActivity(), ctrl, mDatabase);
         mRecycler.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mAdapter.startListening();
         mRecycler.setVisibility(View.VISIBLE);
-
-
     }
 
 /*

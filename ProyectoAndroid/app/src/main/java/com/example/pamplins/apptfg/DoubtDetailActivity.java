@@ -6,6 +6,7 @@ package com.example.pamplins.apptfg;
 
 import android.os.Bundle;
 
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -79,6 +81,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
         initElements();
+        iniCommentSection();
     }
 
 
@@ -106,6 +109,9 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
         btnComment.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mRecycler = this.findViewById(R.id.recycler_comments);
+        mRecycler.setVisibility(View.GONE);
     }
 
     @Override
@@ -119,7 +125,6 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
                 setElementsDoubt();
                 putLikes();
                 putDisLikes();
-                iniCommentSection();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -131,14 +136,11 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
 
     private void iniCommentSection() {
-        mRecycler = this.findViewById(R.id.recycler_comments);
-
+        //mRecycler = this.findViewById(R.id.recycler_comments);
         mManager = new LinearLayoutManager(this);
-        mManager.setReverseLayout(false);
-        mManager.setStackFromEnd(true);
+        //mManager.setReverseLayout(false);
+        //mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-
-
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Comment>()
                 .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey), Comment.class)
                 .build();
@@ -150,6 +152,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         mRecycler.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mAdapter.startListening();
+        mRecycler.setVisibility(View.VISIBLE);
     }
 
     private void putDisLikes(){
@@ -222,7 +225,7 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
             doubtReference.removeEventListener(doubtListener);
         }
         if (mAdapter != null) {
-            mAdapter.stopListening();
+            //mAdapter.stopListening();
         }
     }
 
