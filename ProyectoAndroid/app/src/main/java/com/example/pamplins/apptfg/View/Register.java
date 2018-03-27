@@ -130,10 +130,11 @@ public class Register extends AppCompatActivity {
      *
      * @param v
      */
-    public void createAccount(View v){
+    public void createAccount(final View v){
         progressBar.setVisibility(View.VISIBLE);
         String name = etUserName.getText().toString().trim();
         if (checkInputs()) {
+            v.setEnabled(false);
             DatabaseReference users = FirebaseDatabase.getInstance().getReference(Constants.REF_USERS);
             users.orderByChild(Constants.REF_USERNAME).equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
                  @Override
@@ -148,11 +149,13 @@ public class Register extends AppCompatActivity {
                                          FirebaseUser user = mAuth.getCurrentUser();
                                          updateUI(user);
                                          progressBar.setVisibility(View.INVISIBLE);
+                                         v.setEnabled(true);
                                      } else {
                                          etEmail.setError(getString(R.string.err_email_exist));
                                          progressBar.setVisibility(View.INVISIBLE);
-                                     }
+                                         v.setEnabled(true);
 
+                                     }
                                  }
                              });
                      }
@@ -262,7 +265,7 @@ public class Register extends AppCompatActivity {
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem, bit, "image_profile.jpg");
+        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem, bit, "image_profile.jpg", 0);
         //Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 

@@ -50,6 +50,15 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         imagePopup.initiatePopupWithGlide(url);
         imagePopup.setFullScreen(true);
         imagePopup.setImageOnClickClose(true);
+        //TODO hacer custom dialog y añadir pra zoom:
+        /*
+        PhotoViewAttacher pAttacher;
+        pAttacher = new PhotoViewAttacher(Your_Image_View);
+        pAttacher.update();
+        Add below line in build.gradle:
+
+        compile 'com.commit451:PhotoView:1.2.4
+         */
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

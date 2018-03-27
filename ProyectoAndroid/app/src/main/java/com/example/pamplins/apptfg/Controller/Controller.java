@@ -66,8 +66,8 @@ public class Controller {
         return FirebaseDatabase.getInstance().getReference(Constants.REF_USERS).orderByChild(Constants.REF_USERNAME);
     }
 
-    public static void writeUserDB(String uid, String userName, String email, String spinnerItem, Bitmap bit, String imagePath) {
-        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, spinnerItem, 0);
+    public static void writeUserDB(String uid, String userName, String email, String spinnerItem, Bitmap bit, String imagePath, int action) {
+        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, spinnerItem, action);
 
     }
 
@@ -107,6 +107,10 @@ public class Controller {
                     db.child("users").child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
                 else{
+                    //TODO hacer multi-path updates
+                    db = FirebaseDatabase.getInstance().getReference();
+                    db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
+                    db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
 
                 }
             }

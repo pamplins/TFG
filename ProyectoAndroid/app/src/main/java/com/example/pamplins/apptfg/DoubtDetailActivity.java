@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class DoubtDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
     private DatabaseReference commentsReference;
     private ValueEventListener doubtListener;
@@ -107,7 +107,16 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         numDisLikes = findViewById(R.id.num_dislikes);
         numComments = findViewById(R.id.num_comments);
 
-        btnComment.setOnClickListener(this);
+        //btnComment.setOnClickListener(this);
+        btnComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                postComment();
+            }
+        });
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mRecycler = this.findViewById(R.id.recycler_comments);
@@ -138,12 +147,19 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
     private void iniCommentSection() {
         //mRecycler = this.findViewById(R.id.recycler_comments);
         mManager = new LinearLayoutManager(this);
-        //mManager.setReverseLayout(false);
         //mManager.setStackFromEnd(true);
+        //mManager.setReverseLayout(true);
         mRecycler.setLayoutManager(mManager);
+
+        /*options = new FirebaseRecyclerOptions.Builder<Comment>()
+                .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey).orderByChild("likesCount"), Comment.class)
+                .build();
+        */
+
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Comment>()
                 .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey), Comment.class)
                 .build();
+
         setCommentAdapter(options);
     }
 
@@ -229,14 +245,17 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    @Override
+    /*@Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.button_post_comment) {
             postComment();
         }
-    }
+    }*/
 
+    private void setBtnDoubt(boolean enabled) {
+        btnComment.setEnabled(enabled);
+    }
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));
         like.setOnClickListener(clickListener);
@@ -313,51 +332,54 @@ public class DoubtDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void postComment() {
         final String uid = ctrl.getUid();
-        FirebaseDatabase.getInstance().getReference().child("users").child(uid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        final User user = dataSnapshot.getValue(User.class);
-                        final String authorName = user.getUserName();
+        final String commentText = etComment.getText().toString();
+        if(commentText.isEmpty()){
+            etComment.setError("Entra comentario");
+        }else {
+            setBtnDoubt(false); // evitar multiples creaciones de dudas
+            FirebaseDatabase.getInstance().getReference().child("users").child(uid)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            final User user = dataSnapshot.getValue(User.class);
+                            final String authorName = user.getUserName();
 
-                        final String commentText = etComment.getText().toString();
-                        if(commentText.isEmpty()){
-                            etComment.setError("Entra comentario");
-                        }
-                        if(!commentText.isEmpty()){
                             ctrl.getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                                         User user = childSnapshot.getValue(User.class);
-                                        if(user.getUserName().equals(authorName)){
-                                            String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                                        if (user.getUserName().equals(authorName)) {
+                                            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-                                            Comment comment = new Comment(uid ,commentText, date, user);
+                                            Comment comment = new Comment(uid, commentText, date, user);
                                             Map<String, Object> commentValues = comment.toMap();
 
                                             commentsReference.push().setValue(commentValues);
                                             etComment.setText(null);
-                                            currentdDoubt.setnComments(currentdDoubt.getnComments()+1);
+                                            currentdDoubt.setnComments(currentdDoubt.getnComments() + 1);
                                             doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
                                             ctrl.hideKeyboard(DoubtDetailActivity.this);
+                                            setBtnDoubt(true);
                                             break;
                                         }
                                     }
                                 }
+
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-
+                                    setBtnDoubt(true);
                                 }
                             });
+
+
                         }
 
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            setBtnDoubt(true);
+                        }
+                    });
+        }
     }
 }

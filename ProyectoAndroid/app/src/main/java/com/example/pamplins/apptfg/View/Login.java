@@ -88,11 +88,12 @@ public class Login extends AppCompatActivity {
      *
      * @param v
      */
-    public void signIn(View v) {
+    public void signIn(final View v) {
         email = etEmail.getText().toString().trim();
         if(checkInputs()){
+            v.setEnabled(false);
             if(email.contains("@")){
-                authentication();
+                authentication(v);
             }else {
                 DatabaseReference users = FirebaseDatabase.getInstance().getReference(Constants.REF_USERS);
                 users.orderByChild(Constants.REF_USERNAME).equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -105,12 +106,12 @@ public class Login extends AppCompatActivity {
                          }
                          email = user.getEmail();
                      }
-                     authentication();
+                     authentication(v);
                  }
 
                  @Override
                  public void onCancelled(DatabaseError databaseError) {
-
+                     v.setEnabled(true);
                  }
              });
             }
@@ -119,8 +120,9 @@ public class Login extends AppCompatActivity {
 
     /***
      * Metodo encargado de autentificar que el correo y la contraseña son de un usuario existentes
+     * @param v
      */
-    public void authentication(){
+    public void authentication(final View v){
         String password = etPassword.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -130,10 +132,12 @@ public class Login extends AppCompatActivity {
                 {
                     updateUI(mAuth.getCurrentUser(),false);
                     progressBar.setVisibility(View.GONE);
+                    v.setEnabled(true);
                 }else{
                     Snackbar.make(findViewById(android.R.id.content), R.string.err_login, Snackbar.LENGTH_LONG)
                             .show();
                     progressBar.setVisibility(View.GONE);
+                    v.setEnabled(true);
                 }
             }
         });

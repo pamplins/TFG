@@ -71,6 +71,7 @@ public class NewDoubtFragment extends Fragment {
 
     private EditText etTitle;
     private EditText etDescription;
+    private Button btnNewDoubt;
     private Controller ctrl;
 
     private RecyclerView mRecycler_items;
@@ -106,7 +107,7 @@ public class NewDoubtFragment extends Fragment {
             }
         });
 
-        Button btnNewDoubt = view.findViewById(R.id.btn_newDoubt);
+        btnNewDoubt = view.findViewById(R.id.btn_newDoubt);
         btnNewDoubt.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -147,7 +148,6 @@ public class NewDoubtFragment extends Fragment {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 if(data.getClipData() != null){
                     int totalItemsSelected = data.getClipData().getItemCount();
-
                     Uri fileUri;
                     for(int i = 0; i < totalItemsSelected; i++){
                         fileUri = data.getClipData().getItemAt(i).getUri();
@@ -160,11 +160,10 @@ public class NewDoubtFragment extends Fragment {
 
                     ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
                     mRecycler_items.setAdapter(imageViewAdapter);
-
                 }
             }
-
         }
+
 
     }
 
@@ -172,7 +171,8 @@ public class NewDoubtFragment extends Fragment {
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
          if (checkInputs(title, description)){
-            mDatabase.child(Constants.REF_USERS).child(ctrl.getUid()).addListenerForSingleValueEvent(
+             setBtnDoubt(false); // evitar multiples creaciones de dudas
+             mDatabase.child(Constants.REF_USERS).child(ctrl.getUid()).addListenerForSingleValueEvent(
                     new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -182,20 +182,36 @@ public class NewDoubtFragment extends Fragment {
 
                                     writeNewDoubt(ctrl.getUid(), title, description, user);
                                     ctrl.hideKeyboard(getActivity());
-                                    Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente" , Snackbar.LENGTH_LONG)
-                                            .show();
                                 } else {
                                     Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
                                             .show();
+                                    setBtnDoubt(true);
+
                                 }
 
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
+                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Ha habido un error en la creacion de la duda" , Snackbar.LENGTH_LONG)
+                                    .show();
+                            setBtnDoubt(true);
                         }
                     });
         }
+    }
+
+    private void clearItems() {
+        Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
+                .show();
+        setBtnDoubt(true);
+        etTitle.setText("");
+        etDescription.setText("");
+        if (!urlsImages.isEmpty()) {
+            urlsImages.clear();
+            mRecycler_items.getAdapter().notifyDataSetChanged();
+        }
+
     }
 
     private boolean checkInputs(String title, String description){
@@ -224,13 +240,15 @@ public class NewDoubtFragment extends Fragment {
             childUpdates.put("/doubts/" + key, postValues);
             childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
             FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+            setBtnDoubt(true);
+            clearItems();
         }
     }
 
     public void uploadImageProfile(final String uid, String folder, final String path, final String title, final String body, final User user) {
         donwloadurlsImages = new ArrayList<>();
         for(int i = 0; i < urlsImages.size(); i++){
-            String ref = folder + uid + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
+            String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
             StorageReference fileToUpload;
             fileToUpload = FirebaseStorage.getInstance().getReference().child(ref);
 
@@ -240,19 +258,26 @@ public class NewDoubtFragment extends Fragment {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                     donwloadurlsImages.add(downloadUrl.toString());
-                    if(finalI == urlsImages.size()-1){
+                    if(finalI == urlsImages.size()-1) {
                         String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-                        String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
                         Doubt doubt = new Doubt(uid, title, body, date, user, donwloadurlsImages);
                         Map<String, Object> postValues = doubt.toMap();
                         Map<String, Object> childUpdates = new HashMap<>();
                         childUpdates.put("/doubts/" + key, postValues);
                         childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
                         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                        clearItems();
                     }
                 }
             });
         }
+
+    }
+
+
+    private void setBtnDoubt(boolean enabled) {
+        btnNewDoubt.setEnabled(enabled);
     }
 
 }

@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
@@ -48,7 +49,8 @@ import static android.app.Activity.RESULT_OK;
 public class ProfileFragment extends Fragment {
 
     private ImageView img;
-
+    private Controller ctrl;
+    private Bitmap bit;
     public ProfileFragment() {
     }
 
@@ -80,6 +82,7 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+        ctrl = Controller.getInstance();
         img = view.findViewById(R.id.img_user_profile);
 
         Button btn = view.findViewById(R.id.btn_changeImg);
@@ -91,6 +94,7 @@ public class ProfileFragment extends Fragment {
                 /**
                  * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
                  */openAlert();
+
 
             }
         });
@@ -113,6 +117,7 @@ public class ProfileFragment extends Fragment {
                     Intent intent = new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
                     startActivityForResult(intent, 1);
+
                 }
             }
 
@@ -122,7 +127,6 @@ public class ProfileFragment extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        Bitmap bit = null;
         if (resultCode == RESULT_OK) {
             if(requestCode == 0){
                 bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
@@ -139,6 +143,7 @@ public class ProfileFragment extends Fragment {
                     img.buildDrawingCache();
                     img.setImageBitmap(Utils.getCircularBitmap(bit));
 
+                    ctrl.writeUserDB(ctrl.getUid(), "", "", null, bit, "image_profile_2.jpg", 1);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
