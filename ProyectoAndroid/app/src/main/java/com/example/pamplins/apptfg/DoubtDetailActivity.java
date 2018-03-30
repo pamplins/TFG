@@ -6,7 +6,6 @@ package com.example.pamplins.apptfg;
 
 import android.os.Bundle;
 
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.CommentAdapter;
@@ -37,9 +34,6 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 public class DoubtDetailActivity extends AppCompatActivity {
@@ -240,18 +234,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         if (doubtListener != null) {
             doubtReference.removeEventListener(doubtListener);
         }
-        if (mAdapter != null) {
-            //mAdapter.stopListening();
-        }
     }
-
-    /*@Override
-    public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.button_post_comment) {
-            postComment();
-        }
-    }*/
 
     private void setBtnDoubt(boolean enabled) {
         btnComment.setEnabled(enabled);
@@ -338,48 +321,43 @@ public class DoubtDetailActivity extends AppCompatActivity {
         }else {
             setBtnDoubt(false); // evitar multiples creaciones de dudas
             FirebaseDatabase.getInstance().getReference().child("users").child(uid)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            final User user = dataSnapshot.getValue(User.class);
-                            final String authorName = user.getUserName();
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final User user = dataSnapshot.getValue(User.class);
+                        final String authorName = user.getUserName();
 
-                            ctrl.getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                                        User user = childSnapshot.getValue(User.class);
-                                        if (user.getUserName().equals(authorName)) {
-                                            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
-                                            Comment comment = new Comment(uid, commentText, date, user);
-                                            Map<String, Object> commentValues = comment.toMap();
-
-                                            commentsReference.push().setValue(commentValues);
-                                            etComment.setText(null);
-                                            currentdDoubt.setnComments(currentdDoubt.getnComments() + 1);
-                                            doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
-                                            ctrl.hideKeyboard(DoubtDetailActivity.this);
-                                            setBtnDoubt(true);
-                                            break;
-                                        }
+                        ctrl.getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                                    User user = childSnapshot.getValue(User.class);
+                                    if (user.getUserName().equals(authorName)) {
+                                        Comment comment = new Comment(uid, commentText, ctrl.getDate(), user);
+                                        Map<String, Object> commentValues = comment.toMap();
+                                        commentsReference.push().setValue(commentValues);
+                                        etComment.setText(null);
+                                        currentdDoubt.setnComments(currentdDoubt.getnComments() + 1);
+                                        doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
+                                        ctrl.hideKeyboard(DoubtDetailActivity.this);
+                                        setBtnDoubt(true);
+                                        break;
                                     }
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    setBtnDoubt(true);
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                setBtnDoubt(true);
+                            }
+                        });
+                    }
 
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            setBtnDoubt(true);
-                        }
-                    });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        setBtnDoubt(true);
+                    }
+                });
         }
     }
 }

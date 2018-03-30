@@ -32,6 +32,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Gustavo on 15/02/2018.
@@ -88,7 +95,7 @@ public class Controller {
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        getCircularBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bit.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
         mStorageRef.putBytes(data);
         UploadTask uploadTask = mStorageRef.putBytes(data);
@@ -107,7 +114,7 @@ public class Controller {
                     db.child("users").child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
                 else{
-                    //TODO hacer multi-path updates
+                    //TODO hacer multi-path updates -- ITERACION 5
                     db = FirebaseDatabase.getInstance().getReference();
                     db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
                     db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
@@ -117,44 +124,16 @@ public class Controller {
         });
     }
 
-    public static Bitmap getCircularBitmap(Bitmap bitmap) {
-        Bitmap output;
 
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            output = Bitmap.createBitmap(bitmap.getHeight(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        } else {
-            output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth(), Bitmap.Config.ARGB_8888);
-        }
-
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        float r = 0;
-
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            r = bitmap.getHeight() / 2;
-        } else {
-            r = bitmap.getWidth() / 2;
-        }
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawCircle(r, r, r, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
+    public String getDate(){
+        String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        Calendar currentTime = Calendar.getInstance();
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = currentTime.get(Calendar.MINUTE);
+        return date+","+hour+":"+minute;
     }
 
     public void showProfileImage(Activity activity, Object obj, ImageView img) {
-        urlProfile(activity, obj, img);
-    }
-
-    private void urlProfile(Activity activity, Object obj, ImageView img) {
         String url;
         if(obj.getClass().equals(Doubt.class)){
             url = ((Doubt)obj).getUser().getUrlProfileImage();
@@ -165,65 +144,4 @@ public class Controller {
                 .load(url)
                 .into(img);
     }
-
 }
-
-
-
-/*public static User getUser(){
-mAuth = FirebaseAuth.getInstance().getCurrentUser();
-ValueEventListener eventListener = new ValueEventListener() {
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for(DataSnapshot ds : dataSnapshot.getChildren()) {
-            user = ds.getValue(User.class);
-            if(user != null){
-                if (user.getUid().equals(mAuth.getUid())) {
-                    break;
-                }
-            }else{
-
-            }
-        }
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {}
-};
-db = FirebaseDatabase.getInstance().getReference();
-db.child("users").addListenerForSingleValueEvent(eventListener);
-return user;
-}
-
-
-
-String ref = "user_images/"+uid+"/image_profile.jpg";
-
-
-StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-storageRef.child(ref).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-    @Override
-    public void onSuccess(Uri uri) {
-        Bitmap bit = loadBitmapFromView(img);
-        img.setImageBitmap(Utils.getCircularBitmap(bit));
-        // Load the image using Glide
-        Glide.with(activity)
-                .load(uri.toString())
-                .into(img);
-
-    }
-}).addOnFailureListener(new OnFailureListener() {
-    @Override
-    public void onFailure(@NonNull Exception exception) {
-        // Handle any errors
-    }
-});
-
-
-private static Bitmap loadBitmapFromView(View v) {
-Bitmap b = Bitmap.createBitmap( v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-Canvas c = new Canvas(b);
-v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
-v.draw(c);
-return b;
-}*/

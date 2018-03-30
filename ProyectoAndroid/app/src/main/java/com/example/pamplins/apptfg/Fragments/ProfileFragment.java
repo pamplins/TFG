@@ -15,7 +15,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +22,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.View.Login;
-import com.example.pamplins.apptfg.View.Register;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -132,7 +127,7 @@ public class ProfileFragment extends Fragment {
                 bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
-                img.setImageBitmap(Utils.getCircularBitmap(bit));
+                img.setImageBitmap(bit);
 
             }else{
                 try {
@@ -141,7 +136,7 @@ public class ProfileFragment extends Fragment {
                     bit = BitmapFactory.decodeStream(imageStream);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
-                    img.setImageBitmap(Utils.getCircularBitmap(bit));
+                    img.setImageBitmap(bit);
 
                     ctrl.writeUserDB(ctrl.getUid(), "", "", null, bit, "image_profile_2.jpg", 1);
 
@@ -158,7 +153,6 @@ public class ProfileFragment extends Fragment {
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bit = Utils.getCircularBitmap(bit);
         getCroppedBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
         mStorageRef.putBytes(data);

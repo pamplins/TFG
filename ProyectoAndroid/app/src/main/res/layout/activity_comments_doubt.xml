@@ -40,70 +40,6 @@
 
         />
 
-
-    <!--
-    <RelativeLayout
-        android:id="@+id/linear_doubt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/border"
-        android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingBottom="45dp">
-
-        <LinearLayout
-            android:id="@+id/date_layout_comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/post_author_layout"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/post_author_layout"
-            android:gravity="center_vertical" >
-
-            <TextView
-            android:id="@+id/tv_date_comment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/colorTextDoubt"
-            android:textSize="12dp"
-            android:layout_marginRight="16dp" />
-
-
-            Esti estaba comentado
-            <TextView
-                android:id="@+id/tv_n_comments"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/colorTextDoubt"
-                android:textSize="12dp"
-                android:layout_marginRight="56dp"
-                />
-
-        </LinearLayout>
-
-        <include
-            android:id="@+id/post_author_layout"
-            layout="@layout/include_doubt_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true" />
-
-        <include
-            android:id="@+id/post_text_layout"
-            layout="@layout/include_doubt_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/post_author_layout"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp" />
-    </RelativeLayout>
-    -->
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -159,7 +95,7 @@
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:background="@drawable/send_button" />
+            android:background="@mipmap/ic_send_comment" />
 
     </LinearLayout>
 </RelativeLayout>

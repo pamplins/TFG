@@ -1,6 +1,5 @@
 package com.example.pamplins.apptfg.Fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -60,9 +58,6 @@ public class HomeFragment extends Fragment {
     }
 
     public void showDoubtsHome() {
-        //  mRecycler = getActivity().findViewById(R.id.messages_list);
-        //mRecycler.setVisibility(View.VISIBLE);
-
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
@@ -75,7 +70,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void setDoubtAdapter(FirebaseRecyclerOptions options){
-
         mAdapter = new DoubtAdapter(options, getActivity(), ctrl, mDatabase);
         mRecycler.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -83,26 +77,7 @@ public class HomeFragment extends Fragment {
         mRecycler.setVisibility(View.VISIBLE);
     }
 
-/*
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (mAdapter != null) {
-            // mAdapter.startListening();
 
-            mAdapter.notifyDataSetChanged();
-            mAdapter.startListening();
-            mRecycler.setAdapter(mAdapter);
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAdapter != null) {
-            //mAdapter.stopListening();
-        }
-    }*/
-
+    public void populateViewHolder(){}
 
 }

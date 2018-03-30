@@ -18,7 +18,7 @@ import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.Utils;
+import com.example.pamplins.apptfg.UtilsPassword;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -149,13 +149,15 @@ public class Login extends AppCompatActivity {
      * @return
      */
     private boolean checkInputs() {
-        if(etEmail.getText().toString().trim().isEmpty()){
+        boolean c_email = etEmail.getText().toString().trim().isEmpty();
+        boolean c_pass = etPassword.getText().toString().trim().isEmpty();
+        if(c_email){
             etEmail.setError("Entra el usuario o correo");
         }
-        if(etPassword.getText().toString().trim().isEmpty()){
+        if(c_pass){
             etPassword.setError("Entra la contraseña");
         }
-        if((!etEmail.getText().toString().trim().isEmpty()) && (!etPassword.getText().toString().trim().isEmpty())){
+        if((!c_email) && (!c_pass)){
             return true;
         }else{
             return false;
@@ -261,7 +263,7 @@ public class Login extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        Utils.showPassword(etPassword);
+        UtilsPassword.showPassword(etPassword);
     }
 
     public void hideKeyboard(View v){

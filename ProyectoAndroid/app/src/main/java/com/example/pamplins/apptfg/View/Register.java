@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.MainActivity;
-import com.example.pamplins.apptfg.Utils;
+import com.example.pamplins.apptfg.UtilsPassword;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 
@@ -122,7 +122,7 @@ public class Register extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        Utils.showPassword(etPassword);
+        UtilsPassword.showPassword(etPassword);
     }
 
     /**
@@ -182,19 +182,23 @@ public class Register extends AppCompatActivity {
      * @return
      */
     private boolean checkInputs() {
-        if(!userNameValidator()){
+        boolean c_userN = userNameValidator();
+        boolean c_email = emailValidator();
+        boolean c_pass = passwordValidator();
+        boolean c_curs = cursValidator();
+        if(!c_userN){
             etUserName.setError(getString(R.string.err_userName_len));
         }
-        if(!emailValidator()){
+        if(!c_email){
             etEmail.setError(getString(R.string.err_email_format));
         }
-        if(!passwordValidator()){
+        if(!c_pass){
             etPassword.setError(getString(R.string.err_pass_len));
         }
-        if(cursValidator()){
+        if(c_curs){
             ((TextView)spinner.getSelectedView()).setError(getString(R.string.err_course));
         }
-        if(userNameValidator() && emailValidator() && passwordValidator() && !cursValidator()){
+        if(c_userN && c_email && c_pass && !c_curs){
             return true;
         }
         return false;
@@ -266,7 +270,7 @@ public class Register extends AppCompatActivity {
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
         ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem, bit, "image_profile.jpg", 0);
-        //Utils.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
+        //UtilsPassword.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 
     /**
@@ -327,7 +331,7 @@ public class Register extends AppCompatActivity {
                 ImageView img = findViewById(R.id.img_user);
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
-                img.setImageBitmap(Utils.getCircularBitmap(bit));
+                img.setImageBitmap(bit);
             }else{
                 try {
                     Uri uri = imageReturnedIntent.getData();
@@ -336,7 +340,7 @@ public class Register extends AppCompatActivity {
                     ImageView img = findViewById(R.id.img_user);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
-                    img.setImageBitmap(Utils.getCircularBitmap(bit));
+                    img.setImageBitmap(bit);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }

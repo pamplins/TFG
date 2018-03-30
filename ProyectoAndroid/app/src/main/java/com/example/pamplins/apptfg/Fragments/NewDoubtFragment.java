@@ -1,20 +1,13 @@
 package com.example.pamplins.apptfg.Fragments;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
+
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,20 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import android.widget.TextView;
+
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.Utils;
-import com.example.pamplins.apptfg.View.Register;
-import com.google.android.gms.tasks.OnFailureListener;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,15 +35,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -84,9 +67,7 @@ public class NewDoubtFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        urlsImages = new ArrayList<>();
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,8 +78,8 @@ public class NewDoubtFragment extends Fragment {
 
         etTitle = view.findViewById(R.id.et_title_new_post);
         etDescription = view.findViewById(R.id.et_description_new_post);
-        Button btnUpload = view.findViewById(R.id.btn_upload);
-        btnUpload.setOnClickListener(new View.OnClickListener()
+        TextView tvUpload = view.findViewById(R.id.tv_upload);
+        tvUpload.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -116,13 +97,12 @@ public class NewDoubtFragment extends Fragment {
                 submitPost();
             }
         });
+        urlsImages = new ArrayList<>();
 
         return view;
-
     }
 
     private void selectImage() {
-
         if(ctrl.verifyPermissions(getActivity())) {
             openAlert();
         }else{
@@ -153,18 +133,24 @@ public class NewDoubtFragment extends Fragment {
                         fileUri = data.getClipData().getItemAt(i).getUri();
                         urlsImages.add(fileUri.toString());
                     }
-                    mRecycler_items = getActivity().findViewById(R.id.recycle_items_doubt_nd);
-                    mRecycler_items.setHasFixedSize(true);
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-                    mRecycler_items.setLayoutManager(linearLayoutManager);
-
-                    ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
-                    mRecycler_items.setAdapter(imageViewAdapter);
+                    createRecycleView();
+                }else if(data.getData() != null){
+                    Uri fileUri = data.getData();
+                    urlsImages.add(fileUri.toString());
+                    createRecycleView();
                 }
+
             }
         }
+    }
 
-
+    private void createRecycleView() {
+        mRecycler_items = getActivity().findViewById(R.id.recycle_items_doubt_nd);
+        mRecycler_items.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mRecycler_items.setLayoutManager(linearLayoutManager);
+        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
+        mRecycler_items.setAdapter(imageViewAdapter);
     }
 
     private void submitPost() {
@@ -178,19 +164,14 @@ public class NewDoubtFragment extends Fragment {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final User user = dataSnapshot.getValue(User.class);
                                 if (user != null) {
-                                   //writeNewDoubt(ctrl.getUid(), user.getUserName(), title, description);
-
                                     writeNewDoubt(ctrl.getUid(), title, description, user);
                                     ctrl.hideKeyboard(getActivity());
                                 } else {
                                     Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
                                             .show();
                                     setBtnDoubt(true);
-
                                 }
-
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             Snackbar.make(getActivity().findViewById(android.R.id.content), "Ha habido un error en la creacion de la duda" , Snackbar.LENGTH_LONG)
@@ -215,6 +196,7 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private boolean checkInputs(String title, String description){
+        //TODO hacer una comprobacion de que title tenga max x chars y descirption min x
         if(title.isEmpty()){
             etTitle.setError("Entra titulo");
         }
@@ -230,22 +212,25 @@ public class NewDoubtFragment extends Fragment {
     }
     private void writeNewDoubt(String userId, String title, String body, User user) {
         if(!urlsImages.isEmpty()){
-            uploadImageProfile(userId, "doubt_images/", "image-doubt", title, body, user);
+            uploadImagesDoubt(userId, "doubt_images/", "image-doubt", title, body, user);
         }else{
-            String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-            String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-            Doubt doubt = new Doubt(userId, title, body, date, user, urlsImages);
-            Map<String, Object> postValues = doubt.toMap();
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/doubts/" + key, postValues);
-            childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
-            FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-            setBtnDoubt(true);
-            clearItems();
+            uploadNewDoubt(userId, title, body, user, urlsImages);
         }
     }
 
-    public void uploadImageProfile(final String uid, String folder, final String path, final String title, final String body, final User user) {
+    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array){
+        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
+        Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
+        Map<String, Object> postValues = doubt.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/doubts/" + key, postValues);
+        childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+        setBtnDoubt(true);
+        clearItems();
+    }
+
+    public void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user) {
         donwloadurlsImages = new ArrayList<>();
         for(int i = 0; i < urlsImages.size(); i++){
             String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
@@ -256,25 +241,15 @@ public class NewDoubtFragment extends Fragment {
             fileToUpload.putFile(Uri.parse(urlsImages.get(i))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                    donwloadurlsImages.add(downloadUrl.toString());
-                    if(finalI == urlsImages.size()-1) {
-                        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-                        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-                        Doubt doubt = new Doubt(uid, title, body, date, user, donwloadurlsImages);
-                        Map<String, Object> postValues = doubt.toMap();
-                        Map<String, Object> childUpdates = new HashMap<>();
-                        childUpdates.put("/doubts/" + key, postValues);
-                        childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
-                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-                        clearItems();
-                    }
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                donwloadurlsImages.add(downloadUrl.toString());
+                if(finalI == urlsImages.size()-1) {
+                    uploadNewDoubt(uid, title, body, user, donwloadurlsImages);
+                }
                 }
             });
         }
-
     }
-
 
     private void setBtnDoubt(boolean enabled) {
         btnNewDoubt.setEnabled(enabled);
