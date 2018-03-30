@@ -164,8 +164,10 @@ public class NewDoubtFragment extends Fragment {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final User user = dataSnapshot.getValue(User.class);
                                 if (user != null) {
-                                    writeNewDoubt(ctrl.getUid(), title, description, user);
-                                    ctrl.hideKeyboard(getActivity());
+                                    //writeNewDoubt(ctrl.getUid(), title, description, user);
+                                    ctrl.writeDoubtDB(ctrl.getUid(), title, description, user, urlsImages, new ArrayList<String>(), btnNewDoubt, etTitle, etDescription, mRecycler_items, getActivity());
+
+                                ctrl.hideKeyboard(getActivity());
                                 } else {
                                     Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
                                             .show();
@@ -182,7 +184,7 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
-    private void clearItems() {
+    /*private void clearItems() {
         Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
                 .show();
         setBtnDoubt(true);
@@ -193,7 +195,7 @@ public class NewDoubtFragment extends Fragment {
             mRecycler_items.getAdapter().notifyDataSetChanged();
         }
 
-    }
+    }*/
 
     private boolean checkInputs(String title, String description){
         //TODO hacer una comprobacion de que title tenga max x chars y descirption min x
@@ -210,6 +212,8 @@ public class NewDoubtFragment extends Fragment {
         return false;
 
     }
+
+    /*
     private void writeNewDoubt(String userId, String title, String body, User user) {
         if(!urlsImages.isEmpty()){
             uploadImagesDoubt(userId, "doubt_images/", "image-doubt", title, body, user);
@@ -249,7 +253,7 @@ public class NewDoubtFragment extends Fragment {
                 }
             });
         }
-    }
+    }*/
 
     private void setBtnDoubt(boolean enabled) {
         btnNewDoubt.setEnabled(enabled);

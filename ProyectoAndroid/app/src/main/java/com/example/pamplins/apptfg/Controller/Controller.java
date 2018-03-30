@@ -4,16 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.view.View;
+import android.support.v7.widget.RecyclerView;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -102,7 +100,6 @@ public class Controller {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                //TODO el usuario no se ha podido registrar porque no se ha podido subir la foto
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -116,8 +113,8 @@ public class Controller {
                 else{
                     //TODO hacer multi-path updates -- ITERACION 5
                     db = FirebaseDatabase.getInstance().getReference();
-                    db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
-                    db.child("users").child(uid).child("urlProfileImage").setValue(downloadUrl.toString());
+                    db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
+                    db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
                 }
             }
@@ -130,7 +127,8 @@ public class Controller {
         Calendar currentTime = Calendar.getInstance();
         int hour = currentTime.get(Calendar.HOUR_OF_DAY);
         int minute = currentTime.get(Calendar.MINUTE);
-        return date+","+hour+":"+minute;
+        date = date+", "+String.format("%02d:%02d", hour, minute);
+        return date;
     }
 
     public void showProfileImage(Activity activity, Object obj, ImageView img) {
@@ -143,5 +141,54 @@ public class Controller {
         Glide.with(activity)
                 .load(url)
                 .into(img);
+    }
+
+
+    public void writeDoubtDB(String userId, String title, String body, User user, ArrayList<String> url1, ArrayList<String> url2, Button btn, EditText et1, EditText et2, RecyclerView rv, Activity activity){
+        if(!url1.isEmpty()){
+            uploadImagesDoubt(userId, Constants.REF_DOUBT_IMAGES, Constants.REF_DOUBT_NAME, title, body, user, url1, url2, btn, et1, et2, rv, activity);
+        }else{
+            uploadNewDoubt(userId, title, body, user, url2, btn, et1, et2, rv, url1, activity);
+        }
+    }
+
+    private void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final Button btn, final EditText et1, final EditText et2, final RecyclerView rv, final Activity activity) {
+        for(int i = 0; i < url1.size(); i++){
+            String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
+            StorageReference fileToUpload;
+            fileToUpload = FirebaseStorage.getInstance().getReference().child(ref);
+
+            final int finalI = i;
+            final ArrayList<String> finalUrl = url2;
+            fileToUpload.putFile(Uri.parse(url1.get(i))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                    finalUrl.add(downloadUrl.toString());
+                    if(finalI == url1.size()-1) {
+                        uploadNewDoubt(uid, title, body, user, finalUrl, btn, et1, et2, rv, url1, activity);
+                    }
+                }
+            });
+        }
+    }
+
+    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity){
+        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
+        Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
+        Map<String, Object> postValues = doubt.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
+        childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+        Snackbar.make(activity.findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
+                .show();
+        btn.setEnabled(true);
+        et1.setText("");
+        et2.setText("");
+        if (!url1.isEmpty()) {
+            url1.clear();
+            rv.getAdapter().notifyDataSetChanged();
+        }
     }
 }

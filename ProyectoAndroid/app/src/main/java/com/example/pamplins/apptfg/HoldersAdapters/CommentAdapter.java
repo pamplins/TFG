@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Comment;
-import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;

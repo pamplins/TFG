@@ -198,7 +198,7 @@ public class Login extends AppCompatActivity {
                             .show();
                     progressBar.setVisibility(View.GONE);
                 }else{
-                    final FirebaseAuth auth = FirebaseAuth.getInstance();
+                    final FirebaseAuth auth = FirebaseAuth.getInstance(); // ya tnego mAuht
                     auth.fetchProvidersForEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
                         @Override
                         public void onComplete(@NonNull Task<ProviderQueryResult> task) {
