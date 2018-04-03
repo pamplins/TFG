@@ -26,7 +26,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
     private ImageView like;
     private TextView numDisLikes;
     private ImageView dislike;
-    private TextView numComments;
+    private TextView numAnswers;
 
     public DoubtViewHolder(View itemView) {
         super(itemView);
@@ -43,7 +43,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         numLikes = itemView.findViewById(R.id.num_likes);
         dislike = itemView.findViewById(R.id.dislike);
         numDisLikes = itemView.findViewById(R.id.num_dislikes);
-        numComments = itemView.findViewById(R.id.num_comments);
+        numAnswers = itemView.findViewById(R.id.num_answers);
     }
 
     public ImageView getLike() {
@@ -57,11 +57,22 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
     public void bindToPost(final Doubt doubt, Activity activity, Controller ctrl) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getUser().getUserName());
-        numComments.setText(String.valueOf(doubt.getnComments()));
-         if (doubt.getDescription().trim().length() > 100) {
-            bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
-        } else {
-            bodyView.setText(doubt.getDescription());
+        numAnswers.setText(String.valueOf(doubt.getnAnswers()));
+        int count = doubt.getDescription().split("\r\n|\r|\n").length;
+        String desc = doubt.getDescription();
+        if(count > 4){
+            desc = desc.replace("\n", " ").replace("\r", " ");
+            if(desc.length() > 20){
+                bodyView.setText(doubt.getDescription().substring(0, 20) + "...");
+            }
+        }else{
+            if (desc.length() > 100) {
+                bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
+
+            }
+            else {
+                bodyView.setText(doubt.getDescription());
+            }
         }
         date.setText(doubt.getDate());
         ctrl.showProfileImage(activity, doubt, img);

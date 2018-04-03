@@ -1,6 +1,7 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import android.support.v7.app.AlertDialog;
@@ -8,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -41,6 +44,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         String url = urlImagesDoubt.get(position);
         Glide.with(activity)
                 .load(url)
+                .thumbnail(0.1f)
                 .into(viewHolder.img);
         final ImagePopup imagePopup = new ImagePopup(activity);
         imagePopup.initiatePopupWithGlide(url);
@@ -58,7 +62,10 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
                 imagePopup.viewPopup();
+
             }
         });
 

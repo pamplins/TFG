@@ -6,7 +6,7 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/comment_photo"
+        android:id="@+id/answer_photo"
         android:layout_width="40dp"
         android:layout_height="40dp"
         app:civ_border_width="0dp" />
@@ -16,14 +16,14 @@
         android:id="@+id/date_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/comment_photo"
+        android:layout_alignBottom="@+id/answer_photo"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/comment_photo"
+        android:layout_alignTop="@+id/answer_photo"
         android:gravity="center"
         android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/tv_date_comment"
+        android:id="@+id/tv_date_answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextDoubt"
@@ -40,11 +40,11 @@
         android:orientation="vertical"
         android:layout_marginLeft="10dp"
         android:padding="5dp"
-        android:layout_toRightOf="@+id/comment_photo"
+        android:layout_toRightOf="@+id/answer_photo"
         android:id="@+id/lay_description_comment">
 
         <TextView
-            android:id="@+id/comment_author"
+            android:id="@+id/answer_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -53,7 +53,7 @@
 
 
         <TextView
-            android:id="@+id/comment_body"
+            android:id="@+id/answer_description"
             style="@style/TextAppearance.AppCompat.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,16 +72,16 @@
             >
 
             <ImageView
-                android:id="@+id/like_comment"
+                android:id="@+id/like_answer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
                 android:background="?attr/selectableItemBackground"
-                android:src="@drawable/like_comment" />
+                android:src="@drawable/like_answer" />
 
             <TextView
-                android:id="@+id/num_likes_comment"
+                android:id="@+id/num_likes_answer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -90,16 +90,16 @@
                 android:layout_marginRight="10dp"/>
 
             <ImageView
-                android:id="@+id/dislike_comment"
+                android:id="@+id/dislike_answer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
                 android:background="?attr/selectableItemBackground"
-                android:src="@drawable/dislike_comment"/>
+                android:src="@drawable/dislike_answer"/>
 
             <TextView
-                android:id="@+id/num_dislikes_comment"
+                android:id="@+id/num_dislikes_answer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"

@@ -20,7 +20,7 @@ public class Doubt {
     private String date;
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> dislikes = new HashMap<>();
-    private long nComments;
+    private long nAnswers;
     private ArrayList<String> urlsImages;
 
     public Doubt() {
@@ -32,7 +32,7 @@ public class Doubt {
         this.description = description;
         this.date = date;
         this.user = user;
-        this.nComments = 0;
+        this.nAnswers = 0;
         this.urlsImages = urlsImages;
     }
 
@@ -109,12 +109,12 @@ public class Doubt {
         this.user = user;
     }
 
-    public long getnComments() {
-        return nComments;
+    public long getnAnswers() {
+        return nAnswers;
     }
 
-    public void setnComments(long nComments) {
-        this.nComments = nComments;
+    public void setnAnswers(long nAnswers) {
+        this.nAnswers = nAnswers;
     }
 
     public ArrayList<String> getUrlsImages() {
@@ -137,7 +137,7 @@ public class Doubt {
                 ", date='" + date + '\'' +
                 ", likes=" + likes +
                 ", dislikes=" + dislikes +
-                ", nComments=" + nComments +
+                ", nAnswers=" + nAnswers +
                 ", urlImage='" + urlsImages + '\'' +
                 '}';
     }
@@ -153,7 +153,7 @@ public class Doubt {
         doubt.put("date", date);
         doubt.put("likes", likes);
         doubt.put("dislikes", dislikes);
-        doubt.put("nComments", nComments);
+        doubt.put("nAnswers", nAnswers);
         doubt.put("user", user);
         doubt.put("urlsImages", urlsImages);
         return doubt;

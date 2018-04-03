@@ -10,7 +10,7 @@ public class Constants {
 
     public static final String REF_DOUBTS = "doubts";
     public static final String REF_USER_DOUBTS = "user_doubts";
-    public static final String REF_POST_COMMENTS = "post-comments";
+    public static final String REF_POST_ANSWERS = "doubt-answers";
     public static final String KEY_DOUBT = "doubtKey";
 
 

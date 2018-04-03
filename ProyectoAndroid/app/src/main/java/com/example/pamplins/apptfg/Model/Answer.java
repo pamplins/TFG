@@ -11,7 +11,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Comment {
+public class Answer {
 
     public String uid;
     public String text;
@@ -22,10 +22,10 @@ public class Comment {
     private String date;
     private User user;
 
-    public Comment() {
+    public Answer() {
     }
 
-    public Comment(String uid,String text, String date, User user) {
+    public Answer(String uid, String text, String date, User user) {
         this.uid = uid;
         this.text = text;
         this.date = date;
@@ -98,7 +98,7 @@ public class Comment {
 
     @Override
     public String toString() {
-        return "Comment{" +
+        return "Answer{" +
                 "uid='" + uid + '\'' +
                 ", text='" + text + '\'' +
                 ", likesCount=" + likesCount +
@@ -112,15 +112,15 @@ public class Comment {
 
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> comment = new HashMap<>();
-        comment.put("uid", uid);
-        comment.put("text", text);
-        comment.put("likesCount", likesCount);
-        comment.put("disLikesCount", dislikesCount);
-        comment.put("date", date);
-        comment.put("likes", likes);
-        comment.put("dislikes", dislikes);
-        comment.put("user", user);
-        return comment;
+        HashMap<String, Object> answer = new HashMap<>();
+        answer.put("uid", uid);
+        answer.put("text", text);
+        answer.put("likesCount", likesCount);
+        answer.put("disLikesCount", dislikesCount);
+        answer.put("date", date);
+        answer.put("likes", likes);
+        answer.put("dislikes", dislikes);
+        answer.put("user", user);
+        return answer;
     }
 }

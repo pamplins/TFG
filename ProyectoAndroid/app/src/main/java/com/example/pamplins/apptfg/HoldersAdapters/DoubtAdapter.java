@@ -23,7 +23,7 @@ import com.google.firebase.database.Transaction;
  * Created by Gustavo on 12/03/2018.
  */
 
-//TODO poner codigo en comun de CommentAdapter y DoubtAdapter
+//TODO poner codigo en comun de AnswerAdapter y DoubtAdapter
 public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> {
     private Activity activity;
     private Controller ctrl;
@@ -62,14 +62,12 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
         votesDoubt(doubt, viewHolder, postKey);
     }
 
-
     private  void votesDoubt(final Doubt doubt, DoubtViewHolder viewHolder, final String postKey){
         viewHolder.bindLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
-                // Run two transactions
                 onLikeClicked(globalPostRef,true);
                 onLikeClicked(userPostRef, true);
         }
@@ -80,7 +78,6 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
                 DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
-                // Run two transactions
                 onDisLikeClicked(globalPostRef, true);
                 onDisLikeClicked(userPostRef, true);
             }

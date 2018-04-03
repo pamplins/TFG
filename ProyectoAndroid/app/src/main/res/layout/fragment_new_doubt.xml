@@ -7,26 +7,26 @@
     android:background="@color/backGround"
     android:isScrollContainer="false">
 
-    <TextView
-        android:text="NUEVA DUDA"
-        android:textSize="24sp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity = "center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorName" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:isScrollContainer="false">
 
+        <TextView
+            android:text="NUEVA DUDA"
+            android:textSize="24sp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:gravity = "center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorName" />
+
         <EditText
             android:id="@+id/et_title_new_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="82dp"
+            android:layout_marginTop="52dp"
             android:hint="Título"
             android:textColorHint="@color/colorButton"
             android:padding="16dp"
@@ -90,6 +90,6 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_marginTop="20dp"
-            android:text="Nueva duda" />
+            android:text="Crear duda" />
     </RelativeLayout>
 </FrameLayout>

@@ -1,12 +1,14 @@
 package com.example.pamplins.apptfg.Fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -30,10 +32,12 @@ public class HomeFragment extends Fragment {
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private Controller ctrl;
+    private ProgressBar progressBar;
 
     public HomeFragment() {
     }
 
+    // TODO comprobar conexion de internet
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,12 +51,15 @@ public class HomeFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         ctrl = Controller.getInstance();
         mRecycler = rootView.findViewById(R.id.messages_list);
+        progressBar = rootView.findViewById(R.id.progressBar_h);
+
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         showDoubts();
     }
 
@@ -71,10 +78,19 @@ public class HomeFragment extends Fragment {
     private void setDoubtAdapter(FirebaseRecyclerOptions options){
         mAdapter = new DoubtAdapter(options, getActivity(), ctrl, mDatabase);
         mRecycler.setAdapter(mAdapter);
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                if(mAdapter.getItemCount() > 0 ){
+                    progressBar.setVisibility(View.GONE);
+                    mRecycler.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         mAdapter.notifyDataSetChanged();
-        mAdapter.startListening();
-        mRecycler.setVisibility(View.VISIBLE);
-
     }
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAdapter.startListening();
+    }
 }

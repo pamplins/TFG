@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.DoubtDetailActivity;
-import com.example.pamplins.apptfg.Model.Comment;
+import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -141,7 +141,7 @@ public class Controller {
         if(obj.getClass().equals(Doubt.class)){
             url = ((Doubt)obj).getUser().getUrlProfileImage();
         }else{
-            url = ((Comment)obj).getUser().getUrlProfileImage();
+            url = ((Answer)obj).getUser().getUrlProfileImage();
         }
         Glide.with(activity)
                 .load(url)
@@ -197,13 +197,13 @@ public class Controller {
         }
     }
 
-    public void writeCommentDB(final Doubt currentdDoubt, final DatabaseReference commentsReference, final EditText etComment, final DatabaseReference doubtReference, final Button btnComment, final DoubtDetailActivity activity) {
+    public void writeAnswerDB(final Doubt currentdDoubt, final DatabaseReference answersReference, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
         final String uid = getUid();
-        final String commentText = etComment.getText().toString();
-        if(commentText.isEmpty()){
-            etComment.setError("Entra comentario");
+        final String answerText = etAnswer.getText().toString();
+        if(answerText.isEmpty()){
+            etAnswer.setError("Entra comentario");
         }else {
-            btnComment.setEnabled(false); // evitar multiples creaciones de dudas
+            btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
             FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -217,14 +217,14 @@ public class Controller {
                                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                                         User user = childSnapshot.getValue(User.class);
                                         if (user.getUserName().equals(authorName)) {
-                                            Comment comment = new Comment(uid, commentText, ctrl.getDate(), user);
-                                            Map<String, Object> commentValues = comment.toMap();
-                                            commentsReference.push().setValue(commentValues);
-                                            etComment.setText(null);
-                                            currentdDoubt.setnComments(currentdDoubt.getnComments() + 1);
-                                            doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
+                                            Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
+                                            Map<String, Object> answerValues = answer.toMap();
+                                            answersReference.push().setValue(answerValues);
+                                            etAnswer.setText(null);
+                                            currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
+                                            doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
                                             ctrl.hideKeyboard(activity);
-                                            btnComment.setEnabled(true);
+                                            btnAnswer.setEnabled(true);
                                             break;
                                         }
                                     }
@@ -232,14 +232,14 @@ public class Controller {
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    btnComment.setEnabled(true);
+                                    btnAnswer.setEnabled(true);
                                 }
                             });
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-                            btnComment.setEnabled(true);
+                            btnAnswer.setEnabled(true);
                         }
                     });
         }

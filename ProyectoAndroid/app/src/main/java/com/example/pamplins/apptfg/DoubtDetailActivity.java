@@ -7,15 +7,12 @@ package com.example.pamplins.apptfg;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
-import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,10 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.HoldersAdapters.CommentAdapter;
-import com.example.pamplins.apptfg.HoldersAdapters.CommentViewHolder;
+import com.example.pamplins.apptfg.HoldersAdapters.AnswerAdapter;
+import com.example.pamplins.apptfg.HoldersAdapters.AnswerViewHolder;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
-import com.example.pamplins.apptfg.Model.Comment;
+import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -40,7 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
-    private DatabaseReference commentsReference;
+    private DatabaseReference answersReference;
     private ValueEventListener doubtListener;
     private String doubtKey;
 
@@ -48,30 +45,29 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvDate;
     private TextView tvDescription;
-    private EditText etComment;
+    private EditText etAnswer;
     private ImageView img;
-    private Button btnComment;
+    private Button btnAnswer;
 
     public TextView numLikes;
     public ImageView like;
     public TextView numDisLikes;
     public ImageView dislike;
-    public TextView numComments;
+    public TextView numAnswers;
 
     private Controller ctrl;
 
-    private Doubt currentdDoubt;
+    private Doubt currentDoubt;
     private RecyclerView mRecycler;
     private RecyclerView mRecycler_items;
     LinearLayoutManager mManager;
-    private FirebaseRecyclerAdapter<Comment, CommentViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Answer, AnswerViewHolder> mAdapter;
     private DatabaseReference mDatabase;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comments_doubt);
+        setContentView(R.layout.activity_answers_doubt);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,7 +80,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         }
 
         initElements();
-        showCommentsDoubt();
+        showAnswersDoubt();
 
     }
 
@@ -99,37 +95,37 @@ public class DoubtDetailActivity extends AppCompatActivity {
         //TODO enviar estas referencias a la class ctontroller
         doubtReference = FirebaseDatabase.getInstance().getReference()
                 .child(Constants.REF_DOUBTS).child(doubtKey);
-        commentsReference = FirebaseDatabase.getInstance().getReference()
-                .child(Constants.REF_POST_COMMENTS).child(doubtKey);
+        answersReference = FirebaseDatabase.getInstance().getReference()
+                .child(Constants.REF_POST_ANSWERS).child(doubtKey);
 
         tvAuthor = findViewById(R.id.post_author);
         tvTitle = findViewById(R.id.post_title);
         tvDate = findViewById(R.id.tv_date);
         tvDescription = findViewById(R.id.post_description);
-        etComment = findViewById(R.id.field_comment_text);
+        etAnswer = findViewById(R.id.field_answer_text);
         img = findViewById(R.id.post_author_photo);
-        btnComment = findViewById(R.id.button_post_comment);
+        btnAnswer = findViewById(R.id.button_post_answer);
 
         like = findViewById(R.id.like);
         numLikes = findViewById(R.id.num_likes);
 
         dislike = findViewById(R.id.dislike);
         numDisLikes = findViewById(R.id.num_dislikes);
-        numComments = findViewById(R.id.num_comments);
+        numAnswers = findViewById(R.id.num_answers);
 
-        //btnComment.setOnClickListener(this);
-        btnComment.setOnClickListener(new View.OnClickListener()
+        //btnAnswer.setOnClickListener(this);
+        btnAnswer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ctrl.writeCommentDB(currentdDoubt, commentsReference, etComment, doubtReference, btnComment, DoubtDetailActivity.this);
+                ctrl.writeAnswerDB(currentDoubt, answersReference, etAnswer, doubtReference, btnAnswer, DoubtDetailActivity.this);
             }
         });
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mRecycler = this.findViewById(R.id.recycler_comments);
+        mRecycler = this.findViewById(R.id.recycler_answers);
         mRecycler.setVisibility(View.GONE);
     }
 
@@ -142,7 +138,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
             // Aqui se actualiza la informacion de la duda al abrirla
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                currentdDoubt = dataSnapshot.getValue(Doubt.class);
+                currentDoubt = dataSnapshot.getValue(Doubt.class);
 
                 showMainDoubt();
                 putLikes();
@@ -157,40 +153,45 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
 
-    private void showCommentsDoubt() {
-        //mRecycler = this.findViewById(R.id.recycler_comments);
+    private void showAnswersDoubt() {
         mManager = new LinearLayoutManager(this);
         mManager.setStackFromEnd(true);
 
         mManager.setReverseLayout(false);
         mRecycler.setLayoutManager(mManager);
 
-        /*options = new FirebaseRecyclerOptions.Builder<Comment>()
-                .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey).orderByChild("likesCount"), Comment.class)
+        /*options = new FirebaseRecyclerOptions.Builder<Answer>()
+                .setQuery(mDatabase.child(Constants.REF_POST_ANSWERS).child(doubtKey).orderByChild("likesCount"), Answer.class)
                 .build();
         */
 
-        final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Comment>()
-                .setQuery(mDatabase.child(Constants.REF_POST_COMMENTS).child(doubtKey), Comment.class)
+        final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Answer>()
+                .setQuery(mDatabase.child(Constants.REF_POST_ANSWERS).child(doubtKey), Answer.class)
                 .build();
 
-        setCommentAdapter(options);
+        setAnswerAdapter(options);
     }
 
-    private void setCommentAdapter(FirebaseRecyclerOptions options) {
-        mAdapter = new CommentAdapter(options, this, doubtKey, mDatabase, ctrl);
+    private void setAnswerAdapter(FirebaseRecyclerOptions options) {
+        mAdapter = new AnswerAdapter(options, this, doubtKey, mDatabase, ctrl);
         mRecycler.setAdapter(mAdapter);
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                mRecycler.scrollToPosition(mAdapter.getItemCount());
+                if(mAdapter.getItemCount() > 0 ){
+                    mRecycler.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         mAdapter.notifyDataSetChanged();
-        mAdapter.startListening();
-        mRecycler.setVisibility(View.VISIBLE);
     }
 
     private void putDisLikes(){
-        bindDisLikes(currentdDoubt, new View.OnClickListener() {
+        bindDisLikes(currentDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentDoubt.getUid()).child(doubtKey);
                 onDisLikeClicked(globalPostRef, true);
                 onDisLikeClicked(userPostRef, true);
             }
@@ -198,11 +199,11 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
     private void putLikes(){
-        bindLikes(currentdDoubt, new View.OnClickListener() {
+        bindLikes(currentDoubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(doubtKey);
-                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentdDoubt.getUid()).child(doubtKey);
+                DatabaseReference userPostRef = mDatabase.child(Constants.REF_USER_DOUBTS).child(currentDoubt.getUid()).child(doubtKey);
                 onLikeClicked(globalPostRef, true);
                 onLikeClicked(userPostRef, true);
             }
@@ -210,13 +211,13 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
     private void showMainDoubt(){
-        tvAuthor.setText(currentdDoubt.getUser().getUserName());
-        tvTitle.setText(currentdDoubt.getTitle());
-        tvDescription.setText(currentdDoubt.getDescription());
-        tvDate.setText(currentdDoubt.getDate());
-        numComments.setText(String.valueOf(currentdDoubt.getnComments()));
-        ctrl.showProfileImage(this, currentdDoubt, img);
-        if(currentdDoubt.getUrlsImages() != null){
+        tvAuthor.setText(currentDoubt.getUser().getUserName());
+        tvTitle.setText(currentDoubt.getTitle());
+        tvDescription.setText(currentDoubt.getDescription());
+        tvDate.setText(currentDoubt.getDate());
+        numAnswers.setText(String.valueOf(currentDoubt.getnAnswers()));
+        ctrl.showProfileImage(this, currentDoubt, img);
+        if(currentDoubt.getUrlsImages() != null){
             initCarousel();
         }else{
             TextView tv_attachedFiles = findViewById(R.id.tv_attachedFiles);
@@ -231,17 +232,17 @@ public class DoubtDetailActivity extends AppCompatActivity {
         mRecycler_items.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecycler_items.setLayoutManager(linearLayoutManager);
-        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(this, currentdDoubt.getUrlsImages());
+        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(this, currentDoubt.getUrlsImages());
         mRecycler_items.setAdapter(imageViewAdapter);
     }
 
     private void checkLikesDis() {
-        if (currentdDoubt.getLikes().containsKey(ctrl.getUid())) {
+        if (currentDoubt.getLikes().containsKey(ctrl.getUid())) {
             like.setImageResource(R.drawable.like_ac);
         } else {
             like.setImageResource(R.drawable.like);
         }
-        if (currentdDoubt.getDislikes().containsKey(ctrl.getUid())) {
+        if (currentDoubt.getDislikes().containsKey(ctrl.getUid())) {
             dislike.setImageResource(R.drawable.dislike_ac);
         } else {
             dislike.setImageResource(R.drawable.dislike);

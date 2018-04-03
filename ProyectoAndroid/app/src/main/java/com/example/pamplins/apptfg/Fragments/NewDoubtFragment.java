@@ -176,11 +176,11 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private boolean checkInputs(String title, String description){
-        //TODO hacer una comprobacion de que title tenga max x chars y descirption min x
-        if(title.isEmpty()){
+        // TODO hacer una comprobacion de que title tenga max x chars y descirption min x
+        if(title.trim().length() < 10){
             etTitle.setError("Entra titulo");
         }
-        if(description.isEmpty()){
+        if(description.trim().length() < 10){
             etDescription.setError("Entra descripcion");
         }
 

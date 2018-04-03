@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="16dp"
+    tools:context=".DoubtDetailActivity"
+    android:background="@color/backGround">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:titleTextColor="@color/colorName"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:layout_collapseMode="pin"
+        app:layout_scrollFlags="scroll|enterAlways"/>
+
+    <android.support.v4.widget.NestedScrollView
+    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/my_toolbar"
+        android:id="@+id/hola"
+        android:layout_above="@id/answer_form">
+
+        <LinearLayout
+            android:id="@+id/post_author_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/my_toolbar">
+
+
+            <include
+                layout="@layout/item_doubt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:id="@+id/tv_attachedFiles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Archivos adjuntos de la duda:"
+                android:paddingLeft="16dp"
+                android:textColor="@color/colorName" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle_items_doubt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_attachedFiles"
+                android:layout_gravity="center"
+                android:paddingLeft="16dp"
+                tools:listitem="@layout/items_carousel"
+                android:scrollbars="horizontal"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Respuestas:"
+                android:layout_marginTop="5dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="16dp"
+                android:layout_below="@id/post_author_layout"
+                android:id="@+id/answers"
+                android:textColor="@color/colorName"/>
+            <!--<TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¡Sé el primero en ayudar!"
+                android:layout_marginTop="5dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="16dp"
+                android:layout_below="@id/post_author_layout"
+                android:id="@+id/not_answers"
+                android:textColor="@color/colorName"/>
+            <ProgressBar
+                android:id="@+id/progressBar_a"
+                android:visibility="visible"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"/>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/post_author_layout"
+                android:id="@+id/layout_recycler" >
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_answers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/item_answer"
+                    android:paddingLeft="16dp"
+                    />
+
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_below="@id/answer_form"
+        android:id="@+id/answer_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:theme="@style/MyEditText"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        >
+
+        <EditText
+            android:id="@+id/field_answer_text"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:hint="Escribe tu respuesta"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false"
+            android:maxLines="4"
+            android:minLines="1"
+            android:inputType="textMultiLine"/>
+
+        <Button
+            android:id="@+id/button_post_answer"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@mipmap/ic_send_answer" />
+    </LinearLayout>
+
+</RelativeLayout>
