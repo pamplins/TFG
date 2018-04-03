@@ -4,13 +4,18 @@ package com.example.pamplins.apptfg;
  * Created by Gustavo on 21/02/2018.
  */
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 
+import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,7 +28,6 @@ import com.example.pamplins.apptfg.HoldersAdapters.CommentViewHolder;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Comment;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.example.pamplins.apptfg.Model.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -33,8 +37,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.Map;
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
@@ -61,26 +63,40 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private Doubt currentdDoubt;
     private RecyclerView mRecycler;
     private RecyclerView mRecycler_items;
-
-    private LinearLayoutManager mManager;
+    LinearLayoutManager mManager;
     private FirebaseRecyclerAdapter<Comment, CommentViewHolder> mAdapter;
     private DatabaseReference mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments_doubt);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("ASIGNATURA X");
+
+        myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
         doubtKey = getIntent().getStringExtra(Constants.KEY_DOUBT);
         if (doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
+
         initElements();
-        iniCommentSection();
+        showCommentsDoubt();
+
     }
 
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
 
     private void initElements(){
         ctrl = Controller.getInstance();
+        //TODO enviar estas referencias a la class ctontroller
         doubtReference = FirebaseDatabase.getInstance().getReference()
                 .child(Constants.REF_DOUBTS).child(doubtKey);
         commentsReference = FirebaseDatabase.getInstance().getReference()
@@ -107,7 +123,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                postComment();
+                ctrl.writeCommentDB(currentdDoubt, commentsReference, etComment, doubtReference, btnComment, DoubtDetailActivity.this);
             }
         });
 
@@ -120,12 +136,15 @@ public class DoubtDetailActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        mAdapter.startListening();
+
         ValueEventListener postListener = new ValueEventListener() {
             // Aqui se actualiza la informacion de la duda al abrirla
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 currentdDoubt = dataSnapshot.getValue(Doubt.class);
-                setElementsDoubt();
+
+                showMainDoubt();
                 putLikes();
                 putDisLikes();
             }
@@ -138,11 +157,12 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
 
-    private void iniCommentSection() {
+    private void showCommentsDoubt() {
         //mRecycler = this.findViewById(R.id.recycler_comments);
         mManager = new LinearLayoutManager(this);
-        //mManager.setStackFromEnd(true);
-        //mManager.setReverseLayout(true);
+        mManager.setStackFromEnd(true);
+
+        mManager.setReverseLayout(false);
         mRecycler.setLayoutManager(mManager);
 
         /*options = new FirebaseRecyclerOptions.Builder<Comment>()
@@ -189,7 +209,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void setElementsDoubt(){
+    private void showMainDoubt(){
         tvAuthor.setText(currentdDoubt.getUser().getUserName());
         tvTitle.setText(currentdDoubt.getTitle());
         tvDescription.setText(currentdDoubt.getDescription());
@@ -234,11 +254,9 @@ public class DoubtDetailActivity extends AppCompatActivity {
         if (doubtListener != null) {
             doubtReference.removeEventListener(doubtListener);
         }
+
     }
 
-    private void setBtnDoubt(boolean enabled) {
-        btnComment.setEnabled(enabled);
-    }
     public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));
         like.setOnClickListener(clickListener);
@@ -311,53 +329,5 @@ public class DoubtDetailActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void postComment() {
-        final String uid = ctrl.getUid();
-        final String commentText = etComment.getText().toString();
-        if(commentText.isEmpty()){
-            etComment.setError("Entra comentario");
-        }else {
-            setBtnDoubt(false); // evitar multiples creaciones de dudas
-            FirebaseDatabase.getInstance().getReference().child("users").child(uid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        final User user = dataSnapshot.getValue(User.class);
-                        final String authorName = user.getUserName();
-
-                        ctrl.getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                                    User user = childSnapshot.getValue(User.class);
-                                    if (user.getUserName().equals(authorName)) {
-                                        Comment comment = new Comment(uid, commentText, ctrl.getDate(), user);
-                                        Map<String, Object> commentValues = comment.toMap();
-                                        commentsReference.push().setValue(commentValues);
-                                        etComment.setText(null);
-                                        currentdDoubt.setnComments(currentdDoubt.getnComments() + 1);
-                                        doubtReference.child("nComments").setValue(currentdDoubt.getnComments());
-                                        ctrl.hideKeyboard(DoubtDetailActivity.this);
-                                        setBtnDoubt(true);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                setBtnDoubt(true);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        setBtnDoubt(true);
-                    }
-                });
-        }
     }
 }

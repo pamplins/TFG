@@ -65,6 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/et_description_new_post"
             android:layout_marginBottom="20dp"
+            android:layout_marginLeft="16dp"
             android:background="@mipmap/ic_select_images_doubt" />
 
         <android.support.v7.widget.RecyclerView

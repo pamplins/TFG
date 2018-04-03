@@ -21,24 +21,16 @@ import android.widget.TextView;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
-import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -59,7 +51,6 @@ public class NewDoubtFragment extends Fragment {
 
     private RecyclerView mRecycler_items;
     private ArrayList<String> urlsImages;
-    private ArrayList<String> donwloadurlsImages;
 
     public NewDoubtFragment() {
     }
@@ -94,7 +85,7 @@ public class NewDoubtFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                submitPost();
+                sendDoubt();
             }
         });
         urlsImages = new ArrayList<>();
@@ -153,7 +144,7 @@ public class NewDoubtFragment extends Fragment {
         mRecycler_items.setAdapter(imageViewAdapter);
     }
 
-    private void submitPost() {
+    private void sendDoubt() {
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
          if (checkInputs(title, description)){
@@ -184,19 +175,6 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
-    /*private void clearItems() {
-        Snackbar.make(getActivity().findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
-                .show();
-        setBtnDoubt(true);
-        etTitle.setText("");
-        etDescription.setText("");
-        if (!urlsImages.isEmpty()) {
-            urlsImages.clear();
-            mRecycler_items.getAdapter().notifyDataSetChanged();
-        }
-
-    }*/
-
     private boolean checkInputs(String title, String description){
         //TODO hacer una comprobacion de que title tenga max x chars y descirption min x
         if(title.isEmpty()){
@@ -212,48 +190,6 @@ public class NewDoubtFragment extends Fragment {
         return false;
 
     }
-
-    /*
-    private void writeNewDoubt(String userId, String title, String body, User user) {
-        if(!urlsImages.isEmpty()){
-            uploadImagesDoubt(userId, "doubt_images/", "image-doubt", title, body, user);
-        }else{
-            uploadNewDoubt(userId, title, body, user, urlsImages);
-        }
-    }
-
-    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array){
-        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-        Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
-        Map<String, Object> postValues = doubt.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/doubts/" + key, postValues);
-        childUpdates.put("/user_doubts/" + doubt.getUid() + "/" + key, postValues);
-        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-        setBtnDoubt(true);
-        clearItems();
-    }
-
-    public void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user) {
-        donwloadurlsImages = new ArrayList<>();
-        for(int i = 0; i < urlsImages.size(); i++){
-            String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
-            StorageReference fileToUpload;
-            fileToUpload = FirebaseStorage.getInstance().getReference().child(ref);
-
-            final int finalI = i;
-            fileToUpload.putFile(Uri.parse(urlsImages.get(i))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                donwloadurlsImages.add(downloadUrl.toString());
-                if(finalI == urlsImages.size()-1) {
-                    uploadNewDoubt(uid, title, body, user, donwloadurlsImages);
-                }
-                }
-            });
-        }
-    }*/
 
     private void setBtnDoubt(boolean enabled) {
         btnNewDoubt.setEnabled(enabled);

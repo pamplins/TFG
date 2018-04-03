@@ -3,21 +3,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="16dp"
     tools:context=".DoubtDetailActivity"
     android:background="@color/backGround">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:titleTextColor="@color/colorName"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:layout_collapseMode="pin"
+        app:layout_scrollFlags="scroll|enterAlways"
+
+        />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/my_toolbar"
+        android:layout_above="@id/comment_form">
 
     <LinearLayout
         android:id="@+id/post_author_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_below="@+id/my_toolbar">
 
-    <include
-        layout="@layout/item_doubt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+
+        <include
+            layout="@layout/item_doubt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
 
         <TextView
             android:id="@+id/tv_attachedFiles"
@@ -27,48 +48,53 @@
             android:paddingLeft="16dp"
             android:textColor="@color/colorName" />
 
-
-    </LinearLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycle_items_doubt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:listitem="@layout/items_carousel"
-        android:paddingLeft="16dp"
-        android:layout_below="@+id/post_author_layout"
-        android:layout_gravity="center"
-
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Comentarios:"
-        android:layout_marginTop="5dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="16dp"
-        android:layout_below="@id/recycle_items_doubt"
-        android:id="@+id/comments"
-        android:textColor="@color/colorName"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/comments"
-        android:id="@+id/layout_recycler"
-        android:layout_above="@id/comment_form">
-
-         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_comments"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycle_items_doubt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/item_comment"
+            android:layout_below="@+id/tv_attachedFiles"
+            android:layout_gravity="center"
             android:paddingLeft="16dp"
+            tools:listitem="@layout/items_carousel"
+            android:scrollbars="horizontal"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+
             />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comentarios:"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="16dp"
+            android:layout_below="@id/post_author_layout"
+            android:id="@+id/comments"
+            android:textColor="@color/colorName"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/post_author_layout"
+            android:id="@+id/layout_recycler"
+            >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_comment"
+                android:paddingLeft="16dp"
+                />
+
+        </LinearLayout>
+
     </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
+        android:layout_below="@id/comment_form"
         android:id="@+id/comment_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,7 +112,7 @@
             android:hint="Escribe tu comentario"
             android:scrollbars="vertical"
             android:fadeScrollbars="false"
-            android:maxLines="4"
+            android:maxLines="3"
             android:minLines="1"
             android:inputType="textMultiLine"/>
 
@@ -96,6 +122,6 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:background="@mipmap/ic_send_comment" />
-
     </LinearLayout>
+
 </RelativeLayout>

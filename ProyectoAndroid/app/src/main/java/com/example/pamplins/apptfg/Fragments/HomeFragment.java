@@ -47,17 +47,16 @@ public class HomeFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         ctrl = Controller.getInstance();
         mRecycler = rootView.findViewById(R.id.messages_list);
-        mRecycler.setVisibility(View.GONE);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showDoubtsHome();
+        showDoubts();
     }
 
-    public void showDoubtsHome() {
+    public void showDoubts() {
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
@@ -75,9 +74,7 @@ public class HomeFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
         mAdapter.startListening();
         mRecycler.setVisibility(View.VISIBLE);
+
     }
-
-
-    public void populateViewHolder(){}
 
 }
