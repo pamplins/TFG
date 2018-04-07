@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
@@ -149,15 +150,15 @@ public class Controller {
     }
 
 
-    public void writeDoubtDB(String userId, String title, String body, User user, ArrayList<String> url1, ArrayList<String> url2, Button btn, EditText et1, EditText et2, RecyclerView rv, Activity activity){
+    public void writeDoubtDB(String userId, String title, String body, User user, ArrayList<String> url1, ArrayList<String> url2, Button btn, EditText et1, EditText et2, RecyclerView rv, Activity activity, TextView tvUpload){
         if(!url1.isEmpty()){
-            uploadImagesDoubt(userId, Constants.REF_DOUBT_IMAGES, Constants.REF_DOUBT_NAME, title, body, user, url1, url2, btn, et1, et2, rv, activity);
+            uploadImagesDoubt(userId, Constants.REF_DOUBT_IMAGES, Constants.REF_DOUBT_NAME, title, body, user, url1, url2, btn, et1, et2, rv, activity, tvUpload);
         }else{
-            uploadNewDoubt(userId, title, body, user, url2, btn, et1, et2, rv, url1, activity);
+            uploadNewDoubt(userId, title, body, user, url2, btn, et1, et2, rv, url1, activity, tvUpload);
         }
     }
 
-    private void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final Button btn, final EditText et1, final EditText et2, final RecyclerView rv, final Activity activity) {
+    private void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final Button btn, final EditText et1, final EditText et2, final RecyclerView rv, final Activity activity, final TextView tvUpload) {
         for(int i = 0; i < url1.size(); i++){
             String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
             StorageReference fileToUpload;
@@ -171,14 +172,14 @@ public class Controller {
                     Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                     finalUrl.add(downloadUrl.toString());
                     if(finalI == url1.size()-1) {
-                        uploadNewDoubt(uid, title, body, user, finalUrl, btn, et1, et2, rv, url1, activity);
+                        uploadNewDoubt(uid, title, body, user, finalUrl, btn, et1, et2, rv, url1, activity, tvUpload);
                     }
                 }
             });
         }
     }
 
-    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity){
+    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity, TextView tvUpload){
         String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
         Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
         Map<String, Object> postValues = doubt.toMap();
@@ -189,6 +190,9 @@ public class Controller {
         Snackbar.make(activity.findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
                 .show();
         btn.setEnabled(true);
+        et1.setEnabled(true);
+        et2.setEnabled(true);
+        tvUpload.setEnabled(true);
         et1.setText("");
         et2.setText("");
         if (!url1.isEmpty()) {
@@ -200,7 +204,7 @@ public class Controller {
     public void writeAnswerDB(final Doubt currentdDoubt, final DatabaseReference answersReference, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
         final String uid = getUid();
         final String answerText = etAnswer.getText().toString();
-        if(answerText.isEmpty()){
+        if(answerText.trim().isEmpty()){
             etAnswer.setError("Entra comentario");
         }else {
             btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
@@ -210,7 +214,7 @@ public class Controller {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final User user = dataSnapshot.getValue(User.class);
                             final String authorName = user.getUserName();
-
+                            //TODO se puede mejorar el codigo
                             getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {

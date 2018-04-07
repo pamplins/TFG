@@ -51,7 +51,7 @@ public class NewDoubtFragment extends Fragment {
 
     private RecyclerView mRecycler_items;
     private ArrayList<String> urlsImages;
-
+    private TextView tvUpload;
     public NewDoubtFragment() {
     }
 
@@ -69,7 +69,7 @@ public class NewDoubtFragment extends Fragment {
 
         etTitle = view.findViewById(R.id.et_title_new_post);
         etDescription = view.findViewById(R.id.et_description_new_post);
-        TextView tvUpload = view.findViewById(R.id.tv_upload);
+        tvUpload = view.findViewById(R.id.tv_upload);
         tvUpload.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -149,6 +149,9 @@ public class NewDoubtFragment extends Fragment {
         final String description = etDescription.getText().toString();
          if (checkInputs(title, description)){
              setBtnDoubt(false); // evitar multiples creaciones de dudas
+             etTitle.setEnabled(false);
+             etDescription.setEnabled(false);
+             tvUpload.setEnabled(false);
              mDatabase.child(Constants.REF_USERS).child(ctrl.getUid()).addListenerForSingleValueEvent(
                     new ValueEventListener() {
                         @Override
@@ -156,7 +159,7 @@ public class NewDoubtFragment extends Fragment {
                             final User user = dataSnapshot.getValue(User.class);
                                 if (user != null) {
                                     //writeNewDoubt(ctrl.getUid(), title, description, user);
-                                    ctrl.writeDoubtDB(ctrl.getUid(), title, description, user, urlsImages, new ArrayList<String>(), btnNewDoubt, etTitle, etDescription, mRecycler_items, getActivity());
+                                    ctrl.writeDoubtDB(ctrl.getUid(), title, description, user, urlsImages, new ArrayList<String>(), btnNewDoubt, etTitle, etDescription, mRecycler_items, getActivity(), tvUpload);
 
                                 ctrl.hideKeyboard(getActivity());
                                 } else {
@@ -177,14 +180,16 @@ public class NewDoubtFragment extends Fragment {
 
     private boolean checkInputs(String title, String description){
         // TODO hacer una comprobacion de que title tenga max x chars y descirption min x
-        if(title.trim().length() < 10){
+        boolean c_title = title.trim().length() < 10;
+        boolean c_descp = description.trim().length() < 10;
+        if(c_title){
             etTitle.setError("Entra titulo");
         }
-        if(description.trim().length() < 10){
+        if(c_descp){
             etDescription.setError("Entra descripcion");
         }
 
-        if((!title.isEmpty()) && (!description.isEmpty())){
+        if(!(c_title) && !(c_descp)){
             return true;
         }
         return false;
