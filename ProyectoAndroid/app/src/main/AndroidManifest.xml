@@ -37,12 +37,18 @@
                 android:value=".View.Login" />
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".View.MainActivity"
+            android:parentActivityName=".View.MainActivity"
             android:label="MAIN"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
         </activity>
-        <activity android:name=".DoubtDetailActivity"
+        <activity android:name=".View.DoubtDetailActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".View.Courses"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".View.Subject"
             android:windowSoftInputMode="stateHidden">
         </activity>
 

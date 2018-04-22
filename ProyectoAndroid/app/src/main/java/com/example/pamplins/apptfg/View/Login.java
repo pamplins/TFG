@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.UtilsPassword;

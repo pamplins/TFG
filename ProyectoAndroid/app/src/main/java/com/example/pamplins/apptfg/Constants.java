@@ -13,6 +13,10 @@ public class Constants {
     public static final String REF_POST_ANSWERS = "doubt-answers";
     public static final String KEY_DOUBT = "doubtKey";
 
+    public static final String REF_COURSE = "schoolar_course";
+
+
+
 
     public static final String REF_DOUBT_IMAGES = "doubt_images/";
     public static final String REF_DOUBT_NAME = "image-doubt";

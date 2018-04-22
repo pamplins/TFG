@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.DoubtDetailActivity;
+import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -23,7 +23,6 @@ import com.google.firebase.database.Transaction;
  * Created by Gustavo on 12/03/2018.
  */
 
-//TODO poner codigo en comun de AnswerAdapter y DoubtAdapter
 public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> {
     private Activity activity;
     private Controller ctrl;

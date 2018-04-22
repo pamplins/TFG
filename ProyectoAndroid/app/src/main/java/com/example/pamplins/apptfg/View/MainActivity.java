@@ -1,4 +1,4 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.View;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +12,8 @@ import android.view.MenuItem;
 import com.example.pamplins.apptfg.Fragments.HomeFragment;
 import com.example.pamplins.apptfg.Fragments.NewDoubtFragment;
 import com.example.pamplins.apptfg.Fragments.ProfileFragment;
-import com.example.pamplins.apptfg.Fragments.SearchFragment;
+import com.example.pamplins.apptfg.Fragments.MySubjectsFragment;
+import com.example.pamplins.apptfg.R;
 
 /**
  * Created by Gustavo on 17/02/2018.
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Fragment homeFragment = new HomeFragment();
-        final Fragment searchFragment = new SearchFragment();
+        final Fragment mySubjectsFragment = new MySubjectsFragment();
         final Fragment newDoubtFragment = new NewDoubtFragment();
         final Fragment profileFragment = new ProfileFragment();
 
@@ -46,16 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
 
-                if (item.getItemId() == R.id.inicioItem) {
+                if (item.getItemId() == R.id.home_item) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.fragmentContainer, homeFragment).commit();
-                } else if (item.getItemId() == R.id.buscarItem) {
+                } else if (item.getItemId() == R.id.my_subjects_item) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragmentContainer, searchFragment).commit();
-                } else if (item.getItemId() == R.id.favoritosItem) {
+                    fragmentTransaction.replace(R.id.fragmentContainer, mySubjectsFragment).commit();
+                } else if (item.getItemId() == R.id.doubt_item) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.fragmentContainer, newDoubtFragment).commit();
-                } else if (item.getItemId() == R.id.perfilItem) {
+                } else if (item.getItemId() == R.id.profile_item) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.fragmentContainer, profileFragment).commit();
                 }

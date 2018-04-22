@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
-import com.example.pamplins.apptfg.DoubtDetailActivity;
+import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
@@ -181,8 +181,19 @@ public class Controller {
 
     private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity, TextView tvUpload){
         String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
+
+
+
+
         Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
         Map<String, Object> postValues = doubt.toMap();
+
+        Map<String, Object> childUpdates2 = new HashMap<>();
+        childUpdates2.put("/"+Constants.REF_COURSE+"/first/second_semester/elect/" + key, postValues);
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates2);
+
+
+
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
@@ -215,22 +226,19 @@ public class Controller {
                             final User user = dataSnapshot.getValue(User.class);
                             final String authorName = user.getUserName();
                             //TODO se puede mejorar el codigo
-                            getUsersbyUserName().addListenerForSingleValueEvent(new ValueEventListener() {
+                            getUsersbyUserName().equalTo(authorName).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                                         User user = childSnapshot.getValue(User.class);
-                                        if (user.getUserName().equals(authorName)) {
-                                            Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
-                                            Map<String, Object> answerValues = answer.toMap();
-                                            answersReference.push().setValue(answerValues);
-                                            etAnswer.setText(null);
-                                            currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
-                                            doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
-                                            ctrl.hideKeyboard(activity);
-                                            btnAnswer.setEnabled(true);
-                                            break;
-                                        }
+                                        Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
+                                        Map<String, Object> answerValues = answer.toMap();
+                                        answersReference.push().setValue(answerValues);
+                                        etAnswer.setText(null);
+                                        currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
+                                        doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
+                                        ctrl.hideKeyboard(activity);
+                                        btnAnswer.setEnabled(true);
                                     }
                                 }
 

@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.MainActivity;
 import com.example.pamplins.apptfg.UtilsPassword;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;

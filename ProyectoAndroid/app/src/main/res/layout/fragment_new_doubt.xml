@@ -13,33 +13,44 @@
         android:isScrollContainer="false">
 
         <TextView
-            android:text="NUEVA DUDA"
-            android:textSize="24sp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:gravity = "center"
+            android:id="@+id/tv_new_doubt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorName" />
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="CREAR NUEVA DUDA"
+            android:textColor="@color/colorName"
+            android:textSize="24sp" />
+
+        <View
+            android:id="@+id/view_line_nd"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/tv_new_doubt"
+            android:background="@color/colorButton" />
 
         <EditText
             android:id="@+id/et_title_new_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/view_line_nd"
             android:layout_marginTop="52dp"
-            android:hint="Título"
-            android:textColorHint="@color/colorButton"
-            android:padding="16dp"
-            android:maxLength="30"
             android:background="@color/cardview_light_background"
+            android:hint="Título"
+            android:maxLength="30"
+            android:padding="16dp"
             android:textColor="@color/colorTextDoubt"
+            android:textColorHint="@color/colorButton"
             android:theme="@style/MyEditText" />
+
         <View
+            android:id="@+id/v_line"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/et_title_new_post"
-            android:id="@+id/v_line"
             android:background="@color/colorButton" />
+
         <EditText
             android:id="@+id/et_description_new_post"
             android:layout_width="match_parent"

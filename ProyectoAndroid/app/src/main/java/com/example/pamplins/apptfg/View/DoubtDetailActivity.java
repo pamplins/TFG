@@ -1,4 +1,4 @@
-package com.example.pamplins.apptfg;
+package com.example.pamplins.apptfg.View;
 
 /**
  * Created by Gustavo on 21/02/2018.
@@ -19,12 +19,14 @@ import android.widget.ImageView;
 
 import android.widget.TextView;
 
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.AnswerAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.AnswerViewHolder;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
+import com.example.pamplins.apptfg.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -92,7 +94,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
 
     private void initElements(){
         ctrl = Controller.getInstance();
-        //TODO enviar estas referencias a la class ctontroller
+        //TODO  enviar estas referencias a la class ctontroller
         doubtReference = FirebaseDatabase.getInstance().getReference()
                 .child(Constants.REF_DOUBTS).child(doubtKey);
         answersReference = FirebaseDatabase.getInstance().getReference()

@@ -2,23 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/inicioItem"
-        android:icon="@drawable/ic_home"
+        android:id="@+id/home_item"
+        android:icon="@mipmap/ic_home"
         android:title="Inicio" />
 
     <item
-        android:id="@+id/buscarItem"
-        android:icon="@drawable/ic_search"
-        android:title="Buscar" />
+        android:id="@+id/my_subjects_item"
+        android:icon="@mipmap/ic_my_subjects"
+        android:title="Mis asignaturas" />
 
 
     <item
-        android:id="@+id/favoritosItem"
-        android:icon="@drawable/ic_forum"
+        android:id="@+id/doubt_item"
+        android:icon="@mipmap/ic_doubt"
         android:title="Nueva duda" />
 
     <item
-        android:id="@+id/perfilItem"
-        android:icon="@drawable/ic_perfil"
+        android:id="@+id/profile_item"
+        android:icon="@mipmap/ic_profile"
         android:title="Perfil" />
 </menu>
