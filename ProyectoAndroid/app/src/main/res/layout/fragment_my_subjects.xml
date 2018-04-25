@@ -35,7 +35,24 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/et_title_new_post"
-        android:background="@color/colorButton" />
+        android:background="@color/colorLine" />
+
+
+    <include
+        android:id="@+id/subject"
+        layout="@layout/item_subject">
+
+    </include>
+    <include
+        android:id="@+id/subject"
+        layout="@layout/item_subject">
+
+    </include>
+    <include
+        android:id="@+id/subject"
+        layout="@layout/item_subject">
+
+    </include>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list_s"

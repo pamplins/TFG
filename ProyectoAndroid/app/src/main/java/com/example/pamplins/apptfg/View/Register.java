@@ -85,7 +85,7 @@ public class Register extends AppCompatActivity {
         etPassword = findViewById(R.id.et_passwordR);
         showPassword();
         etUserName = findViewById(R.id.et_userName);
-        initSpinner();
+        //initSpinner();
         progressBar = findViewById(R.id.progressBarR);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -94,7 +94,7 @@ public class Register extends AppCompatActivity {
      * Funcion encargada de inicializar el spinner para escoger el curso
      */
     private void initSpinner() {
-        spinner = findViewById(R.id.spinner);
+        //spinner = findViewById(R.id.spinner);
         String[] courses = new String[]{"Curso actual","1º","2º","3º","4º"};
         final List<String> courseList = new ArrayList<>(Arrays.asList(courses));
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
@@ -184,7 +184,6 @@ public class Register extends AppCompatActivity {
         boolean c_userN = userNameValidator();
         boolean c_email = emailValidator();
         boolean c_pass = passwordValidator();
-        boolean c_curs = cursValidator();
         if(!c_userN){
             etUserName.setError(getString(R.string.err_userName_len));
         }
@@ -194,24 +193,11 @@ public class Register extends AppCompatActivity {
         if(!c_pass){
             etPassword.setError(getString(R.string.err_pass_len));
         }
-        if(c_curs){
-            ((TextView)spinner.getSelectedView()).setError(getString(R.string.err_course));
-        }
-        if(c_userN && c_email && c_pass && !c_curs){
+        if(c_userN && c_email && c_pass){
             return true;
         }
         return false;
     }
-
-    /**
-     * Funcion encargar de comprobar la eleccion del curso
-     *
-     * @return
-     */
-    private boolean cursValidator() {
-        return (spinner.getSelectedItem().toString().equals("Curso actual"));
-    }
-
     /**
      * Funcion encargada de validar el nombre de usuario
      *
@@ -264,11 +250,11 @@ public class Register extends AppCompatActivity {
     private void writeUserDB(FirebaseUser user) {
         String userName = etUserName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
-        String spinnerItem = spinner.getSelectedItem().toString();
+        //String spinnerItem = spinner.getSelectedItem().toString();
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ctrl.writeUserDB(user.getUid(), userName, email, spinnerItem, bit, "image_profile.jpg", 0);
+        ctrl.writeUserDB(user.getUid(), userName, email, bit, "image_profile.jpg", 0);
         //UtilsPassword.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 

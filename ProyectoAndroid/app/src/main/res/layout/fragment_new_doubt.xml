@@ -1,40 +1,43 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.example.pamplins.apptfg.Fragments.NewDoubtFragment"
     android:background="@color/backGround"
-    android:isScrollContainer="false">
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <TextView
+        android:id="@+id/tv_new_doubt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="CREAR NUEVA DUDA"
+        android:textColor="@color/colorName"
+        android:textSize="24sp" />
+
+    <View
+        android:id="@+id/view_line_nd"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tv_new_doubt"
+        android:background="@color/colorLine" />
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:isScrollContainer="false">
-
-        <TextView
-            android:id="@+id/tv_new_doubt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="CREAR NUEVA DUDA"
-            android:textColor="@color/colorName"
-            android:textSize="24sp" />
-
-        <View
-            android:id="@+id/view_line_nd"
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tv_new_doubt"
-            android:background="@color/colorButton" />
+        android:isScrollContainer="true">
 
         <EditText
             android:id="@+id/et_title_new_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/view_line_nd"
             android:layout_marginTop="52dp"
             android:background="@color/cardview_light_background"
             android:hint="Título"
@@ -49,7 +52,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/et_title_new_post"
-            android:background="@color/colorButton" />
+            android:background="@color/colorLine" />
 
         <EditText
             android:id="@+id/et_description_new_post"
@@ -103,4 +106,5 @@
             android:layout_marginTop="20dp"
             android:text="Crear duda" />
     </RelativeLayout>
-</FrameLayout>
+</ScrollView>
+</LinearLayout>

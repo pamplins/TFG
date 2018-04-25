@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -29,6 +31,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Gustavo on 17/02/2018.
  */
@@ -41,6 +49,9 @@ public class MySubjectsFragment extends Fragment {
     private Controller ctrl;
     private ProgressBar progressBar;
     private ImageView addNewCourse;
+
+    private String subjects;
+
     public MySubjectsFragment() {
     }
 
@@ -64,21 +75,40 @@ public class MySubjectsFragment extends Fragment {
                 startActivity(i);
             }
         });
+        if(getArguments() != null){
+            subjects = getArguments().getString("subjects");
+            Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
+
+            addNewCourse();
+
+        }
+
+
         return rootView;
     }
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showDoubts();
+
+        //showDoubts();
     }
 
-    public void addNewCourse(final View v) {
+    private void addNewCourse() {
+
+       /* Map<String, Object> childUpdates2 = new HashMap<>();
+        childUpdates2.put("/"+Constants.REF_USERS+"/"+ctrl.getUid()+"/subjects", courses);
+        ref.setValue(courses);*/
 
 
+       /* DatabaseReference m_objFireBaseRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS);
+        m_objFireBaseRef.child(ctrl.getUid()).child("subjects").setValue(courses);*/
     }
-
     public void showDoubts() {
+
+
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);

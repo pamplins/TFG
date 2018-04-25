@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
+import com.example.pamplins.apptfg.Fragments.MySubjectsFragment;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
@@ -76,8 +78,8 @@ public class Controller {
         return FirebaseDatabase.getInstance().getReference(Constants.REF_USERS).orderByChild(Constants.REF_USERNAME);
     }
 
-    public static void writeUserDB(String uid, String userName, String email, String spinnerItem, Bitmap bit, String imagePath, int action) {
-        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, spinnerItem, action);
+    public static void writeUserDB(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
+        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, action);
 
     }
 
@@ -93,7 +95,7 @@ public class Controller {
         }
     }
 
-    public static void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final String spinnerItem, final int action) {
+    public static void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final int action) {
         String ref = folder + uid + "/" + path; // string de la ruta a la que ira
         StorageReference mStorageRef;
         mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
@@ -111,7 +113,7 @@ public class Controller {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                 if(action == 0){
-                    User user = new User(userName, email, spinnerItem, downloadUrl.toString());
+                    User user = new User(userName, email, downloadUrl.toString());
                     db = FirebaseDatabase.getInstance().getReference();
                     db.child("users").child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
@@ -119,7 +121,7 @@ public class Controller {
                     //TODO hacer multi-path updates -- ITERACION 5
                     db = FirebaseDatabase.getInstance().getReference();
                     db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
-                    db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
+                   // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
                 }
             }
@@ -181,16 +183,14 @@ public class Controller {
 
     private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity, TextView tvUpload){
         String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-
-
-
+        // TODO optimizar esto devolviendo algun valor quizas a Doubt.class y ahi dentro hacer recycle y tal
 
         Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
         Map<String, Object> postValues = doubt.toMap();
 
-        Map<String, Object> childUpdates2 = new HashMap<>();
-        childUpdates2.put("/"+Constants.REF_COURSE+"/first/second_semester/elect/" + key, postValues);
-        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates2);
+       /* Map<String, Object> childUpdates2 = new HashMap<>();
+            childUpdates2.put("/"+Constants.REF_COURSE+"/first/first_semester/algebra/"+key, doubt.getUid());
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates2);*/
 
 
 
@@ -256,4 +256,5 @@ public class Controller {
                     });
         }
     }
+
 }

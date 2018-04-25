@@ -52,6 +52,7 @@ public class NewDoubtFragment extends Fragment {
     private RecyclerView mRecycler_items;
     private ArrayList<String> urlsImages;
     private TextView tvUpload;
+
     public NewDoubtFragment() {
     }
 
@@ -180,7 +181,7 @@ public class NewDoubtFragment extends Fragment {
 
     private boolean checkInputs(String title, String description){
         // TODO hacer una comprobacion de que title tenga max x chars y descirption min x
-        boolean c_title = title.trim().length() < 10;
+        boolean c_title = title.trim().length() < 7;
         boolean c_descp = description.trim().length() < 10;
         if(c_title){
             etTitle.setError("Entra titulo");

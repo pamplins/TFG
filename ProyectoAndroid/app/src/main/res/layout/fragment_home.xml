@@ -20,7 +20,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/et_title_new_post"
-        android:background="@color/colorButton" />
+        android:background="@color/colorLine" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"

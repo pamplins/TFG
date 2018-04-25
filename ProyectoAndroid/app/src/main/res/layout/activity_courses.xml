@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backGround">
 
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:orientation="vertical"
-        android:weightSum="10"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -28,19 +32,18 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/et_title_new_post"
-            android:background="@color/colorButton" />
+            android:background="@color/colorLine" />
+
         <GridLayout
             android:id="@+id/mainGrid"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:layout_gravity="center"
             android:layout_weight="4"
-            android:layout_marginTop="60dp"
-            android:alignmentMode="alignMargins"
             android:columnCount="2"
             android:columnOrderPreserved="false"
             android:padding="14dp"
-            android:rowCount="3"
-            android:layout_gravity="center" >
+            android:rowCount="3">
 
             <!-- Row 1 -->
 
@@ -52,11 +55,10 @@
                 android:layout_marginBottom="56dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_rowWeight="1"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/backGround"
-                >
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -86,10 +88,10 @@
                 android:layout_marginBottom="56dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_rowWeight="1"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/backGround" >
+                app:cardBackgroundColor="@color/backGround"
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -119,10 +121,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_rowWeight="1"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/backGround"
-                >
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -153,9 +153,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_rowWeight="1"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/backGround"                >
+                app:cardBackgroundColor="@color/backGround"
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -177,9 +176,8 @@
 
             </android.support.v7.widget.CardView>
 
-
         </GridLayout>
-
     </LinearLayout>
 
 </ScrollView>
+</LinearLayout>

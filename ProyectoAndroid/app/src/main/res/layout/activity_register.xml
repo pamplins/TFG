@@ -45,11 +45,11 @@
             android:inputType="textPassword"
             android:paddingRight="8dip" />
 
-        <Spinner
+        <!--<Spinner
             android:id="@+id/spinner"
             style="@style/spinner_style"
             android:width="0dp"
-            android:prompt="@string/hint_spinner" />
+            android:prompt="@string/hint_spinner" />-->
 
         <ProgressBar
             android:id="@+id/progressBarR"

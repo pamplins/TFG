@@ -2,11 +2,14 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#C1ACCD</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#4173be</color>
     <color name="colorEditText">#00000000</color>
     <color name="colorButton">#716c6c</color>
     <color name="borderColor">#ffffff</color>
     <color name="colorName">#4173be</color>
     <color name="colorTextDoubt">#5c5d5e</color>
     <color name="backGround">#f2f3f5</color>
+    <color name="colorLine">#d4d6da</color>
+    <color name="cardViewPressed">#a1bffa</color>
+
 </resources>

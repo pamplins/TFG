@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/borderColor"
+    android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="vertical"
+            android:background="@color/borderColor" >
+
+            <TextView
+                android:id="@+id/name_subject"
+                style="@style/Base.TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:textSize="20dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/colorName"
+                android:text="Asignatura X"            />
+
+            <TextView
+                android:id="@+id/course_subject"
+                style="@style/Base.TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:textSize="14dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/colorButton"
+                android:text="1r Curso - 2o  Semstre" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/doubt_description"
+            android:padding="16dp"
+            android:layout_gravity="right"
+            >
+
+
+            <ImageView
+                android:id="@+id/iv_doubts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:maxWidth="30dip"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds ="true"
+                android:background="?attr/selectableItemBackground"
+                android:src="@mipmap/ic_doubt"
+                />
+
+            <TextView
+                android:id="@+id/num_doubts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="45"
+                android:textColor="@color/colorButton"
+                android:layout_marginRight="10dp"/>
+        </LinearLayout>
+
+</android.support.v7.widget.CardView>

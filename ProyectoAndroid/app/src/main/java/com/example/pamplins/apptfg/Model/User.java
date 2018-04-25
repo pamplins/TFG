@@ -1,26 +1,31 @@
 package com.example.pamplins.apptfg.Model;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created by Gustavo on 07/02/2018.
  */
 
 public class User {
     private String email;
-    private String course;
     private String userName;
     private String urlProfileImage;
+    private ArrayList<String> subjects;
 
     public User(){
     }
 
 
 
-    public User(String userName, String email, String course, String urlProfileImage){
+
+    public User(String userName, String email, String urlProfileImage){
         this.userName = userName;
         this.email = email;
-        this.course = course;
+        //this.course = course;
         this.urlProfileImage = urlProfileImage;
+        subjects = new ArrayList<>( Arrays.asList(""));
     }
 
     public String getUserName() {
@@ -39,14 +44,6 @@ public class User {
         this.email = email;
     }
 
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
     public String getUrlProfileImage() {
         return urlProfileImage;
     }
@@ -55,13 +52,21 @@ public class User {
         this.urlProfileImage = urlProfileImage;
     }
 
+    public ArrayList<String> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(ArrayList<String> subjects) {
+        this.subjects = subjects;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
-                ", course='" + course + '\'' +
                 ", userName='" + userName + '\'' +
                 ", urlProfileImage='" + urlProfileImage + '\'' +
+                ", subjects ='" + subjects + '\'' +
                 '}';
     }
 }
