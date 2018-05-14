@@ -22,11 +22,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.View.Login;
+import com.example.pamplins.apptfg.View.LoginActivity;
+import com.example.pamplins.apptfg.View.SubjectActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -34,6 +39,8 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -70,8 +77,9 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v)
             {
                 firebaseAuth.signOut();
+                ctrl.restartInstance();
                 getActivity().finish();
-                Intent i = new Intent(getActivity(), Login.class);
+                Intent i = new Intent(getActivity(), LoginActivity.class);
                 startActivity(i);
 
 
@@ -80,22 +88,62 @@ public class ProfileFragment extends Fragment {
         ctrl = Controller.getInstance();
         img = view.findViewById(R.id.img_user_profile);
 
-        Button btn = view.findViewById(R.id.btn_changeImg);
+        Button btn = view.findViewById(R.id.btn_createSubjects);
         btn.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                /**
-                 * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
-                 */openAlert();
+                createSubject();
 
 
             }
         });
 
+
+
+
+        /*Button btn = view.findViewById(R.id.btn_changeImg);
+        btn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+               openAlert();
+
+
+            }
+        });
+        */
         return view;
     }
+
+    private void createSubject() {
+        ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Subject subject = dataSnapshot.getValue(Subject.class);
+                ArrayList<String> doubts = new ArrayList<>(Arrays.asList("duda1","duda2"));
+                subject.getDoubts().add("duda3");
+                ctrl.getSubjectsRef().child("Asignatura C").setValue(subject);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        Subject subject = new Subject("1o", "1r semestre");
+        ctrl.getSubjectsRef().child("Asignatura A").setValue(subject);
+
+
+
+       //ctrl.updateUser();
+
+    }
+
     private void openAlert() {
         final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

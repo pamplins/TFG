@@ -27,6 +27,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
     private TextView numDisLikes;
     private ImageView dislike;
     private TextView numAnswers;
+    private TextView subject;
 
     public DoubtViewHolder(View itemView) {
         super(itemView);
@@ -37,6 +38,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         titleView = itemView.findViewById(R.id.post_title);
         authorView = itemView.findViewById(R.id.post_author);
         bodyView = itemView.findViewById(R.id.post_description);
+        subject = itemView.findViewById(R.id.post_subject);
         date = itemView.findViewById(R.id.tv_date);
         img = itemView.findViewById(R.id.post_author_photo);
         like = itemView.findViewById(R.id.like);
@@ -57,6 +59,7 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
     public void bindToPost(final Doubt doubt, Activity activity, Controller ctrl) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getUser().getUserName());
+        subject.setText(doubt.getSubject());
         numAnswers.setText(String.valueOf(doubt.getnAnswers()));
         int count = doubt.getDescription().split("\r\n|\r|\n").length;
         String desc = doubt.getDescription();

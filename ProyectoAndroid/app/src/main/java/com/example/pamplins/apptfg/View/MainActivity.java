@@ -42,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
             Bundle bundle = new Bundle();
             bundle.putString("subjects", prueba);
             mySubjectsFragment.setArguments(bundle);
-
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragmentContainer, mySubjectsFragment).commit();
             bottomNavigationView.setSelectedItemId(R.id.my_subjects_item);
+            getIntent().removeExtra("main");
+
         }
         else{
             if(savedInstanceState == null) {

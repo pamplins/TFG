@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Fragments.MySubjectsFragment;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.View.Subject;
+import com.example.pamplins.apptfg.View.SubjectActivity;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Created by Gustavo on 21/04/2018.
  */
 
-public class Courses extends AppCompatActivity {
+public class CoursesActivity extends AppCompatActivity {
     private GridLayout mainGrid;
     private ArrayList<String> courses;
 
@@ -55,7 +55,7 @@ public class Courses extends AppCompatActivity {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Courses.this,Subject.class);
+                    Intent intent = new Intent(CoursesActivity.this,SubjectActivity.class);
                     intent.putExtra("course",String.valueOf(finalI));
                     startActivity(intent);
                 }

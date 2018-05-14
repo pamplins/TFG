@@ -17,8 +17,18 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:layout_collapseMode="pin"
-        app:layout_scrollFlags="scroll|enterAlways"/>
+        app:layout_scrollFlags="scroll|enterAlways" >
 
+        <ImageView
+            android:id="@+id/tv_add_subjects"
+            android:onClick="addSubject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:paddingRight="16dp"
+            android:src="@mipmap/ic_add_subjects" />
+
+    </android.support.v7.widget.Toolbar>
 
     <View
         android:layout_width="fill_parent"
@@ -335,13 +345,6 @@
                 </android.support.v7.widget.CardView>
 
             </GridLayout>
-            <Button
-                android:layout_marginTop="16px"
-                android:id="@+id/btn_addSubjects"
-                style="@style/button_style"
-                android:layout_marginBottom="30dp"
-                android:onClick="addSubject"
-                android:text="Añadir Asignaturas" />
         </LinearLayout>
 
     </ScrollView>

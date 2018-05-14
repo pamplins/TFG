@@ -8,16 +8,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <TextView
-        android:id="@+id/tv_new_doubt"
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:text="CREAR NUEVA DUDA"
-        android:textColor="@color/colorName"
-        android:textSize="24sp" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="CREAR NUEVA DUDA"
+            android:textColor="@color/colorName"
+            android:textSize="24sp" />
+
+        <ImageView
+            android:id="@+id/tv_newDoubt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_doubt_upload"
+            android:paddingRight="16dp"/>
+
+    </LinearLayout>
 
     <View
         android:id="@+id/view_line_nd"
@@ -73,11 +89,42 @@
             android:textSize="18dp"
             android:theme="@style/MyEditText" />
 
+        <View
+            android:id="@+id/v_line2"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/et_description_new_post"
+            android:background="@color/colorLine" />
+
+        <AutoCompleteTextView
+            android:id="@+id/et_autocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/v_line2"
+            android:background="@color/cardview_light_background"
+            android:hint="Asignatura"
+            android:padding="16dp"
+            android:theme="@style/spinner_style"
+            android:textColor="@color/colorTextDoubt"
+            android:textColorHint="@color/colorButton" />
+
+        <TextView
+            android:id="@+id/tv_optional"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/et_autocomplete"
+            android:padding="16dp"
+            android:text="Opcional:"
+            android:textColor="@color/colorTextDoubt" />
         <TextView
             android:id="@+id/tv_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_description_new_post"
+            android:layout_below="@+id/tv_optional"
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="16dp"
             android:background="@mipmap/ic_select_images_doubt" />
@@ -97,14 +144,21 @@
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             tools:listitem="@layout/items_carousel" />
 
-        <Button
-            android:id="@+id/btn_newDoubt"
-            style="@style/button_style"
-            android:layout_below="@id/recycle_items_doubt_nd"
+
+        <ProgressBar
+            android:id="@+id/progressBar_nd"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleX="0.50"
+            android:scaleY="0.50"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="20dp"
-            android:text="Crear duda" />
+            android:visibility="gone">
+        </ProgressBar>
+
+
     </RelativeLayout>
+
 </ScrollView>
 </LinearLayout>

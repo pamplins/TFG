@@ -22,11 +22,12 @@ public class Doubt {
     public Map<String, Boolean> dislikes = new HashMap<>();
     private long nAnswers;
     private ArrayList<String> urlsImages;
+    private String subject;
 
     public Doubt() {
     }
 
-    public Doubt(String uid, String title, String description, String date, User user, ArrayList<String> urlsImages) {
+    public Doubt(String uid, String title, String description, String date, User user, ArrayList<String> urlsImages, String subject) {
         this.uid = uid;
         this.title = title;
         this.description = description;
@@ -34,6 +35,7 @@ public class Doubt {
         this.user = user;
         this.nAnswers = 0;
         this.urlsImages = urlsImages;
+        this.subject = subject;
     }
 
 
@@ -125,11 +127,20 @@ public class Doubt {
         this.urlsImages = urlsImages;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
     @Override
     public String toString() {
         return "Doubt{" +
                 "user=" + user +
                 ", uid='" + uid + '\'' +
+                ", subject='" + subject + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", likesCount=" + likesCount +
@@ -156,6 +167,7 @@ public class Doubt {
         doubt.put("nAnswers", nAnswers);
         doubt.put("user", user);
         doubt.put("urlsImages", urlsImages);
+        doubt.put("subject", subject);
         return doubt;
     }
 }

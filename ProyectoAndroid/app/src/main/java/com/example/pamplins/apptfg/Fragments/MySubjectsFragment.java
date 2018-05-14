@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +20,9 @@ import com.example.pamplins.apptfg.HoldersAdapters.DoubtAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtViewHolder;
 import com.example.pamplins.apptfg.View.MainActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.example.pamplins.apptfg.View.Courses;
+import com.example.pamplins.apptfg.View.CoursesActivity;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.View.Login;
+import com.example.pamplins.apptfg.View.LoginActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,15 +69,21 @@ public class MySubjectsFragment extends Fragment {
         addNewCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getActivity().getApplicationContext(), Courses.class);
+                Intent i = new Intent(getActivity().getApplicationContext(), CoursesActivity.class);
                 startActivity(i);
             }
         });
+
+        Toast.makeText(getActivity(),ctrl.getUser().getSubjects().toString(), Toast.LENGTH_SHORT).show();
+        //TODO si abro rapidamente la pantalla de Mis asignaturas falla
+
         if(getArguments() != null){
             subjects = getArguments().getString("subjects");
-            Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
-
-            addNewCourse();
+            if(null != subjects) {
+                Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
+                addNewCourse(subjects);
+                getArguments().remove("subjects");
+            }
 
         }
 
@@ -96,8 +100,8 @@ public class MySubjectsFragment extends Fragment {
         //showDoubts();
     }
 
-    private void addNewCourse() {
-
+    private void addNewCourse(String subjects) {
+        ctrl.updateUser(subjects);
        /* Map<String, Object> childUpdates2 = new HashMap<>();
         childUpdates2.put("/"+Constants.REF_USERS+"/"+ctrl.getUid()+"/subjects", courses);
         ref.setValue(courses);*/

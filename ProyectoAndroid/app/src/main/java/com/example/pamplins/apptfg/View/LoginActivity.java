@@ -17,7 +17,7 @@ import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.UtilsPassword;
+import com.example.pamplins.apptfg.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -36,28 +36,26 @@ import com.google.firebase.database.ValueEventListener;
  * Created by PAMPLINS on 02/01/2018.
  */
 
-public class Login extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPassword;
     private ProgressBar progressBar;
     private String email;
 
     private FirebaseAuth mAuth;
-
-    private Controller ctrl;
     @Override
        protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        initElements();
         mAuth = FirebaseAuth.getInstance();
+
+        initElements();
     }
 
     /**
      * Metodo encargado de inicializar los elementos
      */
     private void initElements() {
-        ctrl = Controller.getInstance();
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
         showPassword();
@@ -71,6 +69,7 @@ public class Login extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         updateUI(mAuth.getCurrentUser(), true);
+
     }
 
     /**
@@ -238,7 +237,9 @@ public class Login extends AppCompatActivity {
      */
     private void updateUI(FirebaseUser currentUser, Boolean start) {
         if(currentUser != null){
+            Controller.getInstance();
             openHome();
+
         }else{
             if(!start){
                 Snackbar.make(findViewById(android.R.id.content), R.string.err_login, Snackbar.LENGTH_LONG)
@@ -254,7 +255,7 @@ public class Login extends AppCompatActivity {
      * @param v
      */
     public void openRegister(View v){
-        Intent i = new Intent(this, Register.class);
+        Intent i = new Intent(this, RegisterActivity.class);
         startActivity(i);
     }
 
@@ -262,10 +263,10 @@ public class Login extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        UtilsPassword.showPassword(etPassword);
+        Utils.showPassword(etPassword);
     }
 
     public void hideKeyboard(View v){
-        ctrl.hideKeyboard(this);
+        Utils.hideKeyboard(this);
     }
 }

@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         >
-        <activity android:name=".View.Login"
+        <activity android:name=".View.LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,15 +26,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".View.Register"
-            android:parentActivityName=".View.Login"
+            android:name=".View.RegisterActivity"
+            android:parentActivityName=".View.LoginActivity"
             android:label="@string/register_name"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.Login" />
+                android:value=".View.LoginActivity" />
         </activity>
         <activity
             android:name=".View.MainActivity"
@@ -45,10 +45,10 @@
         <activity android:name=".View.DoubtDetailActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".View.Courses"
+        <activity android:name=".View.CoursesActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".View.Subject"
+        <activity android:name=".View.SubjectActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
 

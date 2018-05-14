@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
-import com.example.pamplins.apptfg.UtilsPassword;
+import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 
@@ -56,7 +56,7 @@ import java.util.regex.Pattern;
  * Created by PAMPLINS on 09/01/2018.
  */
 
-public class Register extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private EditText etPassword;
@@ -65,8 +65,6 @@ public class Register extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
     private Bitmap bit;
-
-    private Controller ctrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -80,7 +78,6 @@ public class Register extends AppCompatActivity {
      * Metodo encargado de inicializar los elementos
      */
     private void initElements() {
-        ctrl = Controller.getInstance();
         etEmail = findViewById(R.id.et_emailR);
         etPassword = findViewById(R.id.et_passwordR);
         showPassword();
@@ -121,7 +118,7 @@ public class Register extends AppCompatActivity {
      * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
      */
     private void showPassword() {
-        UtilsPassword.showPassword(etPassword);
+        Utils.showPassword(etPassword);
     }
 
     /**
@@ -140,7 +137,7 @@ public class Register extends AppCompatActivity {
                  public void onDataChange(DataSnapshot dataSnapshot) {
                      if(!dataSnapshot.exists()){
                          mAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
-                             .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                             .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                                  @Override
                                  public void onComplete(@NonNull Task<AuthResult> task) {
                                      if (task.isSuccessful()) {
@@ -254,7 +251,7 @@ public class Register extends AppCompatActivity {
         if(null == bit){
             bit = BitmapFactory.decodeResource(getResources(),R.drawable.user_default);
         }
-        ctrl.writeUserDB(user.getUid(), userName, email, bit, "image_profile.jpg", 0);
+        Controller.getInstance().writeUserDB(user.getUid(), userName, email, bit, "image_profile.jpg", 0);
         //UtilsPassword.uploadImageProfile(user.getUid(), bit, "image_profile.jpg");
     }
 
@@ -272,7 +269,7 @@ public class Register extends AppCompatActivity {
      * @param v
      */
     public void openImage(View v){
-        if(ctrl.verifyPermissions(this)) {
+        if(Utils.verifyPermissions(this)) {
             openAlert();
         }else{
             Snackbar.make(findViewById(android.R.id.content), R.string.permiss, Snackbar.LENGTH_LONG)
@@ -285,7 +282,7 @@ public class Register extends AppCompatActivity {
      */
     private void openAlert() {
         final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         builder.setTitle("Añadir imagen");
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 @Override
@@ -343,7 +340,7 @@ public class Register extends AppCompatActivity {
 
 
     public void hideKeyboard(View v){
-       ctrl.hideKeyboard(this);
+       Utils.hideKeyboard(this);
     }
 
 

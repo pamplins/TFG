@@ -34,11 +34,17 @@
         android:src="@drawable/user_img" />
 
     <Button
+        android:id="@+id/btn_createSubjects"
+        style="@style/button_style"
+        android:layout_marginTop="90dp"
+        android:layout_marginBottom="10dp"
+        android:text="CREAR ASIGNATURAS" />
+   <!-- <Button
         android:id="@+id/btn_changeImg"
         style="@style/button_style"
         android:layout_marginTop="90dp"
         android:layout_marginBottom="10dp"
-        android:text="CAMBIAR IMAGEN" />
+        android:text="CAMBIAR IMAGEN" />-->
     <Button
         android:id="@+id/btn_signout"
         style="@style/button_style"

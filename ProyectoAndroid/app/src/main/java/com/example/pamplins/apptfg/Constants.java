@@ -23,4 +23,8 @@ public class Constants {
 
     public static final String REF_PROFILE_IMAGES = "user_images/";
     public static final String REF_PROFILE_NAME = "urlProfileImage";
+
+
+    public static final String REF_SUBJECTS = "subjects";
+
 }

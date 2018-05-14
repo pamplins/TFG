@@ -1,24 +1,23 @@
 package com.example.pamplins.apptfg.Controller;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
-import com.example.pamplins.apptfg.Fragments.MySubjectsFragment;
+import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
@@ -39,6 +38,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,9 +52,34 @@ import java.util.Map;
 public class Controller {
 
     private static Controller ctrl = null;
-    private static DatabaseReference db;
+    private User user;
+    private FirebaseDatabase db;
+    private StorageReference storageRef;
+    private DatabaseReference usersRef;
+    private DatabaseReference doubtsRef;
+    private DatabaseReference subjectsRef;
     private Controller (){
+        initElements();
+    }
 
+
+    private void initElements() {
+        db = FirebaseDatabase.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference();
+        usersRef = db.getReference(Constants.REF_USERS);
+        doubtsRef = db.getReference(Constants.REF_DOUBTS);
+        subjectsRef = db.getReference(Constants.REF_SUBJECTS);
+
+        usersRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
     public static Controller getInstance(){
@@ -64,10 +89,30 @@ public class Controller {
         return ctrl;
     }
 
-    public void hideKeyboard(Activity activity){
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    public void restartInstance(){
+        ctrl = null;
     }
+
+    public StorageReference getStorageRef(){
+        return storageRef;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public DatabaseReference getUsersRef() {
+        return usersRef;
+    }
+
+    public DatabaseReference getDoubtsRef() {
+        return doubtsRef;
+    }
+
+    public DatabaseReference getSubjectsRef() {
+        return subjectsRef;
+    }
+
+
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -75,30 +120,20 @@ public class Controller {
 
 
     public Query getUsersbyUserName(){
-        return FirebaseDatabase.getInstance().getReference(Constants.REF_USERS).orderByChild(Constants.REF_USERNAME);
+        return usersRef.orderByChild(Constants.REF_USERNAME);
     }
 
-    public static void writeUserDB(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
+    public void writeUserDB(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
         uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, action);
 
     }
 
-    public boolean verifyPermissions(Activity activity) {
-        int p_camera = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA);
-        int p_storage = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if((p_camera == PackageManager.PERMISSION_GRANTED) && (p_storage == PackageManager.PERMISSION_GRANTED)){
-            return true;
-        }else{
-            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
-            return false;
-        }
-    }
 
-    public static void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final int action) {
+    public void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final int action) {
         String ref = folder + uid + "/" + path; // string de la ruta a la que ira
         StorageReference mStorageRef;
-        mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
+        mStorageRef =  storageRef.child(ref);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bit.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
@@ -114,13 +149,11 @@ public class Controller {
                 Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                 if(action == 0){
                     User user = new User(userName, email, downloadUrl.toString());
-                    db = FirebaseDatabase.getInstance().getReference();
-                    db.child("users").child(uid).setValue(user);
+                    usersRef.child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
                 else{
                     //TODO hacer multi-path updates -- ITERACION 5
-                    db = FirebaseDatabase.getInstance().getReference();
-                    db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
+                    usersRef.child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
                    // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
                 }
@@ -152,19 +185,19 @@ public class Controller {
     }
 
 
-    public void writeDoubtDB(String userId, String title, String body, User user, ArrayList<String> url1, ArrayList<String> url2, Button btn, EditText et1, EditText et2, RecyclerView rv, Activity activity, TextView tvUpload){
+    public void writeDoubtDB(String title, String body, ArrayList<String> url1, ArrayList<String> url2, RecyclerView rv, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
         if(!url1.isEmpty()){
-            uploadImagesDoubt(userId, Constants.REF_DOUBT_IMAGES, Constants.REF_DOUBT_NAME, title, body, user, url1, url2, btn, et1, et2, rv, activity, tvUpload);
+            uploadImagesDoubt(title, body, user, url1, url2,rv, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }else{
-            uploadNewDoubt(userId, title, body, user, url2, btn, et1, et2, rv, url1, activity, tvUpload);
+            uploadNewDoubt(title, body, user, url2, rv, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }
     }
 
-    private void uploadImagesDoubt(final String uid, String folder, final String path, final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final Button btn, final EditText et1, final EditText et2, final RecyclerView rv, final Activity activity, final TextView tvUpload) {
+    private void uploadImagesDoubt(final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final RecyclerView rv, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
         for(int i = 0; i < url1.size(); i++){
-            String ref = folder + uid + "/" + title + "/" + path+"_"+i+".jpg"; // string de la ruta a la que ira
+            String ref = Constants.REF_DOUBT_IMAGES + getUid() + "/" + title + "/" + Constants.REF_DOUBT_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             StorageReference fileToUpload;
-            fileToUpload = FirebaseStorage.getInstance().getReference().child(ref);
+            fileToUpload = storageRef.child(ref);
 
             final int finalI = i;
             final ArrayList<String> finalUrl = url2;
@@ -174,18 +207,20 @@ public class Controller {
                     Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                     finalUrl.add(downloadUrl.toString());
                     if(finalI == url1.size()-1) {
-                        uploadNewDoubt(uid, title, body, user, finalUrl, btn, et1, et2, rv, url1, activity, tvUpload);
+                        uploadNewDoubt(title, body, user, finalUrl, rv, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
+
                     }
                 }
             });
         }
     }
 
-    private void uploadNewDoubt(String userId, String title, String body, User user, ArrayList array, Button btn, EditText et1, EditText et2, RecyclerView rv, ArrayList<String> url1, Activity activity, TextView tvUpload){
-        String key = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).push().getKey();
-        // TODO optimizar esto devolviendo algun valor quizas a Doubt.class y ahi dentro hacer recycle y tal
+    private void uploadNewDoubt(String title, String body, User user, ArrayList array, RecyclerView rv, ArrayList<String> url1, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
+        String key = doubtsRef.push().getKey();
 
-        Doubt doubt = new Doubt(userId, title, body, ctrl.getDate(), user, array);
+        // TODO optimizar esto
+
+        Doubt doubt = new Doubt(getUid(), title, body, ctrl.getDate(), user, array, subject);
         Map<String, Object> postValues = doubt.toMap();
 
        /* Map<String, Object> childUpdates2 = new HashMap<>();
@@ -193,68 +228,55 @@ public class Controller {
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates2);*/
 
 
-
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
-        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-        Snackbar.make(activity.findViewById(android.R.id.content), "Tu duda se ha posteado correctamente", Snackbar.LENGTH_LONG)
-                .show();
-        btn.setEnabled(true);
-        et1.setEnabled(true);
-        et2.setEnabled(true);
-        tvUpload.setEnabled(true);
-        et1.setText("");
-        et2.setText("");
+        db.getReference().updateChildren(childUpdates);
         if (!url1.isEmpty()) {
             url1.clear();
             rv.getAdapter().notifyDataSetChanged();
         }
+
+        postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView);
+    }
+
+    private void postWriteDoubt(Activity ac, EditText etTitle, EditText etDescription, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, AutoCompleteTextView textView) {
+       Snackbar.make(ac.findViewById(android.R.id.content), "Tu duda se ha creado correctamente", Snackbar.LENGTH_LONG)
+                .show();
+        ac.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressBar.setVisibility(View.GONE);
+        etTitle.setEnabled(true);
+        etDescription.setEnabled(true);
+        tvUpload.setEnabled(true);
+        etTitle.setText("");
+        etDescription.setText("");
+        textView.setEnabled(true);
+        textView.setText("");
+        tvNewDoubt.setEnabled(true);
     }
 
     public void writeAnswerDB(final Doubt currentdDoubt, final DatabaseReference answersReference, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
         final String uid = getUid();
         final String answerText = etAnswer.getText().toString();
         if(answerText.trim().isEmpty()){
-            etAnswer.setError("Entra comentario");
+           etAnswer.setError("Entra comentario");
         }else {
             btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
-            FirebaseDatabase.getInstance().getReference().child("users").child(uid)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            final User user = dataSnapshot.getValue(User.class);
-                            final String authorName = user.getUserName();
-                            //TODO se puede mejorar el codigo
-                            getUsersbyUserName().equalTo(authorName).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                                        User user = childSnapshot.getValue(User.class);
-                                        Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
-                                        Map<String, Object> answerValues = answer.toMap();
-                                        answersReference.push().setValue(answerValues);
-                                        etAnswer.setText(null);
-                                        currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
-                                        doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
-                                        ctrl.hideKeyboard(activity);
-                                        btnAnswer.setEnabled(true);
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    btnAnswer.setEnabled(true);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            btnAnswer.setEnabled(true);
-                        }
-                    });
+            Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
+            Map<String, Object> answerValues = answer.toMap();
+            answersReference.push().setValue(answerValues);
+            etAnswer.setText(null);
+            currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
+            doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
+            Utils.hideKeyboard(activity);
+            btnAnswer.setEnabled(true);
         }
     }
 
+    public void updateUser(String s) {
+        ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
+
+        ctrl.getUser().setSubjects(subjects);
+        usersRef.child(getUid()).setValue(ctrl.getUser());
+    }
 }

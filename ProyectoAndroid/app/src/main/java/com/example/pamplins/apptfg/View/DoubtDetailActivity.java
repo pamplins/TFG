@@ -47,6 +47,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private TextView tvTitle;
     private TextView tvDate;
     private TextView tvDescription;
+    private TextView tvSubject;
     private EditText etAnswer;
     private ImageView img;
     private Button btnAnswer;
@@ -70,12 +71,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_answers_doubt);
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("ASIGNATURA X");
 
-        myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
         doubtKey = getIntent().getStringExtra(Constants.KEY_DOUBT);
         if (doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
@@ -104,6 +100,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.post_title);
         tvDate = findViewById(R.id.tv_date);
         tvDescription = findViewById(R.id.post_description);
+        tvSubject = findViewById(R.id.post_subject);
         etAnswer = findViewById(R.id.field_answer_text);
         img = findViewById(R.id.post_author_photo);
         btnAnswer = findViewById(R.id.button_post_answer);
@@ -141,7 +138,12 @@ public class DoubtDetailActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 currentDoubt = dataSnapshot.getValue(Doubt.class);
+                Toolbar myToolbar = findViewById(R.id.my_toolbar);
+                setSupportActionBar(myToolbar);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(currentDoubt.getTitle());
 
+                myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
                 showMainDoubt();
                 putLikes();
                 putDisLikes();
@@ -216,6 +218,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         tvAuthor.setText(currentDoubt.getUser().getUserName());
         tvTitle.setText(currentDoubt.getTitle());
         tvDescription.setText(currentDoubt.getDescription());
+        tvSubject.setText(currentDoubt.getSubject());
         tvDate.setText(currentDoubt.getDate());
         numAnswers.setText(String.valueOf(currentDoubt.getnAnswers()));
         ctrl.showProfileImage(this, currentDoubt, img);

@@ -54,6 +54,18 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"/>
 
+        <TextView
+            android:id="@+id/post_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/doubt_description"
+            android:textColor="@color/colorTextDoubt"
+            android:padding="16dp"
+            android:textStyle="bold"
+            tools:text="Asignatura de una duda" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

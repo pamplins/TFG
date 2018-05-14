@@ -1,28 +1,27 @@
 package com.example.pamplins.apptfg.Model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created by Gustavo on 25/04/2018.
  */
 
 public class Subject {
 
-    private String name;
     private String course;
     private String semester;
+    private ArrayList<String> doubts;
 
-    public Subject(String name, String course, String semester){
-        this.name = name;
+
+    public Subject(){}
+
+    public Subject(String course, String semester){
         this.course = course;
         this.semester = semester;
+        doubts = new ArrayList<>( Arrays.asList(""));
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getCourse() {
         return course;
@@ -40,12 +39,20 @@ public class Subject {
         this.semester = semester;
     }
 
+    public ArrayList<String> getDoubts() {
+        return doubts;
+    }
+
+    public void setDoubts(ArrayList<String> doubts) {
+        this.doubts = doubts;
+    }
+
     @Override
     public String toString() {
         return "Subject{" +
-                "name='" + name + '\'' +
                 ", course='" + course + '\'' +
                 ", semester='" + semester + '\'' +
+                ", doubts ='" + doubts + '\'' +
                 '}';
     }
 }

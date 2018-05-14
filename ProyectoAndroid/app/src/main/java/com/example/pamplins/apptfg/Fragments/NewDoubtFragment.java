@@ -10,20 +10,28 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
+import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 
+import com.example.pamplins.apptfg.Utils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +39,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -46,31 +55,62 @@ public class NewDoubtFragment extends Fragment {
 
     private EditText etTitle;
     private EditText etDescription;
-    private Button btnNewDoubt;
     private Controller ctrl;
 
     private RecyclerView mRecycler_items;
     private ArrayList<String> urlsImages;
     private TextView tvUpload;
+    private ImageView tvNewDoubt;
+
+    private ProgressBar progressBar;
+    private List<String> subjects;
+    AutoCompleteTextView textView;
 
     public NewDoubtFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ctrl = Controller.getInstance();
+        autocomplete();
         super.onCreate(savedInstanceState);
+    }
+
+    private void autocomplete(){
+        ctrl.getSubjectsRef().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                subjects = new ArrayList<>();
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                    String subject = snapshot.getKey();
+                    subjects.add(subject);
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                        android.R.layout.simple_dropdown_item_1line, subjects);
+                textView = getActivity().findViewById(R.id.et_autocomplete);
+                textView.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ctrl = Controller.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         View view = inflater.inflate(R.layout.fragment_new_doubt,
                 container, false);
 
+        progressBar = view.findViewById(R.id.progressBar_nd);
         etTitle = view.findViewById(R.id.et_title_new_post);
         etDescription = view.findViewById(R.id.et_description_new_post);
         tvUpload = view.findViewById(R.id.tv_upload);
+
         tvUpload.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -80,8 +120,9 @@ public class NewDoubtFragment extends Fragment {
             }
         });
 
-        btnNewDoubt = view.findViewById(R.id.btn_newDoubt);
-        btnNewDoubt.setOnClickListener(new View.OnClickListener()
+        tvNewDoubt = view.findViewById(R.id.tv_newDoubt);
+
+        tvNewDoubt.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -95,7 +136,7 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private void selectImage() {
-        if(ctrl.verifyPermissions(getActivity())) {
+        if(Utils.verifyPermissions(getActivity())) {
             openAlert();
         }else{
             Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.permiss, Snackbar.LENGTH_LONG)
@@ -148,49 +189,49 @@ public class NewDoubtFragment extends Fragment {
     private void sendDoubt() {
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
-         if (checkInputs(title, description)){
-             setBtnDoubt(false); // evitar multiples creaciones de dudas
-             etTitle.setEnabled(false);
-             etDescription.setEnabled(false);
-             tvUpload.setEnabled(false);
-             mDatabase.child(Constants.REF_USERS).child(ctrl.getUid()).addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            final User user = dataSnapshot.getValue(User.class);
-                                if (user != null) {
-                                    //writeNewDoubt(ctrl.getUid(), title, description, user);
-                                    ctrl.writeDoubtDB(ctrl.getUid(), title, description, user, urlsImages, new ArrayList<String>(), btnNewDoubt, etTitle, etDescription, mRecycler_items, getActivity(), tvUpload);
-
-                                ctrl.hideKeyboard(getActivity());
-                                } else {
-                                    Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_post , Snackbar.LENGTH_LONG)
-                                            .show();
-                                    setBtnDoubt(true);
-                                }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Snackbar.make(getActivity().findViewById(android.R.id.content), "Ha habido un error en la creacion de la duda" , Snackbar.LENGTH_LONG)
-                                    .show();
-                            setBtnDoubt(true);
-                        }
-                    });
+        final String subject = textView.getText().toString();
+         if (checkInputs(title, description, subject)){
+             preWriteDoubt();
+             ctrl.writeDoubtDB(title, description, urlsImages, new ArrayList<String>(), mRecycler_items, getActivity(), etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }
     }
 
-    private boolean checkInputs(String title, String description){
-        // TODO hacer una comprobacion de que title tenga max x chars y descirption min x
+
+
+    private void preWriteDoubt() {
+        progressBar.setVisibility(View.VISIBLE);
+        setBtnDoubt(false); // evitar multiples creaciones de dudas
+        etTitle.setEnabled(false);
+        etDescription.setEnabled(false);
+        textView.setEnabled(false);
+        tvUpload.setEnabled(false);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, // bloquea la pantalla hasta que la duda se suba
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Utils.hideKeyboard(getActivity());
+    }
+
+    private boolean checkInputs(String title, String description, String subject){
         boolean c_title = title.trim().length() < 7;
         boolean c_descp = description.trim().length() < 10;
+        boolean c_subject = subject.trim().length() < 1;
+
         if(c_title){
             etTitle.setError("Entra titulo");
         }
         if(c_descp){
             etDescription.setError("Entra descripcion");
         }
+        if(c_subject){
+            textView.setError("Entra una asignatura");
+        }else{
+            if(!subjects.contains(subject)){
+                textView.setError("Asignatura incorrecta");
+                c_subject = true;
+            }
+        }
 
-        if(!(c_title) && !(c_descp)){
+
+        if(!(c_title) && !(c_descp) && !(c_subject)){
             return true;
         }
         return false;
@@ -198,7 +239,7 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private void setBtnDoubt(boolean enabled) {
-        btnNewDoubt.setEnabled(enabled);
+        tvNewDoubt.setEnabled(enabled);
     }
 
 }
