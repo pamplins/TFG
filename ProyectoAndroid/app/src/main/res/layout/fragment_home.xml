@@ -9,6 +9,8 @@
 
     <TextView
         android:text="ÚLTIMOS FOROS"
+        android:textStyle="bold"
+
         android:textSize="24sp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"

@@ -136,7 +136,7 @@ public class MySubjectsFragment extends Fragment {
                             listSubjects.add(subject);
                             keys.add(snapshot.getKey());
                         }
-                        SubjectAdapter adapter = new SubjectAdapter(listSubjects, keys);
+                        SubjectAdapter adapter = new SubjectAdapter(listSubjects, keys, getActivity());
                         mRecycler.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
 

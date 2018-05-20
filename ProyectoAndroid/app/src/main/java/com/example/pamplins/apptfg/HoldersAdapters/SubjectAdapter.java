@@ -1,12 +1,18 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.View.DoubtDetailActivity;
+import com.example.pamplins.apptfg.View.DoubtsActivity;
 
 import java.util.List;
 
@@ -18,10 +24,12 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectViewHolder> {
 
     private List<Subject> subjects;
     private List<String> keys;
+    private Activity activity;
 
-    public SubjectAdapter(List<Subject> subjects, List<String> keys) {
+    public SubjectAdapter(List<Subject> subjects, List<String> keys, Activity activity) {
         this.subjects = subjects;
         this.keys = keys;
+        this.activity = activity;
     }
     @Override
     public SubjectViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -30,15 +38,23 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(SubjectViewHolder holder, int position) {
-        Subject subject = subjects.get(position);
+    public void onBindViewHolder(SubjectViewHolder holder, final int position) {
+        final Subject subject = subjects.get(position);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO abrir pantalla de dudas de la asignatura seleccionada
+                if(!subject.getDoubts().get(0).equals("")){
+                    Intent intent = new Intent(activity, DoubtsActivity.class);
+                    intent.putExtra("subject", keys.get(position));
+                    activity.startActivity(intent);
+                }else{
+                    Snackbar.make(activity.findViewById(android.R.id.content), "Esta asignatura no dispone de ninguna duda", Snackbar.LENGTH_LONG)
+                            .show();
+                }
+
             }
         });
-
+        // TODO borrar asigatura al mantener presionada set on large
         String course = subject.getCourse() + " - " + subject.getSemester();
         holder.getCourse().setText(course);
 

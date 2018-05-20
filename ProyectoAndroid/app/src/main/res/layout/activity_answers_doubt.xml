@@ -17,6 +17,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:layout_collapseMode="pin"
+        android:textStyle="bold"
         app:layout_scrollFlags="scroll|enterAlways"/>
     <View
         android:layout_width="fill_parent"

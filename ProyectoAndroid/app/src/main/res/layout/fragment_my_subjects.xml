@@ -22,10 +22,11 @@
             android:text="MIS ASIGNATURAS"
             android:textColor="@color/colorName"
             android:textSize="24sp"
-
+            android:textStyle="bold"
             />
 
         <ImageView
+            android:paddingRight="16dp"
             android:id="@+id/tv_add_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

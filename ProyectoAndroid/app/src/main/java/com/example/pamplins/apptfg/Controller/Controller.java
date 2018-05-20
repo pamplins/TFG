@@ -120,7 +120,7 @@ public class Controller {
         return coursesRef;
     }
 
-
+    public FirebaseDatabase getDBRef(){ return db;}
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();

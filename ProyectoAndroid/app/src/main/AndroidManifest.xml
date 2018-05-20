@@ -51,6 +51,9 @@
         <activity android:name=".View.SubjectActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
+        <activity android:name=".View.DoubtsActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
 
     </application>
 
