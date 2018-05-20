@@ -47,6 +47,9 @@ public class Subject {
         this.doubts = doubts;
     }
 
+    public void addDoubt(String doubt){
+        this.doubts.add(doubt);
+    }
     @Override
     public String toString() {
         return "Subject{" +

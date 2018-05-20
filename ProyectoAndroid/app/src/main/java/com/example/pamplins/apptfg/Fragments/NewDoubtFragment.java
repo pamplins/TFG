@@ -86,10 +86,15 @@ public class NewDoubtFragment extends Fragment {
                     subjects.add(subject);
                 }
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                        android.R.layout.simple_dropdown_item_1line, subjects);
-                textView = getActivity().findViewById(R.id.et_autocomplete);
-                textView.setAdapter(adapter);
+                try{
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                            android.R.layout.simple_dropdown_item_1line, subjects);
+                    textView = getActivity().findViewById(R.id.et_autocomplete);
+                    textView.setAdapter(adapter);
+                }catch (Exception e){
+
+                }
+
 
             }
 

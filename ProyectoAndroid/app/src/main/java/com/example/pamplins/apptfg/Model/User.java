@@ -17,13 +17,9 @@ public class User {
     public User(){
     }
 
-
-
-
     public User(String userName, String email, String urlProfileImage){
         this.userName = userName;
         this.email = email;
-        //this.course = course;
         this.urlProfileImage = urlProfileImage;
         subjects = new ArrayList<>( Arrays.asList(""));
     }
@@ -54,6 +50,10 @@ public class User {
 
     public ArrayList<String> getSubjects() {
         return subjects;
+    }
+
+    public void addNewSubjects(String subjectsName){
+        subjects.add(subjectsName);
     }
 
     public void setSubjects(ArrayList<String> subjects) {

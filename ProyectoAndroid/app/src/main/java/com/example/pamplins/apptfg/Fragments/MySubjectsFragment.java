@@ -74,13 +74,12 @@ public class MySubjectsFragment extends Fragment {
             }
         });
 
-        Toast.makeText(getActivity(),ctrl.getUser().getSubjects().toString(), Toast.LENGTH_SHORT).show();
-        //TODO si abro rapidamente la pantalla de Mis asignaturas falla
+       // Toast.makeText(getActivity(),ctrl.getUser().getSubjects().toString(), Toast.LENGTH_SHORT).show();
 
         if(getArguments() != null){
             subjects = getArguments().getString("subjects");
             if(null != subjects) {
-                Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
                 addNewCourse(subjects);
                 getArguments().remove("subjects");
             }
@@ -119,7 +118,7 @@ public class MySubjectsFragment extends Fragment {
         mRecycler.setLayoutManager(mManager);
         // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
-                .setQuery(mDatabase.child(Constants.REF_COURSE+"/first/second_semester/elect"), Doubt.class)
+                .setQuery(mDatabase.child(Constants.REF_COURSES+"/first/second_semester/elect"), Doubt.class)
                 .build();
         setDoubtAdapter(options);
     }

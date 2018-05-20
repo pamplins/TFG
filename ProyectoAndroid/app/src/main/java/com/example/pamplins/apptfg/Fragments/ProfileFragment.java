@@ -20,8 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.example.pamplins.apptfg.Controller.Controller;
+import com.example.pamplins.apptfg.Model.Course;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.View.LoginActivity;
@@ -41,6 +43,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -119,7 +122,27 @@ public class ProfileFragment extends Fragment {
     }
 
     private void createSubject() {
-        ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Controller.getInstance().getCoursesRef().child("4o").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Course course = dataSnapshot.getValue(Course.class);
+                for(String key: course.getSubjects().keySet()){
+                    for(String val: course.getSubjects().get(key)){
+                        Subject subject = new Subject("4o", key);
+                        ctrl.getSubjectsRef().child(val).setValue(subject);
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+       /* ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Subject subject = dataSnapshot.getValue(Subject.class);
@@ -136,8 +159,7 @@ public class ProfileFragment extends Fragment {
         });
 
         Subject subject = new Subject("1o", "1r semestre");
-        ctrl.getSubjectsRef().child("Asignatura A").setValue(subject);
-
+        ctrl.getSubjectsRef().child("Asignatura D").setValue(subject);*/
 
 
        //ctrl.updateUser();

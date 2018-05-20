@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
+import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
@@ -58,6 +59,8 @@ public class Controller {
     private DatabaseReference usersRef;
     private DatabaseReference doubtsRef;
     private DatabaseReference subjectsRef;
+    private DatabaseReference coursesRef;
+
     private Controller (){
         initElements();
     }
@@ -69,6 +72,7 @@ public class Controller {
         usersRef = db.getReference(Constants.REF_USERS);
         doubtsRef = db.getReference(Constants.REF_DOUBTS);
         subjectsRef = db.getReference(Constants.REF_SUBJECTS);
+        coursesRef = db.getReference(Constants.REF_COURSES);
 
         usersRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -110,6 +114,10 @@ public class Controller {
 
     public DatabaseReference getSubjectsRef() {
         return subjectsRef;
+    }
+
+    public DatabaseReference getCoursesRef() {
+        return coursesRef;
     }
 
 
@@ -215,12 +223,12 @@ public class Controller {
         }
     }
 
-    private void uploadNewDoubt(String title, String body, User user, ArrayList array, RecyclerView rv, ArrayList<String> url1, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
-        String key = doubtsRef.push().getKey();
+    private void uploadNewDoubt(String title, String body, User user, ArrayList array, RecyclerView rv, ArrayList<String> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
+        final String key = doubtsRef.push().getKey();
 
         // TODO optimizar esto
 
-        Doubt doubt = new Doubt(getUid(), title, body, ctrl.getDate(), user, array, subject);
+        Doubt doubt = new Doubt(getUid(), title, body, ctrl.getDate(), user, array, subjectName);
         Map<String, Object> postValues = doubt.toMap();
 
        /* Map<String, Object> childUpdates2 = new HashMap<>();
@@ -231,11 +239,33 @@ public class Controller {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
+
+
         db.getReference().updateChildren(childUpdates);
         if (!url1.isEmpty()) {
             url1.clear();
             rv.getAdapter().notifyDataSetChanged();
         }
+
+
+        ctrl.getSubjectsRef().child(subjectName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Subject subject = dataSnapshot.getValue(Subject.class);
+                if(subject.getDoubts().get(0).equals("")){
+                    subject.getDoubts().set(0,key);
+                }else{
+                    subject.addDoubt(key);
+                }
+                ctrl.getSubjectsRef().child(subjectName).setValue(subject);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
 
         postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView);
     }
@@ -274,9 +304,20 @@ public class Controller {
     }
 
     public void updateUser(String s) {
+        //TODO permitir borrar en incremento 4
+        // tendre que comprobar que no quede nunca vacia el array. si es asi, metere "" en la posicion 0. 
         ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
-
-        ctrl.getUser().setSubjects(subjects);
+        for(String sub : subjects){
+            sub = sub.replaceFirst("^ *", "");
+            if(getUser().getSubjects().get(0).equals("")){
+                getUser().getSubjects().set(0,sub);
+            }else{
+                if(!getUser().getSubjects().contains(sub)){
+                    getUser().addNewSubjects(sub);
+                }
+            }
+        }
+        //ctrl.getUser().setSubjects(subjects);
         usersRef.child(getUid()).setValue(ctrl.getUser());
     }
 }

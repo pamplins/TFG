@@ -11,5 +11,6 @@
     <color name="backGround">#f2f3f5</color>
     <color name="colorLine">#d4d6da</color>
     <color name="cardViewPressed">#a1bffa</color>
+    <color name="cardViewDisabled">#eaab85</color>
 
 </resources>
