@@ -20,7 +20,6 @@ import com.google.firebase.database.Transaction;
 /**
  * Created by Gustavo on 12/03/2018.
  */
- // TODO corregir bug al dar like
 
 public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerViewHolder> {
 

@@ -18,6 +18,8 @@ import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtViewHolder;
+import com.example.pamplins.apptfg.HoldersAdapters.SubjectAdapter;
+import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.View.MainActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.View.CoursesActivity;
@@ -26,8 +28,11 @@ import com.example.pamplins.apptfg.View.LoginActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +55,8 @@ public class MySubjectsFragment extends Fragment {
 
     private String subjects;
 
+    private List<Subject> listSubjects;
+
     public MySubjectsFragment() {
     }
 
@@ -66,6 +73,8 @@ public class MySubjectsFragment extends Fragment {
         mRecycler = rootView.findViewById(R.id.messages_list_s);
         progressBar = rootView.findViewById(R.id.progressBar_s);
         addNewCourse = rootView.findViewById(R.id.tv_add_course);
+        listSubjects = new ArrayList<>();
+
         addNewCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,7 +105,7 @@ public class MySubjectsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //showDoubts();
+        showDoubts();
     }
 
     private void addNewCourse(String subjects) {
@@ -116,11 +125,37 @@ public class MySubjectsFragment extends Fragment {
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-        // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
-        final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
+        ctrl.getSubjectsRef().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> keys = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Subject subject = snapshot.getValue(Subject.class);
+                    try{
+                        if(ctrl.getUser().getSubjects().contains(snapshot.getKey())){
+                            listSubjects.add(subject);
+                            keys.add(snapshot.getKey());
+                        }
+                        SubjectAdapter adapter = new SubjectAdapter(listSubjects, keys);
+                        mRecycler.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+
+                    }catch (Exception e) {
+                    }
+                }
+             }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+            // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
+        /*final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
                 .setQuery(mDatabase.child(Constants.REF_COURSES+"/first/second_semester/elect"), Doubt.class)
                 .build();
-        setDoubtAdapter(options);
+        setDoubtAdapter(options);*/
     }
 
     private void setDoubtAdapter(FirebaseRecyclerOptions options){

@@ -21,7 +21,6 @@ import com.example.pamplins.apptfg.R;
  * Created by Gustavo on 17/02/2018.
  */
 
-//TODO ver que mientras carga de poner un mensaje
 
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;

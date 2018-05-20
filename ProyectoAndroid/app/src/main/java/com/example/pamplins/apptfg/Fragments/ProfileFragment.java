@@ -123,7 +123,7 @@ public class ProfileFragment extends Fragment {
 
     private void createSubject() {
 
-        Controller.getInstance().getCoursesRef().child("4o").addListenerForSingleValueEvent(new ValueEventListener() {
+        /*Controller.getInstance().getCoursesRef().child("4o").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Course course = dataSnapshot.getValue(Course.class);
@@ -142,7 +142,7 @@ public class ProfileFragment extends Fragment {
 
             }
         });
-       /* ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
+        ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Subject subject = dataSnapshot.getValue(Subject.class);

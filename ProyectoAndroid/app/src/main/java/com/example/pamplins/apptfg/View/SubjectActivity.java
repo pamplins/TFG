@@ -96,13 +96,15 @@ public class SubjectActivity extends AppCompatActivity {
             params.setMargins(margin, margin, margin, margin);
             card.setLayoutParams(params);
             card.setRadius(8);
-            if(Controller.getInstance().getUser().getSubjects().contains(subjectName)) {
+            if (Controller.getInstance().getUser().getSubjects().contains(subjectName)) {
                 card.setCardBackgroundColor(getResources().getColor(R.color.cardViewDisabled));
                 card.setAlpha(0.5f);
                 card.setEnabled(false);
-            }else{
+            } else {
                 card.setCardBackgroundColor(getResources().getColor(R.color.backGround));
             }
+
+
             card.setMaxCardElevation(15);
             card.setCardElevation(9);
             tv = new TextView(getApplicationContext());

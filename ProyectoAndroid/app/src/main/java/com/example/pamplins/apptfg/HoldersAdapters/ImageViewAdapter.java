@@ -50,7 +50,6 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         imagePopup.initiatePopupWithGlide(url);
         imagePopup.setFullScreen(true);
         imagePopup.setImageOnClickClose(true);
-        //TODO hacer custom dialog y añadir pra zoom:
         /*
         PhotoViewAttacher pAttacher;
         pAttacher = new PhotoViewAttacher(Your_Image_View);

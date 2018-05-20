@@ -160,7 +160,7 @@ public class Controller {
                     usersRef.child(uid).setValue(user);
                 }// Si no es 0, significa que sube foto de comentario o duda
                 else{
-                    //TODO hacer multi-path updates -- ITERACION 5
+                    //TODO hacer multi-path updates -- ITERACION 4
                     usersRef.child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
                    // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
@@ -305,10 +305,11 @@ public class Controller {
 
     public void updateUser(String s) {
         //TODO permitir borrar en incremento 4
-        // tendre que comprobar que no quede nunca vacia el array. si es asi, metere "" en la posicion 0. 
+        // tendre que comprobar que no quede nunca vacia el array. si es asi, metere "" en la posicion 0.
         ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
         for(String sub : subjects){
             sub = sub.replaceFirst("^ *", "");
+
             if(getUser().getSubjects().get(0).equals("")){
                 getUser().getSubjects().set(0,sub);
             }else{

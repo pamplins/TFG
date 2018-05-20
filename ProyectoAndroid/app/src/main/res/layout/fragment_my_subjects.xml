@@ -37,23 +37,6 @@
         android:layout_below="@+id/et_title_new_post"
         android:background="@color/colorLine" />
 
-
-    <include
-        android:id="@+id/subject"
-        layout="@layout/item_subject">
-
-    </include>
-    <include
-        android:id="@+id/subject"
-        layout="@layout/item_subject">
-
-    </include>
-    <include
-        android:id="@+id/subject"
-        layout="@layout/item_subject">
-
-    </include>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list_s"
         android:layout_width="match_parent"
@@ -61,8 +44,8 @@
         android:layout_alignParentTop="true"
         android:clipToPadding="false"
         android:scrollbars="vertical"
-        tools:listitem="@layout/item_doubt"
-        android:visibility="gone"/>
+        tools:listitem="@layout/item_subject"
+        android:visibility="visible"/>
 
     <ProgressBar
         android:id="@+id/progressBar_s"
