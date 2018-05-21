@@ -22,6 +22,8 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,12 +32,13 @@ import java.util.List;
 
 public class DoubtsActivity extends AppCompatActivity {
     private String subject;
+    private String response;
     private LinearLayoutManager mManager;
     private Controller ctrl;
-    private List<Doubt> listDoubts;
-    private List<String> keys;
-
     private RecyclerView mRecycler;
+    private String [] aux;
+    private List<String> doubtNames;
+    private HashMap<String, Doubt> hashMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -43,70 +46,74 @@ public class DoubtsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_doubts);
         ctrl = Controller.getInstance();
         mRecycler = findViewById(R.id.rv_doubts);
-        listDoubts = new ArrayList<>();
-        keys = new ArrayList<>();
+        doubtNames = new ArrayList<>();
+        hashMap = new HashMap<>();
 
         if(getIntent() != null)
         {
-            subject = getIntent().getStringExtra("subject");
+            response = getIntent().getStringExtra("subject");
         }
+        response = response.replace("[","");
+        response = response.replace("]","");
+
+        aux = response.split(",");
+        subject = aux[0];
+
+        for(int i = 1; i < aux.length; i++){
+            doubtNames.add(aux[i].trim());
+        }
+
         initToolbar();
 
         showDoubts();
 
     }
     public void showDoubts() {
-
         mManager = new LinearLayoutManager(this);
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-
-        ctrl.getSubjectsRef().child(subject).child("doubts").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String doubtName = snapshot.getValue(String.class);
-                    keys.add(doubtName);
-
-                    ctrl.getDoubtsRef().child(doubtName).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Doubt doubt = dataSnapshot.getValue(Doubt.class);
-                            if(null != doubt.getTitle()){
-                                listDoubts.add(doubt);
+        for (final String key : doubtNames) {
+            ctrl.getDoubtsRef().child(key).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    try {
+                        if (null != doubt.getTitle()) {
+                            if (!hashMap.keySet().contains(dataSnapshot.getKey())) {
+                                hashMap.put(dataSnapshot.getKey(), doubt);
+                            } else {
+                                hashMap.put(dataSnapshot.getKey(), doubt);
                             }
-                            if(listDoubts.size() == keys.size()){
-
-                                DoubtAdapterAct adapter = new DoubtAdapterAct(listDoubts, keys, DoubtsActivity.this);
-                                mRecycler.setAdapter(adapter);
-                                mRecycler.setVisibility(View.VISIBLE);
-
-                                adapter.notifyDataSetChanged();
-                            }
-
+                        }
+                        if (hashMap.keySet().size() == doubtNames.size()) {
+                            List listDoubts = new ArrayList<>(hashMap.values());
+                            List doubtNames = new ArrayList<>(hashMap.keySet());
+                            DoubtAdapterAct adapter = new DoubtAdapterAct(listDoubts, doubtNames, DoubtsActivity.this);
+                            mRecycler.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            mRecycler.setVisibility(View.VISIBLE);
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    } catch (Exception e) {
 
-                        }
-                    });
-
-
+                    }
                 }
 
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
+                }
+            });
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
     }
+
+
+
+
+
+
+
     private void initToolbar(){
         Toolbar myToolbar = findViewById(R.id.tool_doubts);
         setSupportActionBar(myToolbar);
@@ -125,4 +132,6 @@ public class DoubtsActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
     }
+
+
 }

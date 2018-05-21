@@ -36,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class MySubjectsFragment extends Fragment {
 
     private String subjects;
 
-    private List<Subject> listSubjects;
+    private HashMap<String, Subject> hashMap;
 
     public MySubjectsFragment() {
     }
@@ -73,7 +74,7 @@ public class MySubjectsFragment extends Fragment {
         mRecycler = rootView.findViewById(R.id.messages_list_s);
         progressBar = rootView.findViewById(R.id.progressBar_s);
         addNewCourse = rootView.findViewById(R.id.tv_add_course);
-        listSubjects = new ArrayList<>();
+        hashMap = new HashMap<>();
 
         addNewCourse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,16 +134,24 @@ public class MySubjectsFragment extends Fragment {
                     Subject subject = snapshot.getValue(Subject.class);
                     try{
                         if(ctrl.getUser().getSubjects().contains(snapshot.getKey())){
-                            listSubjects.add(subject);
-                            keys.add(snapshot.getKey());
+                            if(!hashMap.keySet().contains(snapshot.getKey())){
+                                hashMap.put(snapshot.getKey(), subject);
+                                keys.add(snapshot.getKey());
+
+                            }else{
+                                hashMap.put(snapshot.getKey(), subject);
+                            }
                         }
-                        SubjectAdapter adapter = new SubjectAdapter(listSubjects, keys, getActivity());
-                        mRecycler.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
 
                     }catch (Exception e) {
                     }
                 }
+                List listSubjects = new ArrayList<>(hashMap.values());
+
+                List listKeys = new ArrayList<>(hashMap.keySet());
+                SubjectAdapter adapter = new SubjectAdapter(listSubjects, listKeys, getActivity());
+                mRecycler.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
              }
 
             @Override

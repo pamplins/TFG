@@ -45,7 +45,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectViewHolder> {
             public void onClick(View view) {
                 if(!subject.getDoubts().get(0).equals("")){
                     Intent intent = new Intent(activity, DoubtsActivity.class);
-                    intent.putExtra("subject", keys.get(position));
+                    intent.putExtra("subject", keys.get(position)+","+subjects.get(position).getDoubts().toString());
                     activity.startActivity(intent);
                 }else{
                     Snackbar.make(activity.findViewById(android.R.id.content), "Esta asignatura no dispone de ninguna duda", Snackbar.LENGTH_LONG)

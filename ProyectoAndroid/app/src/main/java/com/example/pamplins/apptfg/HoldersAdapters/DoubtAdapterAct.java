@@ -14,6 +14,7 @@ import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +35,7 @@ public class DoubtAdapterAct extends RecyclerView.Adapter<DoubtViewHolder> {
     private Controller ctrl;
 
     public DoubtAdapterAct(List<Doubt> doubts, List<String> keys, Activity activity) {
+        super();
         this.doubts = doubts;
         this.keys = keys;
         this.activity = activity;
@@ -61,18 +63,19 @@ public class DoubtAdapterAct extends RecyclerView.Adapter<DoubtViewHolder> {
         checkLikesDis(doubt, holder);
         holder.bindToPost(doubt, activity, ctrl);
         votesDoubt(doubt, holder, keys.get(position));
+
     }
 
 
-        private  void votesDoubt(final Doubt doubt, DoubtViewHolder viewHolder, final String postKey){
+    private  void votesDoubt(final Doubt doubt, final DoubtViewHolder viewHolder, final String postKey) {
         viewHolder.bindLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).child(postKey);
                 DatabaseReference userPostRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
-                onLikeClicked(globalPostRef,true);
+                onLikeClicked(globalPostRef, true);
                 onLikeClicked(userPostRef, true);
-
+                notifyDataSetChanged();
             }
         });
 
@@ -83,9 +86,11 @@ public class DoubtAdapterAct extends RecyclerView.Adapter<DoubtViewHolder> {
                 DatabaseReference userPostRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_USER_DOUBTS).child(doubt.getUid()).child(postKey);
                 onDisLikeClicked(globalPostRef, true);
                 onDisLikeClicked(userPostRef, true);
+                notifyDataSetChanged();
             }
         });
     }
+
 
     private void checkLikesDis(Doubt doubt, DoubtViewHolder viewHolder) {
         if (doubt.getLikes().containsKey(ctrl.getUid())) {
