@@ -1,7 +1,6 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,10 +10,8 @@ import android.view.ViewGroup;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,14 +58,14 @@ public class DoubtAdapterAct extends RecyclerView.Adapter<DoubtViewHolder> {
             }
         });
         checkLikesDis(doubt, holder);
-        holder.bindToPost(doubt, activity, ctrl);
+        holder.fillDoubt(doubt, activity, ctrl);
         votesDoubt(doubt, holder, keys.get(position));
 
     }
 
 
     private  void votesDoubt(final Doubt doubt, final DoubtViewHolder viewHolder, final String postKey) {
-        viewHolder.bindLikes(doubt, new View.OnClickListener() {
+        viewHolder.fillLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).child(postKey);
@@ -79,7 +76,7 @@ public class DoubtAdapterAct extends RecyclerView.Adapter<DoubtViewHolder> {
             }
         });
 
-        viewHolder.bindDisLikes(doubt, new View.OnClickListener() {
+        viewHolder.fillDisLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS).child(postKey);

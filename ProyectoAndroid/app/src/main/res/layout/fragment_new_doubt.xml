@@ -23,7 +23,7 @@
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="CREAR NUEVA DUDA"
+            android:text="@string/title_new_doubt"
             android:textColor="@color/colorName"
             android:textSize="24sp" />
 
@@ -57,8 +57,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="52dp"
             android:background="@color/cardview_light_background"
-            android:hint="Título"
+            android:hint="@string/title"
             android:maxLength="30"
+            android:inputType="text"
             android:padding="16dp"
             android:textColor="@color/colorTextDoubt"
             android:textColorHint="@color/colorButton"
@@ -77,11 +78,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-
             android:layout_below="@+id/v_line"
             android:background="@color/cardview_light_background"
             android:gravity="left"
-            android:hint="Descripción"
+            android:hint="@string/description"
             android:lines="5"
             android:padding="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -105,7 +105,8 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/v_line2"
             android:background="@color/cardview_light_background"
-            android:hint="Asignatura"
+            android:hint="@string/subject"
+            android:inputType="text"
             android:padding="16dp"
             android:theme="@style/spinner_style"
             android:textColor="@color/colorTextDoubt"
@@ -119,7 +120,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/et_autocomplete"
             android:padding="16dp"
-            android:text="Opcional:"
+            android:text="@string/optional"
             android:textColor="@color/colorTextDoubt" />
         <TextView
             android:id="@+id/tv_upload"

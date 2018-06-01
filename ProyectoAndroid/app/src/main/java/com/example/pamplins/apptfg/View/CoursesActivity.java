@@ -45,7 +45,7 @@ public class CoursesActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.tool_course);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("CURSOS");
+        getSupportActionBar().setTitle(R.string.course);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
     private void setSingleEvent(GridLayout mainGrid) {

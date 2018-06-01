@@ -2,6 +2,7 @@ package com.example.pamplins.apptfg.Controller;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.Utils;
@@ -23,6 +25,7 @@ import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.Model.User;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +33,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -43,6 +48,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -82,9 +88,11 @@ public class Controller {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // usuario no tiene permiso.
             }
         });
     }
+
 
     public static Controller getInstance(){
         if(ctrl == null){
@@ -93,6 +101,11 @@ public class Controller {
         return ctrl;
     }
 
+    /**
+     * Metodo encargado de reiniciar la instancia una vez
+     * el usuario ha cerrado sesion para que luego no haya
+     * conflicto cuando vuelva a entrar cogiendo la sesion anterior
+     */
     public void restartInstance(){
         ctrl = null;
     }
@@ -100,6 +113,7 @@ public class Controller {
     public StorageReference getStorageRef(){
         return storageRef;
     }
+
     public User getUser() {
         return user;
     }
@@ -120,26 +134,49 @@ public class Controller {
         return coursesRef;
     }
 
-    public FirebaseDatabase getDBRef(){ return db;}
+    public FirebaseDatabase getDB(){ return db;}
+
+    public DatabaseReference getDoubtReference(String uid){
+        return db.getReference()
+                .child(Constants.REF_DOUBTS).child(uid);
+    }
+
+    public DatabaseReference getAnswerReference(String uid){
+        return db.getReference()
+                .child(Constants.REF_POST_ANSWERS).child(uid);
+    }
+
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
-
+    /**
+     * Metodo de devolver una consulta a la tabla de usuarios ordenados por
+     * el nombre de usuario
+     * @return
+     */
     public Query getUsersbyUserName(){
         return usersRef.orderByChild(Constants.REF_USERNAME);
     }
-
-    public void writeUserDB(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
-        uploadImageProfile(uid, bit, Constants.REF_PROFILE_IMAGES, imagePath, userName, email, action);
-
+    public void uploadImageProfile(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
+        uploadImageProfile(uid, bit, imagePath, userName, email, action);
     }
 
-
-
-    public void uploadImageProfile(final String uid, Bitmap bit, String folder, String path, final String userName, final String email, final int action) {
-        String ref = folder + uid + "/" + path; // string de la ruta a la que ira
+    /**
+     * Metodo encargado de subir la imagen de perfil a storage y
+     * añadirsela al usuario. Ademas, actualiza la foto de perfil
+     * del usuario si la accion que le llega por parametro no es 0
+     *
+     * @param uid
+     * @param bit
+     * @param path
+     * @param userName
+     * @param email
+     * @param action
+     */
+    private void uploadImageProfile(final String uid, Bitmap bit, String path, final String userName, final String email, final int action) {
+        String ref = Constants.REF_PROFILE_IMAGES + uid + "/" + path; // string de la ruta a la que ira
         StorageReference mStorageRef;
         mStorageRef =  storageRef.child(ref);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -158,7 +195,7 @@ public class Controller {
                 if(action == 0){
                     User user = new User(userName, email, downloadUrl.toString());
                     usersRef.child(uid).setValue(user);
-                }// Si no es 0, significa que sube foto de comentario o duda
+                }
                 else{
                     //TODO hacer multi-path updates -- ITERACION 4
                     usersRef.child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
@@ -169,17 +206,27 @@ public class Controller {
         });
     }
 
-
+    /**
+     * Metodo encargado de devolver la fecha para aplicarla en
+     * la creacion de una nueva duda o en un comentario
+     * @return
+     */
     public String getDate(){
         String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         Calendar currentTime = Calendar.getInstance();
         int hour = currentTime.get(Calendar.HOUR_OF_DAY);
         int minute = currentTime.get(Calendar.MINUTE);
-        date = date+", "+String.format("%02d:%02d", hour, minute);
-
-        return date;
+        return date+", "+String.format("%02d:%02d", hour, minute);
     }
 
+    /**
+     * Metodo encargado de mostrar la imagen de perfil en la duda o
+     * comentario que le pertoca
+     *
+     * @param activity
+     * @param obj
+     * @param img
+     */
     public void showProfileImage(Activity activity, Object obj, ImageView img) {
         String url;
         if(obj.getClass().equals(Doubt.class)){
@@ -192,63 +239,175 @@ public class Controller {
                 .into(img);
     }
 
-
-    public void writeDoubtDB(String title, String body, ArrayList<String> url1, ArrayList<String> url2, RecyclerView rv, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
-        if(!url1.isEmpty()){
-            uploadImagesDoubt(title, body, user, url1, url2,rv, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
+    /**
+     * Metodo encargado de escribir la duda en base de datos.
+     * Si esta duda no contiene ninguna imagen la crea directamente, sino,
+     * primero sube las imagenes a storage y luego crea la duda con los links
+     * a estas imagenes
+     * @param title
+     * @param body
+     * @param bits
+     * @param ac
+     * @param etTitle
+     * @param etDescription
+     * @param textView
+     * @param progressBar
+     * @param tvUpload
+     * @param tvNewDoubt
+     * @param subject
+     */
+    public void writeDoubtDB(String title, String body, List<Bitmap> bits, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
+        if(!bits.isEmpty()){
+            uploadImagesDoubt(title, body, bits, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }else{
-            uploadNewDoubt(title, body, user, url2, rv, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
+            uploadNewDoubt(title, body, new ArrayList<String>(), bits, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }
     }
+    private void uploadImagesDoubt(final String title, final String body, final List<Bitmap> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
+        StorageReference fileToUpload;
 
-    private void uploadImagesDoubt(final String title, final String body, final User user, final ArrayList<String> url1, ArrayList<String> url2, final RecyclerView rv, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
+        final ArrayList<String> finalUrl = new ArrayList<>();
         for(int i = 0; i < url1.size(); i++){
             String ref = Constants.REF_DOUBT_IMAGES + getUid() + "/" + title + "/" + Constants.REF_DOUBT_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
-            StorageReference fileToUpload;
             fileToUpload = storageRef.child(ref);
 
+            Bitmap bit = url1.get(i);
+            bit = getVerticalBit(bit);
             final int finalI = i;
-            final ArrayList<String> finalUrl = url2;
-            fileToUpload.putFile(Uri.parse(url1.get(i))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bit.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] fileInBytes = baos.toByteArray();
+            fileToUpload.putBytes(fileInBytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                     finalUrl.add(downloadUrl.toString());
                     if(finalI == url1.size()-1) {
-                        uploadNewDoubt(title, body, user, finalUrl, rv, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
-
+                        uploadNewDoubt(title, body, finalUrl, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
                     }
                 }
             });
         }
     }
 
-    private void uploadNewDoubt(String title, String body, User user, ArrayList array, RecyclerView rv, ArrayList<String> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
+    private Bitmap getVerticalBit(Bitmap bit){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        return Bitmap.createBitmap(bit, 0, 0, bit.getWidth(), bit.getHeight(), matrix, true);
+    }
+
+
+    /**
+     * Metodo encargado de crear una nueva duda en la tabla de
+     * doubts y en la de user doubts. Ademas, limpia todos los
+     * elementos utilizados para la creacion de la duda una vez
+     * se ha creado esta
+     *  @param title
+     * @param body
+     * @param array
+     * @param bits
+     * @param ac
+     * @param etTitle
+     * @param etDescription
+     * @param textView
+     * @param progressBar
+     * @param tvUpload
+     * @param tvNewDoubt
+     * @param subjectName
+     */
+    private void uploadNewDoubt(String title, String body, ArrayList<String> array, List<Bitmap> bits, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
         final String key = doubtsRef.push().getKey();
-
-        // TODO optimizar esto
-
-        Doubt doubt = new Doubt(getUid(), title, body, ctrl.getDate(), user, array, subjectName);
+        Doubt doubt = new Doubt(getUid(), title, body, getDate(), user, array, subjectName);
         Map<String, Object> postValues = doubt.toMap();
-
-       /* Map<String, Object> childUpdates2 = new HashMap<>();
-            childUpdates2.put("/"+Constants.REF_COURSE+"/first/first_semester/algebra/"+key, doubt.getUid());
-        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates2);*/
-
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
 
-
         db.getReference().updateChildren(childUpdates);
-        if (!url1.isEmpty()) {
-            url1.clear();
-            rv.getAdapter().notifyDataSetChanged();
-        }
+
+        addDoubtToSubject(subjectName, key);
+        postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView);
+    }
 
 
-        ctrl.getSubjectsRef().child(subjectName).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void onLikeClicked(final DatabaseReference postRef, final boolean checkDisLike) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Doubt doubt = mutableData.getValue(Doubt.class);
+                if (doubt == null) {
+                    return Transaction.success(mutableData);
+                }
+                if (doubt.getLikes().containsKey(ctrl.getUid())) {
+                    doubt.setLikesCount(doubt.getLikesCount() - 1);
+                    doubt.getLikes().remove(ctrl.getUid());
+                } else {
+                    doubt.setLikesCount(doubt.getLikesCount() + 1);
+                    doubt.getLikes().put(ctrl.getUid(), true);
+                }
+                mutableData.setValue(doubt);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                if(checkDisLike){
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getDislikes().containsKey(ctrl.getUid())){
+                        onDisLikeClicked(postRef, false);
+                    }
+                }
+            }
+        });
+    }
+
+
+    public void onDisLikeClicked(final DatabaseReference postRef, final boolean checkLike) {
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Doubt doubt = mutableData.getValue(Doubt.class);
+                if (doubt == null) {
+                    return Transaction.success(mutableData);
+                }
+                if (doubt.getDislikes().containsKey(ctrl.getUid())) {
+                    doubt.setDislikesCount(doubt.getDislikesCount() - 1);
+                    doubt.getDislikes().remove(ctrl.getUid());
+                } else {
+                    doubt.setDislikesCount(doubt.getDislikesCount() + 1);
+                    doubt.getDislikes().put(ctrl.getUid(), true);
+                }
+                mutableData.setValue(doubt);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                if(checkLike){
+                    Doubt doubt = dataSnapshot.getValue(Doubt.class);
+                    if(doubt.getLikes().containsKey(ctrl.getUid())){
+                        onLikeClicked(postRef, false);
+                    }
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Metodo encargado de añadir la duda a la asignatura que le pertoca.
+     * Si la asignatura no contiene ninguna duda todavia, la mete en la posicion
+     * 0, sino, la añade
+     *
+     * @param subjectName
+     * @param key
+     */
+    private void addDoubtToSubject(final String subjectName, final String key) {
+        getSubjectsRef().child(subjectName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Subject subject = dataSnapshot.getValue(Subject.class);
@@ -257,19 +416,26 @@ public class Controller {
                 }else{
                     subject.addDoubt(key);
                 }
-                ctrl.getSubjectsRef().child(subjectName).setValue(subject);
+                getSubjectsRef().child(subjectName).setValue(subject);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
-
         });
-
-        postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView);
     }
 
+    /**
+     * Metodo encargado mostrar que se ha creado la duda correctamente
+     * y de limpiar los campos para futuras nuevas dudas
+     *
+     * @param ac
+     * @param etTitle
+     * @param etDescription
+     * @param progressBar
+     * @param tvUpload
+     * @param tvNewDoubt
+     * @param textView
+     */
     private void postWriteDoubt(Activity ac, EditText etTitle, EditText etDescription, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, AutoCompleteTextView textView) {
        Snackbar.make(ac.findViewById(android.R.id.content), "Tu duda se ha creado correctamente", Snackbar.LENGTH_LONG)
                 .show();
@@ -285,6 +451,16 @@ public class Controller {
         tvNewDoubt.setEnabled(true);
     }
 
+    /**
+     * Metodo encargado de escribir la respuesta en una duda en concreto
+     *
+     * @param currentdDoubt
+     * @param answersReference
+     * @param etAnswer
+     * @param doubtReference
+     * @param btnAnswer
+     * @param activity
+     */
     public void writeAnswerDB(final Doubt currentdDoubt, final DatabaseReference answersReference, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
         final String uid = getUid();
         final String answerText = etAnswer.getText().toString();
@@ -292,7 +468,7 @@ public class Controller {
            etAnswer.setError("Entra comentario");
         }else {
             btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
-            Answer answer = new Answer(uid, answerText, ctrl.getDate(), user);
+            Answer answer = new Answer(uid, answerText, getDate(), user);
             Map<String, Object> answerValues = answer.toMap();
             answersReference.push().setValue(answerValues);
             etAnswer.setText(null);
@@ -303,22 +479,27 @@ public class Controller {
         }
     }
 
-    public void updateUser(String s) {
+    /**
+     * Metodo encargado de actualizar la lista de Mis asignatura de un usuario.
+     * Si no tenia ninguna duda, se mete como primera posicion, sino se ñade
+     *
+     * @param s
+     */
+    public void updateUserSubjects(String s) {
         //TODO permitir borrar en incremento 4
         // tendre que comprobar que no quede nunca vacia el array. si es asi, metere "" en la posicion 0.
         ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
         for(String sub : subjects){
             sub = sub.replaceFirst("^ *", "");
-
-            if(getUser().getSubjects().get(0).equals("")){
-                getUser().getSubjects().set(0,sub);
+            if(user.getSubjects().get(0).equals("")){
+                user.getSubjects().set(0,sub);
             }else{
-                if(!getUser().getSubjects().contains(sub)){
-                    getUser().addNewSubjects(sub);
+                if(!user.getSubjects().contains(sub)){
+                    user.addNewSubjects(sub);
                 }
             }
         }
-        //ctrl.getUser().setSubjects(subjects);
-        usersRef.child(getUid()).setValue(ctrl.getUser());
+        //user().setSubjects(subjects);
+        usersRef.child(getUid()).setValue(user);
     }
 }

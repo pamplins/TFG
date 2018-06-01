@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,15 +19,17 @@ import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.pamplins.apptfg.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Gustavo on 18/03/2018.
  */
 public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.ImageViewHolder> {
     private Activity activity;
-    private ArrayList<String> urlImagesDoubt;
+    private List<String> urlImagesDoubt;
 
-    public ImageViewAdapter(Activity activity, ArrayList<String> urlImagesDoubt){
+    public ImageViewAdapter(Activity activity, List<String> urlImagesDoubt){
         this.activity = activity;
         this.urlImagesDoubt = urlImagesDoubt;
     }
@@ -64,7 +67,6 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
                 InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
                 imagePopup.viewPopup();
-
             }
         });
 
@@ -82,16 +84,16 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
 
     private void removeItem(final int adapterPosition) {
         new AlertDialog.Builder(activity)
-        .setMessage("¿Realmente quieres eliminar esta imagen?")
+        .setMessage(R.string.alert_remove_image)
         .setIcon(android.R.drawable.ic_dialog_alert)
-        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int whichButton) {
                 urlImagesDoubt.remove(adapterPosition);
                 notifyItemRemoved(adapterPosition);
                 notifyItemRangeChanged(adapterPosition, urlImagesDoubt.size());
             }})
-        .setNegativeButton("No", null).show();
+        .setNegativeButton(R.string.not, null).show();
 
     }
 

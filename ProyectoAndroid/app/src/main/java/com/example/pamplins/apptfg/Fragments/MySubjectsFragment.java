@@ -6,28 +6,21 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtAdapter;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtViewHolder;
 import com.example.pamplins.apptfg.HoldersAdapters.SubjectAdapter;
 import com.example.pamplins.apptfg.Model.Subject;
-import com.example.pamplins.apptfg.View.MainActivity;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.View.CoursesActivity;
 import com.example.pamplins.apptfg.R;
-import com.example.pamplins.apptfg.View.LoginActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,25 +28,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Gustavo on 17/02/2018.
  */
 
 public class MySubjectsFragment extends Fragment {
-    private DatabaseReference mDatabase;
-    private FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private Controller ctrl;
     private ProgressBar progressBar;
     private ImageView addNewCourse;
-
+    private SubjectAdapter mAdapter;
     private String subjects;
 
     private HashMap<String, Subject> hashMap;
@@ -69,7 +57,6 @@ public class MySubjectsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_my_subjects, container, false);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         ctrl = Controller.getInstance();
         mRecycler = rootView.findViewById(R.id.messages_list_s);
         progressBar = rootView.findViewById(R.id.progressBar_s);
@@ -84,12 +71,9 @@ public class MySubjectsFragment extends Fragment {
             }
         });
 
-       // Toast.makeText(getActivity(),ctrl.getUser().getSubjects().toString(), Toast.LENGTH_SHORT).show();
-
         if(getArguments() != null){
             subjects = getArguments().getString("subjects");
             if(null != subjects) {
-                //Toast.makeText(getActivity(),subjects,Toast.LENGTH_SHORT).show();
                 addNewCourse(subjects);
                 getArguments().remove("subjects");
             }
@@ -110,7 +94,7 @@ public class MySubjectsFragment extends Fragment {
     }
 
     private void addNewCourse(String subjects) {
-        ctrl.updateUser(subjects);
+        ctrl.updateUserSubjects(subjects);
        /* Map<String, Object> childUpdates2 = new HashMap<>();
         childUpdates2.put("/"+Constants.REF_USERS+"/"+ctrl.getUid()+"/subjects", courses);
         ref.setValue(courses);*/
@@ -119,9 +103,9 @@ public class MySubjectsFragment extends Fragment {
        /* DatabaseReference m_objFireBaseRef = FirebaseDatabase.getInstance().getReference().child(Constants.REF_DOUBTS);
         m_objFireBaseRef.child(ctrl.getUid()).child("subjects").setValue(courses);*/
     }
+
+
     public void showDoubts() {
-
-
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
@@ -132,27 +116,26 @@ public class MySubjectsFragment extends Fragment {
                 List<String> keys = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Subject subject = snapshot.getValue(Subject.class);
-                    try{
-                        if(ctrl.getUser().getSubjects().contains(snapshot.getKey())){
-                            if(!hashMap.keySet().contains(snapshot.getKey())){
+                    try {
+                        if (ctrl.getUser().getSubjects().contains(snapshot.getKey())) {
+                            if (!hashMap.keySet().contains(snapshot.getKey())) {
                                 hashMap.put(snapshot.getKey(), subject);
                                 keys.add(snapshot.getKey());
 
-                            }else{
+                            } else {
                                 hashMap.put(snapshot.getKey(), subject);
                             }
                         }
 
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                     }
                 }
                 List listSubjects = new ArrayList<>(hashMap.values());
-
                 List listKeys = new ArrayList<>(hashMap.keySet());
-                SubjectAdapter adapter = new SubjectAdapter(listSubjects, listKeys, getActivity());
-                mRecycler.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-             }
+                mAdapter = new SubjectAdapter(listSubjects, listKeys, getActivity());
+                mRecycler.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -160,29 +143,13 @@ public class MySubjectsFragment extends Fragment {
             }
         });
 
-            // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
-        /*final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
-                .setQuery(mDatabase.child(Constants.REF_COURSES+"/first/second_semester/elect"), Doubt.class)
-                .build();
-        setDoubtAdapter(options);*/
     }
 
-    private void setDoubtAdapter(FirebaseRecyclerOptions options){
-        mAdapter = new DoubtAdapter(options, getActivity(), ctrl, mDatabase);
-        mRecycler.setAdapter(mAdapter);
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                if(mAdapter.getItemCount() > 0 ){
-                    progressBar.setVisibility(View.GONE);
-                    mRecycler.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        mAdapter.notifyDataSetChanged();
-    }
     @Override
     public void onStart() {
         super.onStart();
-       // mAdapter.startListening();
+        if(mAdapter != null){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

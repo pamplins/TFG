@@ -5,13 +5,14 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardBackgroundColor="@color/borderColor"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="10dp"
+    android:id="@+id/CARD">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:background="@color/borderColor" >
+        android:background="@color/borderColor"
+        android:paddingTop="10dp">
 
         <include
             android:id="@+id/post_author_layout"
@@ -21,7 +22,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="16dp"/>
+            android:layout_marginLeft="16dp" />
 
         <LinearLayout
             android:id="@+id/date_layout"
@@ -37,10 +38,10 @@
                 android:id="@+id/tv_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:gravity="center"
                 android:textColor="@color/colorTextDoubt"
-                android:textSize="12dp"
-                android:layout_marginRight="16dp" />
+                android:textSize="12dp" />
 
         </LinearLayout>
 
@@ -52,28 +53,28 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/post_author_layout"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp" />
 
         <TextView
             android:id="@+id/post_subject"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/doubt_description"
-            android:textColor="@color/colorTextDoubt"
+            android:autoSizeTextType="uniform"
             android:padding="16dp"
+            android:textColor="@color/colorTextDoubt"
             android:textStyle="bold"
-            tools:text="Asignatura de una duda" />
+            tools:text="Asignatura de una as14da" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_alignParentRight="true"
             android:layout_below="@id/doubt_description"
-            android:padding="10dp"
-            >
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/like"
@@ -88,10 +89,11 @@
                 android:id="@+id/num_likes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:gravity="center"
-                tools:text="45"
                 android:textColor="@color/colorButton"
-                android:layout_marginRight="10dp"/>
+                tools:text="45" />
+
             <ImageView
                 android:id="@+id/dislike"
                 android:layout_width="wrap_content"
@@ -99,17 +101,16 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
                 android:background="?attr/selectableItemBackground"
-                android:src="@drawable/dislike"
-                />
+                android:src="@drawable/dislike" />
 
             <TextView
                 android:id="@+id/num_dislikes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:gravity="center"
-                tools:text="45"
                 android:textColor="@color/colorButton"
-                android:layout_marginRight="10dp"/>
+                tools:text="45" />
 
             <ImageView
                 android:id="@+id/iv_comments"
@@ -118,17 +119,16 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
                 android:background="?attr/selectableItemBackground"
-                android:src="@drawable/n_answers"
-                />
+                android:src="@drawable/n_answers" />
 
             <TextView
                 android:id="@+id/num_answers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:gravity="center"
-                tools:text="45"
                 android:textColor="@color/colorButton"
-                android:layout_marginRight="10dp"/>
+                tools:text="45" />
         </LinearLayout>
 
     </RelativeLayout>

@@ -56,7 +56,14 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         return dislike;
     }
 
-    public void bindToPost(final Doubt doubt, Activity activity, Controller ctrl) {
+    /**
+     * Funcion encargada de añadir a los elementos los datos de la duda
+     *
+     * @param doubt
+     * @param activity
+     * @param ctrl
+     */
+    public void fillDoubt(final Doubt doubt, Activity activity, Controller ctrl) {
         titleView.setText(doubt.getTitle());
         authorView.setText(doubt.getUser().getUserName());
         subject.setText(doubt.getSubject());
@@ -81,12 +88,12 @@ public class DoubtViewHolder extends RecyclerView.ViewHolder {
         ctrl.showProfileImage(activity, doubt, img);
     }
 
-    public void bindLikes (Doubt doubt, View.OnClickListener clickListener){
+    public void fillLikes(Doubt doubt, View.OnClickListener clickListener){
         numLikes.setText(String.valueOf(doubt.getLikesCount()));
         like.setOnClickListener(clickListener);
     }
 
-    public void bindDisLikes (Doubt doubt, View.OnClickListener clickListener){
+    public void fillDisLikes(Doubt doubt, View.OnClickListener clickListener){
         numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
         dislike.setOnClickListener(clickListener);
     }

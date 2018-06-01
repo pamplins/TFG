@@ -18,13 +18,13 @@
             <TextView
                 android:id="@+id/name_subject"
                 style="@style/Base.TextAppearance.AppCompat.Small"
-                android:layout_width="wrap_content"
+                android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:textSize="20dp"
+                android:textSize="18dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/colorName"
-                android:text="Asignatura X"            />
+                android:text="Asignaturas" />
 
             <TextView
                 android:id="@+id/course_subject"

@@ -2,7 +2,6 @@ package com.example.pamplins.apptfg.View;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -18,9 +17,10 @@ import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.User;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,21 +40,17 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPassword;
     private ProgressBar progressBar;
+    private FirebaseAuth mAuth;
     private String email;
 
-    private FirebaseAuth mAuth;
     @Override
        protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
-
         initElements();
     }
 
-    /**
-     * Metodo encargado de inicializar los elementos
-     */
     private void initElements() {
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
@@ -64,17 +60,17 @@ public class LoginActivity extends AppCompatActivity {
         email = "";
     }
 
+    /**
+     * Metodo encargado de llamar a updateUI cada vez que se abre la aplicacion
+     * para asi evitar entrar los datos de iniciar sesion si ya habia iniciado
+     * sesion anteriormente en el dispositivo movil
+     */
     @Override
     protected void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
         updateUI(mAuth.getCurrentUser(), true);
-
     }
 
-    /**
-     * Metodo encargado de abrir la pantalla de home
-     */
     private void openHome() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
@@ -82,42 +78,52 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo encadago de registrar el usuario. Comprueba si se hace mediante usuario o correo
+     * Metodo encargado de comprobar si el inicio de sesion
+     * se hace mediante usuario o correo. Si es por nombre de
+     * usuario, obtiene el objeto usuario desde base de datos
+     * para asi extraer el correo electronico y de esta forma
+     * iniciar sesion en el metodo authentication
      *
      * @param v
      */
     public void signIn(final View v) {
         email = etEmail.getText().toString().trim();
-        if(checkInputs()){
-            v.setEnabled(false);
-            if(email.contains("@")){
-                authentication(v);
-            }else {
-                DatabaseReference users = FirebaseDatabase.getInstance().getReference(Constants.REF_USERS);
-                users.orderByChild(Constants.REF_USERNAME).equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-                 @Override
-                 public void onDataChange(DataSnapshot dataSnapshot) {
-                     if(dataSnapshot.exists()){
-                         User user = null;
-                         for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                             user = childSnapshot.getValue(User.class);
-                         }
-                         email = user.getEmail();
-                     }
-                     authentication(v);
-                 }
+        if(Utils.isNetworkAvailable(this)) {
+            if (checkInputs()) {
+                v.setEnabled(false);
+                if (email.contains("@")) {
+                    authentication(v);
+                } else {
+                    DatabaseReference users = FirebaseDatabase.getInstance().getReference(Constants.REF_USERS);
+                    users.orderByChild(Constants.REF_USERNAME).equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                User user = null;
+                                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                                    user = childSnapshot.getValue(User.class);
+                                }
+                                email = user.getEmail();
+                            }
+                            authentication(v);
+                        }
 
-                 @Override
-                 public void onCancelled(DatabaseError databaseError) {
-                     v.setEnabled(true);
-                 }
-             });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            v.setEnabled(true);
+                        }
+                    });
+                }
             }
+        }else{
+            Snackbar.make(findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
+                    .show();
         }
     }
 
     /***
-     * Metodo encargado de autentificar que el correo y la contraseña son de un usuario existentes
+     * Metodo encargado de autentificar que el correo y la contraseña son
+     * de un usuario existente en base de datos
      * @param v
      */
     public void authentication(final View v){
@@ -138,11 +144,20 @@ public class LoginActivity extends AppCompatActivity {
                     v.setEnabled(true);
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Snackbar.make(findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
+                        .show();
+                progressBar.setVisibility(View.GONE);
+                v.setEnabled(true);
+            }
         });
     }
 
     /**
      * Metodo encargado de comprobar los diferentes campos de texto
+     * introducidos y mostrar error si son incorrectos
      *
      * @return
      */
@@ -150,10 +165,10 @@ public class LoginActivity extends AppCompatActivity {
         boolean c_email = etEmail.getText().toString().trim().isEmpty();
         boolean c_pass = etPassword.getText().toString().trim().isEmpty();
         if(c_email){
-            etEmail.setError("Entra el usuario o correo");
+            etEmail.setError(getResources().getString(R.string.err_email_empty));
         }
         if(c_pass){
-            etPassword.setError("Entra la contraseña");
+            etPassword.setError(getResources().getString(R.string.err_pass_empty));
         }
         if((!c_email) && (!c_pass)){
             return true;
@@ -164,7 +179,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo encargado de gestionar el reestablecimiento de contraseña
+     * Metodo encargado de mostrar una ventana emergente
+     * para entrar el correo electronico en caso de haber
+     * seleccionado la opcion de ¿Has olvidado la contraseña?
      *
      * @param v
      */
@@ -174,21 +191,22 @@ public class LoginActivity extends AppCompatActivity {
         final EditText email = new EditText(this);
         email.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        email.setHint("Correo");
+        email.setHint(R.string.et_email);
         alert.setView(email);
         alertSendEmail(alert, email);
-        alert.setNegativeButton("Cancelar", null);
+        alert.setNegativeButton(R.string.cancel, null);
         alert.show();
     }
 
     /**
-     * Metodo encargado de enviar el correo para la reestablecer la contraseña
+     * Metodo encargado de enviar el correo electronico con los pasas
+     * para la reestablecer la contraseña
      *
      * @param alert
      * @param email
      */
-    private void alertSendEmail(AlertDialog.Builder alert, final EditText email) {
-        alert.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+    public void alertSendEmail(AlertDialog.Builder alert, final EditText email) {
+        alert.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 progressBar.setVisibility(View.VISIBLE);
                 if(email.getText().toString().isEmpty()) {
@@ -196,12 +214,11 @@ public class LoginActivity extends AppCompatActivity {
                             .show();
                     progressBar.setVisibility(View.GONE);
                 }else{
-                    final FirebaseAuth auth = FirebaseAuth.getInstance(); // ya tnego mAuht
-                    auth.fetchProvidersForEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                    mAuth.fetchProvidersForEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
                         @Override
                         public void onComplete(@NonNull Task<ProviderQueryResult> task) {
                             if (task.isSuccessful()) {
-                                auth.sendPasswordResetEmail(email.getText().toString())
+                                mAuth.sendPasswordResetEmail(email.getText().toString())
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -230,7 +247,11 @@ public class LoginActivity extends AppCompatActivity {
 
 
     /**
-     * Metodo encargado de recargar la interfaz de usuario
+     * Metodo encargado de comprobar si el usuario actual
+     * ya ha iniciado sesion anteriormente en el dispositivo
+     * movil para asi abrir la pantalla principal de la aplicacion.
+     * Si el booleano recibido por parametro es falso, significa que
+     * proviene de haber dado a iniciar sesion y los datos son incorrectos.
      *
      * @param currentUser
      * @param start
@@ -249,19 +270,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    /***
-     * Metodo encargado de abrir la ventana de Registro
-     *
-     * @param v
-     */
     public void openRegister(View v){
         Intent i = new Intent(this, RegisterActivity.class);
         startActivity(i);
     }
 
-    /**
-     * Metodo encargado de mostrar la contraseña o ocultarla si se clica sobre la imagen del EditText
-     */
     private void showPassword() {
         Utils.showPassword(etPassword);
     }

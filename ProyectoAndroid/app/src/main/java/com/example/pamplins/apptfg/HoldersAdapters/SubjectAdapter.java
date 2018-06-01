@@ -48,13 +48,13 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectViewHolder> {
                     intent.putExtra("subject", keys.get(position)+","+subjects.get(position).getDoubts().toString());
                     activity.startActivity(intent);
                 }else{
-                    Snackbar.make(activity.findViewById(android.R.id.content), "Esta asignatura no dispone de ninguna duda", Snackbar.LENGTH_LONG)
+                    Snackbar.make(activity.findViewById(android.R.id.content), R.string.err_empty_subject, Snackbar.LENGTH_LONG)
                             .show();
                 }
 
             }
         });
-        // TODO borrar asigatura al mantener presionada set on large
+        //TODO borrar asigatura al mantener presionada set on large
         String course = subject.getCourse() + " - " + subject.getSemester();
         holder.getCourse().setText(course);
 

@@ -208,7 +208,7 @@ public class ProfileFragment extends Fragment {
                     img.buildDrawingCache();
                     img.setImageBitmap(bit);
 
-                    ctrl.writeUserDB(ctrl.getUid(), "", "", bit, "image_profile_2.jpg", 1);
+                    ctrl.uploadImageProfile(ctrl.getUid(), "", "", bit, "image_profile_2.jpg", 1);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
