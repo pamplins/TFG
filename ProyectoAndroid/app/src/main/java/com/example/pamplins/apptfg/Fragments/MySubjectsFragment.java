@@ -1,5 +1,6 @@
 package com.example.pamplins.apptfg.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,8 @@ public class MySubjectsFragment extends Fragment {
     private String subjects;
     private HashMap<String, Subject> hashMap;
     private TextView emptySubjects;
+    private List listSubjects;
+    private List listKeys;
 
     public MySubjectsFragment() {
     }
@@ -45,7 +48,6 @@ public class MySubjectsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ctrl = Controller.getInstance();
     }
 
     @Override
@@ -56,6 +58,7 @@ public class MySubjectsFragment extends Fragment {
         addNewCourse = rootView.findViewById(R.id.tv_add_course);
         hashMap = new HashMap<>();
         emptySubjects = rootView.findViewById(R.id.tv_empty_subjects);
+        ctrl = Controller.getInstance();
 
         addNewCourse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,15 +82,15 @@ public class MySubjectsFragment extends Fragment {
                 getArguments().remove("subjects");
             }
         }
+
         return rootView;
     }
-
-
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showSubjects();
+
     }
 
     private void addNewCourse(String subjects) {
@@ -100,50 +103,44 @@ public class MySubjectsFragment extends Fragment {
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-        ctrl.getSubjectsRef().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> keys = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Subject subject = snapshot.getValue(Subject.class);
-                        if (ctrl.getUser().getSubjects().contains(snapshot.getKey())) {
-                            if (!hashMap.keySet().contains(snapshot.getKey())) {
-                                hashMap.put(snapshot.getKey(), subject);
-                                keys.add(snapshot.getKey());
+        listSubjects =  new ArrayList<>();
+        listKeys = new ArrayList<>();
+        int i = 0;
 
-                            } else {
-                                hashMap.put(snapshot.getKey(), subject);
+        try {
+            for (String key : ctrl.getUser().getSubjects()) {
+                i++;
+                listKeys.add(key);
+                final int finalI = i;
+                ctrl.getSubjectsRef().child(key).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Subject subject = dataSnapshot.getValue(Subject.class);
+                        listSubjects.add(subject);
+                        if (finalI == ctrl.getUser().getSubjects().size()) {
+                            if(ctrl.getUser().getSubjects().contains("")){
+                                emptySubjects.setVisibility(View.VISIBLE);
+                            }else{
+                                progressBar.setVisibility(View.GONE);
+                                mRecycler.setVisibility(View.VISIBLE);
+                                emptySubjects.setVisibility(View.GONE);
+                                mAdapter =  new SubjectAdapter(listSubjects, listKeys, getActivity(), ctrl);
+                                mRecycler.setAdapter(mAdapter);
+                                mAdapter.notifyDataSetChanged();
                             }
+
                         }
-                }
-                List listSubjects = new ArrayList<>(hashMap.values());
-                List listKeys = new ArrayList<>(hashMap.keySet());
-                progressBar.setVisibility(View.GONE);
+                    }
 
-                if(listKeys.isEmpty()){
-                    emptySubjects.setVisibility(View.VISIBLE);
-                }else {
-                    mAdapter = new SubjectAdapter(listSubjects, listKeys, getActivity(), ctrl);
-                    mRecycler.setVisibility(View.VISIBLE);
-                    mRecycler.setAdapter(mAdapter);
-                    emptySubjects.setVisibility(View.GONE);
-                    mAdapter.notifyDataSetChanged();
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
+        }catch (Exception e){
+       }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if(mAdapter != null){
-            mAdapter.notifyDataSetChanged();
-        }
     }
 }
+

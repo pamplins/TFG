@@ -123,7 +123,7 @@ public class SubjectActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.tool_subject);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.subjects_of + courses[Integer.valueOf(subject)]);
+        getSupportActionBar().setTitle(getResources().getString(R.string.subjects_of) +" " +courses[Integer.valueOf(subject)]);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 

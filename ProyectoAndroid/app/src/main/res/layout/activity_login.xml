@@ -13,10 +13,12 @@
 
         <TextView
             android:id="@+id/nameApp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="80dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="60dp"
+            android:gravity="center"
             android:text="@string/app_name"
             android:textStyle="bold"
             android:textSize="50dp" />
@@ -54,13 +56,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="50dp">
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/tv_forget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
                 android:onClick="forgotPassword"
                 android:text="@string/tv_forget" />
 

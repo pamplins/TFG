@@ -251,7 +251,6 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void updateUI(FirebaseUser currentUser, Boolean start) {
         if(currentUser != null){
-            Controller.getInstance();
             openHome();
 
         }else{
