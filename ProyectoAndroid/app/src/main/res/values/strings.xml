@@ -60,6 +60,16 @@
     <string name="yes">Sí</string>
     <string name="not">No</string>
     <string name="course">CURSOS</string>
+    <string name="alert_remove_subject">¿Realmente quieres eliminar esta asignatura?</string>
+    <string name="exit_with_selected_subjects">No has guardado las asignaturas seleccionadas. ¿Estás seguro que quieres salir?</string>
+    <string name="select_any_subject">Selecciona alguna asignatura</string>
+    <string name="subjects_of">ASIGNATURAS DE</string>
+    <string name="first_semester">1r semestre</string>
+    <string name="second_semester">2o semestre</string>
+    <string name="string_images_doubts">Archivos adjuntos de la duda:</string>
+    <string name="responses">Respuestas:</string>
+    <string name="string_write_response">Escribe tu respuesta</string>
+    <string name="empty_subjects">No dispones de ninguna asignatura. ¡Añade todas las que quieras!</string>
 
 
 </resources>

@@ -6,7 +6,6 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
@@ -88,7 +87,6 @@ public class Controller {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // usuario no tiene permiso.
             }
         });
     }
@@ -211,7 +209,7 @@ public class Controller {
      * la creacion de una nueva duda o en un comentario
      * @return
      */
-    public String getDate(){
+    private String getDate(){
         String date =  new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         Calendar currentTime = Calendar.getInstance();
         int hour = currentTime.get(Calendar.HOUR_OF_DAY);
@@ -242,8 +240,9 @@ public class Controller {
     /**
      * Metodo encargado de escribir la duda en base de datos.
      * Si esta duda no contiene ninguna imagen la crea directamente, sino,
-     * primero sube las imagenes a storage y luego crea la duda con los links
+     * primero sube las imagenes a storage y luego crea la duda con las urls
      * a estas imagenes
+     *
      * @param title
      * @param body
      * @param bits
@@ -263,18 +262,32 @@ public class Controller {
             uploadNewDoubt(title, body, new ArrayList<String>(), bits, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }
     }
+
+    /**
+     * Metodo encargado de subir las imagenes de la duda y una vez subidas,
+     * crear la duda con las ulrs obtenidas de estas
+     *
+     * @param title
+     * @param body
+     * @param url1
+     * @param ac
+     * @param etTitle
+     * @param etDescription
+     * @param textView
+     * @param progressBar
+     * @param tvUpload
+     * @param tvNewDoubt
+     * @param subject
+     */
     private void uploadImagesDoubt(final String title, final String body, final List<Bitmap> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
         StorageReference fileToUpload;
-
         final ArrayList<String> finalUrl = new ArrayList<>();
         for(int i = 0; i < url1.size(); i++){
             String ref = Constants.REF_DOUBT_IMAGES + getUid() + "/" + title + "/" + Constants.REF_DOUBT_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             fileToUpload = storageRef.child(ref);
-
             Bitmap bit = url1.get(i);
             bit = getVerticalBit(bit);
             final int finalI = i;
-
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bit.compress(Bitmap.CompressFormat.JPEG, 25, baos);
             byte[] fileInBytes = baos.toByteArray();
@@ -481,25 +494,28 @@ public class Controller {
 
     /**
      * Metodo encargado de actualizar la lista de Mis asignatura de un usuario.
-     * Si no tenia ninguna duda, se mete como primera posicion, sino se ñade
+     * Si no tenia ninguna duda, se mete como primera posicion, sino se añade
      *
      * @param s
      */
-    public void updateUserSubjects(String s) {
-        //TODO permitir borrar en incremento 4
-        // tendre que comprobar que no quede nunca vacia el array. si es asi, metere "" en la posicion 0.
-        ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
-        for(String sub : subjects){
-            sub = sub.replaceFirst("^ *", "");
-            if(user.getSubjects().get(0).equals("")){
-                user.getSubjects().set(0,sub);
-            }else{
-                if(!user.getSubjects().contains(sub)){
-                    user.addNewSubjects(sub);
+    public void updateUserSubjects(String s, boolean add) {
+        if(add){
+            ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
+            for(String sub : subjects){
+                sub = sub.replaceFirst("^ *", "");
+                if(user.getSubjects().get(0).equals("")){
+                    user.getSubjects().set(0,sub);
+                }else{
+                    if(!user.getSubjects().contains(sub)){
+                        user.addNewSubjects(sub);
+                    }
                 }
             }
+        }else {
+            user.deleteSubject(s);
+
         }
-        //user().setSubjects(subjects);
         usersRef.child(getUid()).setValue(user);
+
     }
 }

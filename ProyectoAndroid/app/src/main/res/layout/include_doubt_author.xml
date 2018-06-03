@@ -29,6 +29,6 @@
         android:layout_marginLeft="10dp"
         android:gravity="center_vertical"
         android:textColor="@color/colorName"
-        tools:text="someauthor@email.com" />
+        tools:text="ejemplo@gmail.es" />
 
 </LinearLayout>

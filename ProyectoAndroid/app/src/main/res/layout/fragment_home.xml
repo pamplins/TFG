@@ -31,8 +31,8 @@
         android:layout_alignParentTop="true"
         android:clipToPadding="false"
         android:scrollbars="vertical"
-        tools:listitem="@layout/item_doubt"
-        android:visibility="gone"/>
+        android:visibility="visible"
+        tools:listitem="@layout/item_doubt" />
 
     <ProgressBar
         android:id="@+id/progressBar_h"

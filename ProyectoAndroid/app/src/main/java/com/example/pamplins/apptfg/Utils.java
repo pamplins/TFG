@@ -5,13 +5,13 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
 
 /**
  * Created by gtenorio on 05/02/2018.

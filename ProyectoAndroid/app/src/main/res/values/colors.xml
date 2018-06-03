@@ -10,7 +10,7 @@
     <color name="colorTextDoubt">#5c5d5e</color>
     <color name="backGround">#f2f3f5</color>
     <color name="colorLine">#d4d6da</color>
-    <color name="cardViewPressed">#a1faa1</color>
-    <color name="cardViewDisabled">#eaab85</color>
+    <color name="cardViewPressed">#86c1ed</color>
+    <color name="cardViewDisabled">#00000000</color>
 
 </resources>

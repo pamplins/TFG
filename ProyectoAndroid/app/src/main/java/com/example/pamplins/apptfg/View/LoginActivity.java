@@ -144,14 +144,6 @@ public class LoginActivity extends AppCompatActivity {
                     v.setEnabled(true);
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Snackbar.make(findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
-                        .show();
-                progressBar.setVisibility(View.GONE);
-                v.setEnabled(true);
-            }
         });
     }
 
@@ -209,16 +201,17 @@ public class LoginActivity extends AppCompatActivity {
         alert.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 progressBar.setVisibility(View.VISIBLE);
-                if(email.getText().toString().isEmpty()) {
+                final String emailText = email.getText().toString().trim();
+                if(emailText.isEmpty()) {
                     Snackbar.make(findViewById(android.R.id.content), R.string.err_notSend_email, Snackbar.LENGTH_LONG)
                             .show();
                     progressBar.setVisibility(View.GONE);
                 }else{
-                    mAuth.fetchProvidersForEmail(email.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                    mAuth.fetchProvidersForEmail(emailText).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
                         @Override
                         public void onComplete(@NonNull Task<ProviderQueryResult> task) {
                             if (task.isSuccessful()) {
-                                mAuth.sendPasswordResetEmail(email.getText().toString())
+                                mAuth.sendPasswordResetEmail(emailText)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -226,14 +219,14 @@ public class LoginActivity extends AppCompatActivity {
                                                     Snackbar.make(findViewById(android.R.id.content), R.string.restartP, Snackbar.LENGTH_LONG)
                                                             .show();
                                                 } else {
-                                                    Snackbar.make(findViewById(android.R.id.content), R.string.err_send_email, Snackbar.LENGTH_LONG)
+                                                    Snackbar.make(findViewById(android.R.id.content), R.string.email_not_registred, Snackbar.LENGTH_LONG)
                                                             .show();
                                                 }
                                                 progressBar.setVisibility(View.GONE);
                                             }
                                         });
                             }else{
-                                Snackbar.make(findViewById(android.R.id.content), R.string.email_not_registred, Snackbar.LENGTH_LONG)
+                                Snackbar.make(findViewById(android.R.id.content), R.string.err_send_email, Snackbar.LENGTH_LONG)
                                         .show();
                                 progressBar.setVisibility(View.GONE);
                             }

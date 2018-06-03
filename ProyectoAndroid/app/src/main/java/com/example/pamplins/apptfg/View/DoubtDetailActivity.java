@@ -22,7 +22,6 @@ import android.widget.TextView;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.AnswerAdapter;
-import com.example.pamplins.apptfg.HoldersAdapters.AnswerViewHolder;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
@@ -32,7 +31,6 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class DoubtDetailActivity extends AppCompatActivity {
@@ -62,7 +60,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private RecyclerView mRecycler;
     private RecyclerView mRecycler_items;
     private LinearLayoutManager mManager;
-    private FirebaseRecyclerAdapter<Answer, AnswerViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Answer, AnswerAdapter.AnswerViewHolder> mAdapter;
     private DatabaseReference mDatabase;
 
     @Override
@@ -113,7 +111,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.post_title);
         tvDate = findViewById(R.id.tv_date);
         tvDescription = findViewById(R.id.post_description);
-        tvSubject = findViewById(R.id.post_subject);
+        tvSubject = findViewById(R.id.name_subject);
         etAnswer = findViewById(R.id.field_answer_text);
         img = findViewById(R.id.post_author_photo);
         btnAnswer = findViewById(R.id.button_post_answer);

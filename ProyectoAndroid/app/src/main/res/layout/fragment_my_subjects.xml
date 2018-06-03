@@ -46,11 +46,21 @@
         android:clipToPadding="false"
         android:scrollbars="vertical"
         tools:listitem="@layout/item_subject"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
+    <TextView
+        android:id="@+id/tv_empty_subjects"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/empty_subjects"
+        android:textColor="@color/colorButton"
+        android:textSize="30dp"
+        android:visibility="gone" />
     <ProgressBar
         android:id="@+id/progressBar_s"
-        android:visibility="gone"
+        android:visibility="visible"
         android:scaleX="0.10"
         android:scaleY="0.10"
         android:layout_height="match_parent"

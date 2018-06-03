@@ -55,7 +55,12 @@ public class User {
     public void addNewSubjects(String subjectsName){
         subjects.add(subjectsName);
     }
-
+    public void deleteSubject(String subjectsName) {
+        subjects.remove(subjectsName);
+        if(subjects.isEmpty()){
+            subjects.add("");
+        }
+    }
     public void setSubjects(ArrayList<String> subjects) {
         this.subjects = subjects;
     }
@@ -69,5 +74,7 @@ public class User {
                 ", subjects ='" + subjects + '\'' +
                 '}';
     }
+
+
 }
 

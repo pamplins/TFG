@@ -1,9 +1,12 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -21,7 +24,7 @@ import com.google.firebase.database.Transaction;
  * Created by Gustavo on 12/03/2018.
  */
 
-public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerViewHolder> {
+public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter.AnswerViewHolder> {
 
     private Activity activity;
     private String doubtKey;
@@ -72,14 +75,14 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerViewHol
 
     private void checkLikesDisAnswer(Answer answer, AnswerViewHolder viewHolder){
         if (answer.getLikes().containsKey(ctrl.getUid())) {
-            viewHolder.getLike().setImageResource(R.drawable.like_ac);
+            viewHolder.like.setImageResource(R.drawable.like_ac);
         } else {
-            viewHolder.getLike().setImageResource(R.drawable.like);
+            viewHolder.like.setImageResource(R.drawable.like);
         }
         if (answer.getDislikes().containsKey(ctrl.getUid())) {
-            viewHolder.getDislike().setImageResource(R.drawable.dislike_ac);
+            viewHolder.dislike.setImageResource(R.drawable.dislike_ac);
         } else {
-            viewHolder.getDislike().setImageResource(R.drawable.dislike);
+            viewHolder.dislike.setImageResource(R.drawable.dislike);
         }
 
     }
@@ -148,6 +151,52 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerViewHol
         });
     }
 
+    public static class AnswerViewHolder extends RecyclerView.ViewHolder {
+
+        TextView tvAuthor;
+        TextView tvDescription;
+        ImageView img;
+        TextView numLikes;
+        ImageView like;
+        TextView numDisLikes;
+        ImageView dislike;
+        TextView date;
+
+        public AnswerViewHolder(View itemView) {
+            super(itemView);
+            initElements();
+        }
+
+        private void initElements(){
+            tvAuthor = itemView.findViewById(R.id.answer_author);
+            tvDescription = itemView.findViewById(R.id.answer_description);
+            img = itemView.findViewById(R.id.answer_photo);
+            like = itemView.findViewById(R.id.like_answer);
+            numLikes = itemView.findViewById(R.id.num_likes_answer);
+            dislike = itemView.findViewById(R.id.dislike_answer);
+            numDisLikes = itemView.findViewById(R.id.num_dislikes_answer);
+            date = itemView.findViewById(R.id.tv_date_answer);
+        }
+
+
+        public void bindToPost(final Answer answer, Activity activity, Controller ctrl) {
+            tvAuthor.setText(answer.getUser().getUserName());
+            tvDescription.setText(answer.getText());
+            date.setText(answer.getDate());
+            ctrl.showProfileImage(activity, answer, img);
+        }
+
+        public void bindLikes (Answer answer, View.OnClickListener clickListener){
+            numLikes.setText(String.valueOf(answer.getLikesCount()));
+            like.setOnClickListener(clickListener);
+        }
+
+        public void bindDisLikes (Answer answer, View.OnClickListener clickListener){
+            numDisLikes.setText(String.valueOf(answer.getDislikesCount()));
+            dislike.setOnClickListener(clickListener);
+        }
+
+    }
 
 }
 

@@ -36,7 +36,6 @@
         android:layout_below="@+id/et_title_new_post"
         android:background="@color/colorLine" />
 
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -45,61 +44,8 @@
             android:orientation="vertical"
             android:id="@+id/linear_subjects"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent"            >
 
-
-            <!--<TextView
-                android:padding="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1r semestre:"
-                android:textColor="@color/colorName"
-
-                 />
-            <GridLayout
-                android:id="@+id/grid_subject_1"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:columnCount="2"
-                android:padding="16dp"
-                android:layout_gravity="center" >
-
-                <android.support.v7.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="56dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_rowWeight="1"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@color/backGround"
-                    >
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal|center_vertical"
-                        android:layout_margin="16dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Asignatura A probando con nombre largo"
-                            android:textAlignment="center"
-                            android:textColor="@color/colorButton"
-                            android:gravity="center"
-                            android:textStyle="bold"
-                            android:autoSizeTextType="uniform"/>
-
-                    </LinearLayout>
-
-                </android.support.v7.widget.CardView>
-
-            </GridLayout>-->
         </LinearLayout>
 
     </ScrollView>

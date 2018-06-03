@@ -58,16 +58,16 @@ public class NewDoubtFragment extends Fragment {
 
     private ProgressBar progressBar;
     private List<String> subjects;
-    AutoCompleteTextView textView;
+    private AutoCompleteTextView textView;
 
     public NewDoubtFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         ctrl = Controller.getInstance();
         autocomplete();
-        super.onCreate(savedInstanceState);
     }
 
     /**
@@ -222,8 +222,6 @@ public class NewDoubtFragment extends Fragment {
         final String description = etDescription.getText().toString();
         final String subject = textView.getText().toString();
         if(Utils.isNetworkAvailable(getActivity())) {
-
-
             if (checkInputs(title, description, subject)) {
                 preWriteDoubt();
                 ctrl.writeDoubtDB(title, description, bitImages, getActivity(), etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);

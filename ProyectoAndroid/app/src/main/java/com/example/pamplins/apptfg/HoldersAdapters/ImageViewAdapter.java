@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,14 +54,6 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         imagePopup.initiatePopupWithGlide(url);
         imagePopup.setFullScreen(true);
         imagePopup.setImageOnClickClose(true);
-        /*
-        PhotoViewAttacher pAttacher;
-        pAttacher = new PhotoViewAttacher(Your_Image_View);
-        pAttacher.update();
-        Add below line in build.gradle:
-
-        compile 'com.commit451:PhotoView:1.2.4
-         */
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +67,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
             @Override
             public boolean onLongClick(View v) {
                 if(activity.getClass().getName().contains("MainActivity")) {
-                    removeItem(viewHolder.getAdapterPosition());
+                    removeImage(viewHolder.getAdapterPosition());
                 }
                 return true;
 
@@ -82,7 +75,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         });
     }
 
-    private void removeItem(final int adapterPosition) {
+    private void removeImage(final int adapterPosition) {
         new AlertDialog.Builder(activity)
         .setMessage(R.string.alert_remove_image)
         .setIcon(android.R.drawable.ic_dialog_alert)

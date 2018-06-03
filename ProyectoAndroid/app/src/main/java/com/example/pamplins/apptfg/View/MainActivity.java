@@ -25,6 +25,7 @@ import com.example.pamplins.apptfg.R;
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
 
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +59,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 FragmentManager fragmentManager = getSupportFragmentManager();
-
                 if (item.getItemId() == R.id.home_item) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.fragmentContainer, homeFragment).commit();

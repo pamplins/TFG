@@ -105,13 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                                             }
                                         }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Snackbar.make(findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
-                                            .show();
-                                }
-                            });
+                                    });
                         } else {
                             etUserName.setError(getString(R.string.err_user_exist));
                             progressBar.setVisibility(View.INVISIBLE);

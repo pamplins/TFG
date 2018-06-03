@@ -1,10 +1,11 @@
 package com.example.pamplins.apptfg.View;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -39,6 +40,7 @@ public class SubjectActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
+        subjects = new ArrayList<>();
 
         if(getIntent() != null)
         {
@@ -50,13 +52,12 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void getSubjects() {
-        //TODO añadir barra de progreso si no hay nada en linearSubjects
         String nameCourse = courses[Integer.valueOf(subject)];
         Controller.getInstance().getCoursesRef().child(nameCourse).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Course course = dataSnapshot.getValue(Course.class);
-                firstSemester = course.getSubjects().get("1r semestre");
+                firstSemester = course.getSubjects().get("1r semestre");// TODO ver si es siempre esta string o poner getResources().getString(R.string.first_semester)
                 secondSemester = course.getSubjects().get("2o semestre");
 
                 LayoutParams params = new LayoutParams(
@@ -64,13 +65,12 @@ public class SubjectActivity extends AppCompatActivity {
                         LayoutParams.WRAP_CONTENT);
                 linearSubjects = findViewById(R.id.linear_subjects);
                 if(null != firstSemester){
-                    createCardsViews("1r semestre", firstSemester, params);
+                    createCardsViews(getResources().getString(R.string.first_semester), firstSemester, params);
                 }
                 if(null != secondSemester){
-                    createCardsViews("2o semestre", secondSemester, params);
+                    createCardsViews(getResources().getString(R.string.second_semester), secondSemester, params);
                 }
                 setSingleEvent();
-                subjects = new ArrayList<>();
 
             }
 
@@ -114,10 +114,7 @@ public class SubjectActivity extends AppCompatActivity {
             tv.setTextColor(getResources().getColor(R.color.colorButton));
             card.addView(tv);
 
-
             linearSubjects.addView(card);
-
-
         }
 
     }
@@ -126,7 +123,7 @@ public class SubjectActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.tool_subject);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("ASIGNATURAS DE " + courses[Integer.valueOf(subject)]);
+        getSupportActionBar().setTitle(R.string.subjects_of + courses[Integer.valueOf(subject)]);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 
@@ -164,24 +161,40 @@ public class SubjectActivity extends AppCompatActivity {
 
     public void addSubject(View v){
         if(!subjects.isEmpty()){
-            Intent openFragmentBIntent = new Intent(this, MainActivity.class);
-            openFragmentBIntent.putExtra("main", subjects.toString());
-            startActivity(openFragmentBIntent);
+            Intent i = new Intent(this, MainActivity.class);
+            i.putExtra("main", subjects.toString());
+            startActivity(i);
             finish();
         }else{
-            Snackbar.make(v, "Selecciona alguna asignatura", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(v, R.string.select_any_subject, Snackbar.LENGTH_SHORT).show();
         }
 
     }
 
+    private void confirmExit(){
+        if(!subjects.isEmpty()){
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.exit_with_selected_subjects)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            finish();
+                        }})
+                    .setNegativeButton(R.string.not, null).show();
+        }
+        else{
+            finish();
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp(){
-        finish();
+        confirmExit();
         return true;
     }
     @Override
     public void onBackPressed() {
-        finish();
+        confirmExit();
     }
 
 }

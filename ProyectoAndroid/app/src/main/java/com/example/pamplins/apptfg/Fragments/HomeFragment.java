@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.DoubtAdapter;
 import com.example.pamplins.apptfg.Model.Doubt;
-import com.example.pamplins.apptfg.HoldersAdapters.DoubtViewHolder;
 import com.example.pamplins.apptfg.R;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -27,7 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 public class HomeFragment extends Fragment {
 
     private DatabaseReference mDatabase;
-    private FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Doubt, DoubtAdapter.DoubtViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private Controller ctrl;
@@ -39,17 +39,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ctrl = Controller.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        ctrl = Controller.getInstance();
         mDatabase = ctrl.getDB().getReference();
         mRecycler = rootView.findViewById(R.id.messages_list);
         progressBar = rootView.findViewById(R.id.progressBar_h);
-
         return rootView;
     }
 
@@ -93,6 +92,7 @@ public class HomeFragment extends Fragment {
         });
         mAdapter.notifyDataSetChanged();
     }
+
     @Override
     public void onStart() {
         super.onStart();

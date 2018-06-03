@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
-                android:text="Archivos adjuntos de la duda:"
+                android:text="@string/string_images_doubts"
                 android:textColor="@color/colorName" />
 
             <android.support.v7.widget.RecyclerView
@@ -73,7 +73,7 @@
                 android:layout_marginTop="5dp"
                 android:paddingBottom="10dp"
                 android:paddingLeft="16dp"
-                android:text="Respuestas:"
+                android:text="@string/responses"
                 android:textColor="@color/colorName" />
             <!--<TextView
                 android:layout_width="match_parent"
@@ -127,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:fadeScrollbars="false"
-            android:hint="Escribe tu respuesta"
+            android:hint="@string/string_write_response"
             android:inputType="textMultiLine"
             android:maxLines="4"
             android:minLines="1"

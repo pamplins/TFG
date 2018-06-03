@@ -2,10 +2,12 @@ package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -18,11 +20,13 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import com.google.firebase.database.DatabaseReference;
 
+import java.util.List;
+
 /**
  * Created by Gustavo on 12/03/2018.
  */
 
-public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolder> {
+public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtAdapter.DoubtViewHolder> {
     private Activity activity;
     private Controller ctrl;
     private DatabaseReference mDatabase;
@@ -41,12 +45,12 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
     }
 
     @Override
-    protected void onBindViewHolder(final DoubtViewHolder viewHolder, int position, final Doubt doubt) {
-        final DatabaseReference postRef = getRef(viewHolder.getAdapterPosition());
+    protected void onBindViewHolder(final DoubtViewHolder holder, int position, final Doubt doubt) {
+        final DatabaseReference postRef = getRef(holder.getAdapterPosition());
         final String postKey = postRef.getKey();
 
         // Abrir una duda X de la lista de home
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, DoubtDetailActivity.class);
@@ -55,27 +59,27 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
             }
         });
 
-        checkLikesDis(doubt, viewHolder.getLike(), viewHolder.getDislike());
-        viewHolder.fillDoubt(doubt, activity, ctrl);
-        votesDoubt(doubt, viewHolder, postKey);
+        checkLikesDis(doubt, holder);
+        holder.fillDoubt(doubt, activity, ctrl);
+        votesDoubt(doubt, holder, postKey);
     }
 
-    public void checkLikesDis(Doubt doubt, ImageView like, ImageView dislike) {
+    public void checkLikesDis(Doubt doubt, DoubtViewHolder holder) {
         if (doubt.getLikes().containsKey(ctrl.getUid())) {
-            like.setImageResource(R.drawable.like_ac);
+            holder.like.setImageResource(R.drawable.like_ac);
         } else {
-            like.setImageResource(R.drawable.like);
+            holder.like.setImageResource(R.drawable.like);
         }
         if (doubt.getDislikes().containsKey(ctrl.getUid())) {
-            dislike.setImageResource(R.drawable.dislike_ac);
+            holder.dislike.setImageResource(R.drawable.dislike_ac);
         } else {
-            dislike.setImageResource(R.drawable.dislike);
+            holder.dislike.setImageResource(R.drawable.dislike);
         }
     }
 
 
-    private  void votesDoubt(final Doubt doubt, DoubtViewHolder viewHolder, final String postKey){
-        viewHolder.fillLikes(doubt, new View.OnClickListener() {
+    private  void votesDoubt(final Doubt doubt, DoubtViewHolder holder, final String postKey){
+        holder.fillLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
@@ -85,7 +89,7 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
         }
         });
 
-        viewHolder.fillDisLikes(doubt, new View.OnClickListener() {
+        holder.fillDisLikes(doubt, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference globalPostRef = mDatabase.child(Constants.REF_DOUBTS).child(postKey);
@@ -96,4 +100,88 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtViewHolde
         });
     }
 
-}
+    public static class DoubtViewHolder extends RecyclerView.ViewHolder {
+
+        TextView titleView;
+        TextView authorView;
+        TextView bodyView;
+        TextView date;
+        ImageView img;
+        TextView numLikes;
+        ImageView like;
+        TextView numDisLikes;
+        ImageView dislike;
+        TextView numAnswers;
+        TextView subject;
+
+        public DoubtViewHolder(View itemView) {
+            super(itemView);
+            initElements(itemView);
+        }
+
+        private void initElements(View itemView) {
+            titleView = itemView.findViewById(R.id.post_title);
+            authorView = itemView.findViewById(R.id.post_author);
+            bodyView = itemView.findViewById(R.id.post_description);
+            subject = itemView.findViewById(R.id.name_subject);
+            date = itemView.findViewById(R.id.tv_date);
+            img = itemView.findViewById(R.id.post_author_photo);
+            like = itemView.findViewById(R.id.like);
+            numLikes = itemView.findViewById(R.id.num_likes);
+            dislike = itemView.findViewById(R.id.dislike);
+            numDisLikes = itemView.findViewById(R.id.num_dislikes);
+            numAnswers = itemView.findViewById(R.id.num_answers);
+        }
+
+        public ImageView getLike() {
+            return like;
+        }
+
+        public ImageView getDislike() {
+            return dislike;
+        }
+
+        /**
+         * Funcion encargada de añadir a los elementos los datos de la duda
+         *
+         * @param doubt
+         * @param activity
+         * @param ctrl
+         */
+        public void fillDoubt(final Doubt doubt, Activity activity, Controller ctrl) {
+            titleView.setText(doubt.getTitle());
+            authorView.setText(doubt.getUser().getUserName());
+            subject.setText(doubt.getSubject());
+            numAnswers.setText(String.valueOf(doubt.getnAnswers()));
+            int count = doubt.getDescription().split("\r\n|\r|\n").length;
+            String desc = doubt.getDescription();
+            if (count > 4) {
+                desc = desc.replace("\n", " ").replace("\r", " ");
+                if (desc.length() > 20) {
+                    bodyView.setText(doubt.getDescription().substring(0, 20) + "...");
+                }
+            } else {
+                if (desc.length() > 100) {
+                    bodyView.setText(doubt.getDescription().substring(0, 100) + "...");
+
+                } else {
+                    bodyView.setText(doubt.getDescription());
+                }
+            }
+            date.setText(doubt.getDate());
+            ctrl.showProfileImage(activity, doubt, img);
+        }
+
+        public void fillLikes(Doubt doubt, View.OnClickListener clickListener) {
+            numLikes.setText(String.valueOf(doubt.getLikesCount()));
+            like.setOnClickListener(clickListener);
+        }
+
+        public void fillDisLikes(Doubt doubt, View.OnClickListener clickListener) {
+            numDisLikes.setText(String.valueOf(doubt.getDislikesCount()));
+            dislike.setOnClickListener(clickListener);
+        }
+
+    }
+
+    }
