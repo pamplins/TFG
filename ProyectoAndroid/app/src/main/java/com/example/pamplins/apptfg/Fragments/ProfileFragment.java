@@ -21,7 +21,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Course;
 import com.example.pamplins.apptfg.Model.Subject;
@@ -33,6 +35,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -51,120 +54,72 @@ import static android.app.Activity.RESULT_OK;
  * Created by Gustavo on 17/02/2018.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends DoubtsFragment {
 
     private ImageView img;
-    private Controller ctrl;
     private Bitmap bit;
+
     public ProfileFragment() {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-
+    public Query getQuery() {
+        return mDatabase.child(Constants.REF_USER_DOUBTS).child(ctrl.getUid());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View setView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+        mRecycler = rootView.findViewById(R.id.messages_list);
+        progressBar = rootView.findViewById(R.id.progressBar_h);
+        TextView name = rootView.findViewById(R.id.tv_user_name_p);
 
+        name.setText(ctrl.getUser().getUserName());
+        ImageView ivUser = rootView.findViewById(R.id.img_user_profile);
+        ctrl.showProfileImage(getActivity(),ctrl.getUser().getUrlProfileImage(), ivUser);
+        ImageView ivLogout = rootView.findViewById(R.id.iv_signout);
+        ivLogout.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                confirmExit();
+
+            }
+        });
+        LinearLayout camera = rootView.findViewById(R.id.ll_camera_p);
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAlert();
+            }
+        });
+
+        return rootView;
+
+    }
+
+    private void exit() {
         final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        View view = inflater.inflate(R.layout.fragment_profile,
-                container, false);
-        Button button = view.findViewById(R.id.btn_signout);
-        button.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                firebaseAuth.signOut();
-                ctrl.restartInstance();
-                getActivity().finish();
-                Intent i = new Intent(getActivity(), LoginActivity.class);
-                startActivity(i);
-
-
-            }
-        });
-        ctrl = Controller.getInstance();
-        img = view.findViewById(R.id.img_user_profile);
-
-        Button btn = view.findViewById(R.id.btn_createSubjects);
-        btn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                createSubject();
-
-
-            }
-        });
-
-
-
-
-        /*Button btn = view.findViewById(R.id.btn_changeImg);
-        btn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-               openAlert();
-
-
-            }
-        });
-        */
-        return view;
+        firebaseAuth.signOut();
+        ctrl.restartInstance();
+        getActivity().finish();
+        Intent i = new Intent(getActivity(), LoginActivity.class);
+        startActivity(i);
     }
 
-    private void createSubject() {
+    private void confirmExit() {
+        new AlertDialog.Builder(getActivity())
+            .setMessage(R.string.alert_exit)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
-        /*Controller.getInstance().getCoursesRef().child("4o").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Course course = dataSnapshot.getValue(Course.class);
-                for(String key: course.getSubjects().keySet()){
-                    for(String val: course.getSubjects().get(key)){
-                        Subject subject = new Subject("4o", key);
-                        ctrl.getSubjectsRef().child(val).setValue(subject);
-                    }
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        ctrl.getSubjectsRef().child("Asignatura C").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Subject subject = dataSnapshot.getValue(Subject.class);
-                ArrayList<String> doubts = new ArrayList<>(Arrays.asList("duda1","duda2"));
-                subject.getDoubts().add("duda3");
-                ctrl.getSubjectsRef().child("Asignatura C").setValue(subject);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        Subject subject = new Subject("1o", "1r semestre");
-        ctrl.getSubjectsRef().child("Asignatura D").setValue(subject);*/
-
-
-       //ctrl.updateUser();
-
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    exit();
+                }})
+            .setNegativeButton(R.string.not, null).show();
     }
+
 
     private void openAlert() {
         final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
@@ -193,13 +148,13 @@ public class ProfileFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         if (resultCode == RESULT_OK) {
-            if(requestCode == 0){
+            if (requestCode == 0) {
                 bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
                 img.setImageBitmap(bit);
 
-            }else{
+            } else {
                 try {
                     Uri uri = imageReturnedIntent.getData();
                     InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
@@ -215,33 +170,31 @@ public class ProfileFragment extends Fragment {
                 }
             }
 
+
+            String ref = "user_images/" + FirebaseAuth.getInstance().getUid() + "/" + "image_profile.jpg";
+            StorageReference mStorageRef;
+            mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            getCroppedBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+            mStorageRef.putBytes(data);
+
+            UploadTask uploadTask = mStorageRef.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+
+                }
+            });
+
         }
-
-
-        String ref = "user_images/" + FirebaseAuth.getInstance().getUid()+ "/" + "image_profile.jpg";
-        StorageReference mStorageRef;
-        mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        getCroppedBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-        mStorageRef.putBytes(data);
-
-        UploadTask uploadTask = mStorageRef.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-
-            }
-        });
-
-
 
     }
 

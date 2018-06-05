@@ -35,7 +35,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
-    private DatabaseReference answersReference;
     private ValueEventListener doubtListener;
     private String doubtKey;
 
@@ -87,7 +86,6 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private void initElements(){
         ctrl = Controller.getInstance();
         doubtReference = ctrl.getDoubtReference(doubtKey);
-        answersReference = ctrl.getAnswerReference(doubtKey);
         mDatabase = ctrl.getDB().getReference();
         initDoubtItems();
         initAnswerItems();
@@ -99,7 +97,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                ctrl.writeAnswerDB(currentDoubt, answersReference, etAnswer, doubtReference, btnAnswer, DoubtDetailActivity.this);
+                ctrl.writeAnswerDB(currentDoubt, doubtKey, etAnswer, doubtReference, btnAnswer, DoubtDetailActivity.this);
             }
         });
         mRecycler = this.findViewById(R.id.recycler_answers);

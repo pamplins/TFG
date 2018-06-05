@@ -38,6 +38,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/example/pamplins/apptfg/Fragments/DoubtsFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/example/pamplins/apptfg/Fragments/HomeFragment.java">
           <value>
             <set />
@@ -49,6 +54,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/example/pamplins/apptfg/Fragments/NewDoubtFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/example/pamplins/apptfg/Fragments/ProfileFragment.java">
           <value>
             <set />
           </value>
@@ -198,6 +208,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/fragment_profile.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/layout/include_doubt_author.xml">
           <value>
             <set />
@@ -234,6 +249,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/values/styles.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../../FirebaseDatabaseStructure-master/app/src/main/java/com/delaroystudios/firebasedatabasestructure/fragment/MyTopPostsFragment.java">
           <value>
             <set />
           </value>

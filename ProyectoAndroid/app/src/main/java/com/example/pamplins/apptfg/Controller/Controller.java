@@ -40,6 +40,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.w3c.dom.Comment;
+
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -139,6 +141,11 @@ public class Controller {
                 .child(Constants.REF_DOUBTS).child(uid);
     }
 
+    public DatabaseReference getUserDoubtReference(String uidDoubt){
+        return db.getReference()
+                .child(Constants.REF_USER_DOUBTS).child(getUid()).child(uidDoubt);
+    }
+
     public DatabaseReference getAnswerReference(String uid){
         return db.getReference()
                 .child(Constants.REF_POST_ANSWERS).child(uid);
@@ -195,7 +202,7 @@ public class Controller {
                     usersRef.child(uid).setValue(user);
                 }
                 else{
-                    //TODO hacer multi-path updates -- ITERACION 4
+                    //TODO hacer multi-path updates -- INCREMENTO 4
                     usersRef.child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
                    // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
@@ -229,8 +236,10 @@ public class Controller {
         String url;
         if(obj.getClass().equals(Doubt.class)){
             url = ((Doubt)obj).getUser().getUrlProfileImage();
-        }else{
+        }else if(obj.getClass().equals(Answer.class)){
             url = ((Answer)obj).getUser().getUrlProfileImage();
+        }else{
+            url = obj.toString();
         }
         Glide.with(activity)
                 .load(url)
@@ -466,15 +475,14 @@ public class Controller {
 
     /**
      * Metodo encargado de escribir la respuesta en una duda en concreto
-     *
-     * @param currentdDoubt
-     * @param answersReference
+     *  @param currentdDoubt
+     * @param uidDoubt
      * @param etAnswer
      * @param doubtReference
      * @param btnAnswer
      * @param activity
      */
-    public void writeAnswerDB(final Doubt currentdDoubt, final DatabaseReference answersReference, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
+    public void writeAnswerDB(final Doubt currentdDoubt, final String uidDoubt, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
         final String uid = getUid();
         final String answerText = etAnswer.getText().toString();
         if(answerText.trim().isEmpty()){
@@ -483,10 +491,12 @@ public class Controller {
             btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
             Answer answer = new Answer(uid, answerText, getDate(), user);
             Map<String, Object> answerValues = answer.toMap();
-            answersReference.push().setValue(answerValues);
+            getAnswerReference(uidDoubt).push().setValue(answerValues);
             etAnswer.setText(null);
             currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
             doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
+            getUserDoubtReference(uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
+
             Utils.hideKeyboard(activity);
             btnAnswer.setEnabled(true);
         }

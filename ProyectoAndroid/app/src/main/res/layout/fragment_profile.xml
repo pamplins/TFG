@@ -6,51 +6,97 @@
     android:background="@color/backGround"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_perfil"
-        android:text="MI PERFIL"
-        android:textStyle="bold"
-        android:textSize="24dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity = "center"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorName"
-        />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/my_perfil"
+            android:textColor="@color/colorName"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:paddingRight="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_exit"
+            android:id="@+id/iv_signout"/>
+    </LinearLayout>
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tv_perfil"
         android:background="@color/colorLine"
         />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:id="@+id/ll_camera_p" >
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/img_user_profile"
+        android:layout_width="120dp"
+        app:civ_border_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp" />
 
     <ImageView
-        android:id="@+id/img_user_profile"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="30dp"
-        android:src="@drawable/user_img" />
+        android:layout_marginTop="-20dp"
+        android:paddingLeft="16dp"
+        android:src="@mipmap/ic_camera" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_createSubjects"
-        style="@style/button_style"
-        android:layout_marginTop="90dp"
-        android:layout_marginBottom="10dp"
-        android:text="CREAR ASIGNATURAS" />
-   <!-- <Button
-        android:id="@+id/btn_changeImg"
-        style="@style/button_style"
-        android:layout_marginTop="90dp"
-        android:layout_marginBottom="10dp"
-        android:text="CAMBIAR IMAGEN" />-->
-    <Button
-        android:id="@+id/btn_signout"
-        style="@style/button_style"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/btn_signout" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:id="@+id/tv_user_name_p"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/colorTextDoubt"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorName"
+        android:padding="16dp"
+        android:textSize="16dp"
+        android:text="@string/tv_my_doubts"
+        android:textStyle="bold" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/messages_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        android:visibility="visible"
+        tools:listitem="@layout/item_doubt" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_h"
+        android:visibility="visible"
+        android:scaleX="0.10"
+        android:scaleY="0.10"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"/>
 
 </LinearLayout>
