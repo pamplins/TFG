@@ -29,6 +29,7 @@ import com.example.pamplins.apptfg.Model.Course;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.View.LoginActivity;
+import com.example.pamplins.apptfg.View.RegisterActivity;
 import com.example.pamplins.apptfg.View.SubjectActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -56,9 +57,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends DoubtsFragment {
 
-    private ImageView img;
     private Bitmap bit;
-
     public ProfileFragment() {
     }
 
@@ -95,6 +94,8 @@ public class ProfileFragment extends DoubtsFragment {
             }
         });
 
+        prueba =  rootView.findViewById(R.id.tv_empty_doubts_p);
+        prueba.setVisibility(View.VISIBLE);
         return rootView;
 
     }
@@ -120,106 +121,66 @@ public class ProfileFragment extends DoubtsFragment {
             .setNegativeButton(R.string.not, null).show();
     }
 
-
+    /**
+     * Funcion encargada de abrir el dialogo para escoger entre la
+     * galeria o camara para subir una imagen
+     */
     private void openAlert() {
-        final CharSequence[] items = {"Hacer foto", "Seleccionar de galeria"};
+        final CharSequence[] items = {getResources().getString(R.string.open_camera), getResources().getString(R.string.select_gallery)};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Añadir imagen");
+        builder.setTitle(R.string.add_image);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Hacer foto")) {
+                if (items[item].equals(getResources().getString(R.string.open_camera))) {
                     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(takePictureIntent, 0);
 
-                } else if (items[item].equals("Seleccionar de galeria")) {
+                } else if (items[item].equals(getResources().getString(R.string.select_gallery))){
 
                     Intent intent = new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
                     startActivityForResult(intent, 1);
-
                 }
             }
 
         });
         builder.show();
     }
-
+    /**
+     * Metodo encargado de obtener la imagen que el usuario
+     * ha seleccionado, ya sea desde camara o desde storage
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param imageReturnedIntent
+     */
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         if (resultCode == RESULT_OK) {
-            if (requestCode == 0) {
+            if(requestCode == 0){
                 bit = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                ImageView img = getActivity().findViewById(R.id.img_user_profile);
                 img.setDrawingCacheEnabled(true);
                 img.buildDrawingCache();
                 img.setImageBitmap(bit);
-
-            } else {
+            }else{
                 try {
                     Uri uri = imageReturnedIntent.getData();
-                    InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
+                    InputStream imageStream =  getActivity().getContentResolver().openInputStream(uri);
                     bit = BitmapFactory.decodeStream(imageStream);
+                    ImageView img = getActivity().findViewById(R.id.img_user_profile);
                     img.setDrawingCacheEnabled(true);
                     img.buildDrawingCache();
                     img.setImageBitmap(bit);
-
-                    ctrl.uploadImageProfile(ctrl.getUid(), "", "", bit, "image_profile_2.jpg", 1);
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
-
-
-            String ref = "user_images/" + FirebaseAuth.getInstance().getUid() + "/" + "image_profile.jpg";
-            StorageReference mStorageRef;
-            mStorageRef = FirebaseStorage.getInstance().getReference().child(ref);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            getCroppedBitmap(bit).compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] data = baos.toByteArray();
-            mStorageRef.putBytes(data);
-
-            UploadTask uploadTask = mStorageRef.putBytes(data);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-
-                }
-            });
+            ctrl.uploadImageProfile(ctrl.getUid(), "", "", bit, "image_profile.jpg", 1);
 
         }
-
-    }
-
-
-
-    public Bitmap getCroppedBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
-                bitmap.getWidth() / 2, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
-        //return _bmp;
-        return output;
     }
 
 }

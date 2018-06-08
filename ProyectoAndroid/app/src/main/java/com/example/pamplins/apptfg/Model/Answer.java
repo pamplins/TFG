@@ -1,9 +1,14 @@
 package com.example.pamplins.apptfg.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,7 +16,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Answer {
+public class Answer{
 
     public String uid;
     public String text;
@@ -20,16 +25,20 @@ public class Answer {
     private Map<String, Boolean> likes = new HashMap<>();
     private Map<String, Boolean> dislikes = new HashMap<>();
     private String date;
-    private User user;
+    private String author;
+    private String urlProfileImage;
+    private List<String> urlsImages;
 
     public Answer() {
     }
 
-    public Answer(String uid, String text, String date, User user) {
+    public Answer(String uid, String text, String date, String author, String urlProfileImage, List<String> urlsImages) {
         this.uid = uid;
         this.text = text;
         this.date = date;
-        this.user = user;
+        this.author = author;
+        this.urlProfileImage = urlProfileImage;
+        this.urlsImages = urlsImages;
     }
 
     public String getUid() {
@@ -88,12 +97,20 @@ public class Answer {
         this.date = date;
     }
 
-    public User getUser() {
-        return user;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getUrlProfileImage() {
+        return urlProfileImage;
+    }
+
+    public void setUrlProfileImage(String urlProfileImage) {
+        this.urlProfileImage = urlProfileImage;
     }
 
     @Override
@@ -101,12 +118,15 @@ public class Answer {
         return "Answer{" +
                 "uid='" + uid + '\'' +
                 ", text='" + text + '\'' +
-                ", likesCount=" + likesCount +
-                ", dislikesCount=" + dislikesCount +
-                ", likes=" + likes +
-                ", dislikes=" + dislikes +
+                ", likesCount=" + likesCount + '\'' +
+                ", dislikesCount=" + dislikesCount +  '\'' +
+                ", likes=" + likes + '\'' +
+                ", dislikes=" + dislikes + '\'' +
                 ", date='" + date + '\'' +
-                ", user=" + user +
+                ", author=" + author + '\'' +
+                ", urlProfileImage=" + urlProfileImage + '\'' +
+                ", urlsImages=" + urlsImages +
+
                 '}';
     }
 
@@ -120,7 +140,10 @@ public class Answer {
         answer.put("date", date);
         answer.put("likes", likes);
         answer.put("dislikes", dislikes);
-        answer.put("user", user);
+        answer.put("author", author);
+        answer.put("urlProfileImage", urlProfileImage);
+        answer.put("urlsImages", urlsImages);
         return answer;
     }
+
 }

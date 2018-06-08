@@ -4,6 +4,8 @@ package com.example.pamplins.apptfg.View;
  * Created by Gustavo on 21/02/2018.
  */
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
@@ -26,12 +28,16 @@ import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
@@ -61,6 +67,9 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private LinearLayoutManager mManager;
     private FirebaseRecyclerAdapter<Answer, AnswerAdapter.AnswerViewHolder> mAdapter;
     private DatabaseReference mDatabase;
+
+    private Button btnAdvAnswer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,16 +101,32 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
     private void initAnswerItems() {
+        etAnswer = findViewById(R.id.field_answer_text);
+        mRecycler = this.findViewById(R.id.recycler_answers);
+        mRecycler.setVisibility(View.GONE);
+        btnAnswer = findViewById(R.id.button_post_answer);
         btnAnswer.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ctrl.writeAnswerDB(currentDoubt, doubtKey, etAnswer, doubtReference, btnAnswer, DoubtDetailActivity.this);
+                ctrl.writeAnswerDB(currentDoubt, doubtKey, etAnswer, doubtReference, btnAnswer);
+                Utils.hideKeyboard(DoubtDetailActivity.this);
+
             }
         });
-        mRecycler = this.findViewById(R.id.recycler_answers);
-        mRecycler.setVisibility(View.GONE);
+        btnAdvAnswer = findViewById(R.id.button_advance_answer);
+        btnAdvAnswer.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent i = new Intent(DoubtDetailActivity.this, AdvAnswerActivity.class);
+                startActivity(i);
+            }
+        });
+
+
     }
 
     private void initDoubtItems() {
@@ -110,14 +135,13 @@ public class DoubtDetailActivity extends AppCompatActivity {
         tvDate = findViewById(R.id.tv_date);
         tvDescription = findViewById(R.id.post_description);
         tvSubject = findViewById(R.id.name_subject);
-        etAnswer = findViewById(R.id.field_answer_text);
         img = findViewById(R.id.post_author_photo);
-        btnAnswer = findViewById(R.id.button_post_answer);
         like = findViewById(R.id.like);
         numLikes = findViewById(R.id.num_likes);
         dislike = findViewById(R.id.dislike);
         numDisLikes = findViewById(R.id.num_dislikes);
         numAnswers = findViewById(R.id.num_answers);
+
     }
 
 
@@ -205,13 +229,13 @@ public class DoubtDetailActivity extends AppCompatActivity {
     }
 
     private void showMainDoubt(){
-        tvAuthor.setText(currentDoubt.getUser().getUserName());
+        tvAuthor.setText(currentDoubt.getAuthor());
         tvTitle.setText(currentDoubt.getTitle());
         tvDescription.setText(currentDoubt.getDescription());
         tvSubject.setText(currentDoubt.getSubject());
         tvDate.setText(currentDoubt.getDate());
         numAnswers.setText(String.valueOf(currentDoubt.getnAnswers()));
-        ctrl.showProfileImage(this, currentDoubt, img);
+        ctrl.showProfileImage(this, currentDoubt.getUrlProfileImage(), img);
         if(currentDoubt.getUrlsImages() != null){
             initCarousel();
         }else{

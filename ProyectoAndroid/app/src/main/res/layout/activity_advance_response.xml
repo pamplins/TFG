@@ -1,0 +1,151 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backGround"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tool_subject"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:titleTextColor="@color/colorName"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:layout_collapseMode="pin"
+        app:layout_scrollFlags="scroll|enterAlways" >
+
+        <ImageView
+            android:id="@+id/iv_new_adv_res"
+            android:onClick="addSubject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:paddingRight="16dp"
+            android:src="@mipmap/ic_doubt_upload" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <View
+        android:id="@+id/view_line_nd"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tv_new_doubt"
+        android:background="@color/colorLine" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:isScrollContainer="true">
+
+            <EditText
+                android:id="@+id/et_title_new_answer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="52dp"
+                android:background="@color/cardview_light_background"
+                android:hint="@string/title"
+                android:inputType="text"
+                android:maxLength="30"
+                android:padding="16dp"
+                android:textColor="@color/colorTextDoubt"
+                android:textColorHint="@color/colorButton"
+                android:theme="@style/MyEditText" />
+
+            <View
+                android:id="@+id/v_line"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/et_title_new_answer"
+                android:background="@color/colorLine" />
+
+            <EditText
+                android:id="@+id/et_description_new_answer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/v_line"
+                android:background="@color/cardview_light_background"
+                android:gravity="left"
+                android:hint="@string/description"
+                android:lines="10"
+                android:padding="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@color/colorTextDoubt"
+                android:textColorHint="@color/colorButton"
+                android:textSize="18dp"
+                android:theme="@style/MyEditText" />
+
+            <View
+                android:id="@+id/v_line2"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/et_description_new_answer"
+                android:background="@color/colorLine" />
+
+
+            <TextView
+                android:id="@+id/tv_optional"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/v_line2"
+                android:padding="16dp"
+                android:text="@string/optional"
+                android:textColor="@color/colorTextDoubt" />
+            <TextView
+                android:id="@+id/tv_upload_adv_res"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_optional"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="16dp"
+                android:background="@mipmap/ic_select_images_doubt" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle_items_answer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/tv_upload_adv_res"
+                android:layout_gravity="center"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingLeft="16dp"
+                android:scrollbars="horizontal"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                tools:listitem="@layout/items_carousel" />
+
+
+            <ProgressBar
+                android:id="@+id/progressBar_naa"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleX="0.50"
+                android:scaleY="0.50"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone">
+            </ProgressBar>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+</LinearLayout>

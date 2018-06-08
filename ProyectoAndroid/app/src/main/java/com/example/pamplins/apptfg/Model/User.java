@@ -3,6 +3,7 @@ package com.example.pamplins.apptfg.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Gustavo on 07/02/2018.
@@ -12,7 +13,9 @@ public class User {
     private String email;
     private String userName;
     private String urlProfileImage;
-    private ArrayList<String> subjects;
+    private List<String> subjects;
+    private List<String> uidDoubts;
+    private List<String> uidAnswers;
 
     public User(){
     }
@@ -22,6 +25,8 @@ public class User {
         this.email = email;
         this.urlProfileImage = urlProfileImage;
         subjects = new ArrayList<>( Arrays.asList(""));
+        uidDoubts = new ArrayList<>( Arrays.asList(""));
+        uidAnswers = new ArrayList<>( Arrays.asList(""));
     }
 
     public String getUserName() {
@@ -48,7 +53,7 @@ public class User {
         this.urlProfileImage = urlProfileImage;
     }
 
-    public ArrayList<String> getSubjects() {
+    public List<String> getSubjects() {
         return subjects;
     }
 
@@ -61,8 +66,32 @@ public class User {
             subjects.add("");
         }
     }
-    public void setSubjects(ArrayList<String> subjects) {
+    public void setSubjects(List<String> subjects) {
         this.subjects = subjects;
+    }
+
+    public void addNewDoubt(String uid){
+        if(getUidDoubts().get(0).equals("")){
+            getUidDoubts().set(0,uid);
+        }else{
+            uidDoubts.add(uid);
+        }
+    }
+
+    public void addNewAnswr(String uid){
+        if(getUidAnswers().get(0).equals("")){
+            getUidAnswers().set(0,uid);
+        }else{
+            uidAnswers.add(uid);
+        }
+    }
+
+    public List<String> getUidDoubts() {
+        return uidDoubts;
+    }
+
+    public List<String> getUidAnswers() {
+        return uidAnswers;
     }
 
     @Override

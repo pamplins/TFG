@@ -66,7 +66,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         viewHolder.img.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(activity.getClass().getName().contains("MainActivity")) {
+                if(activity.getClass().getName().contains("Activity")) {
                     removeImage(viewHolder.getAdapterPosition());
                 }
                 return true;

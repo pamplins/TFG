@@ -150,7 +150,7 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtAdapter.D
          */
         public void fillDoubt(final Doubt doubt, Activity activity, Controller ctrl) {
             titleView.setText(doubt.getTitle());
-            authorView.setText(doubt.getUser().getUserName());
+            authorView.setText(doubt.getAuthor());
             subject.setText(doubt.getSubject());
             numAnswers.setText(String.valueOf(doubt.getnAnswers()));
             int count = doubt.getDescription().split("\r\n|\r|\n").length;
@@ -169,7 +169,7 @@ public class DoubtAdapter  extends FirebaseRecyclerAdapter<Doubt, DoubtAdapter.D
                 }
             }
             date.setText(doubt.getDate());
-            ctrl.showProfileImage(activity, doubt, img);
+            ctrl.showProfileImage(activity, doubt.getUrlProfileImage(), img);
         }
 
         public void fillLikes(Doubt doubt, View.OnClickListener clickListener) {

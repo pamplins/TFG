@@ -60,6 +60,9 @@
         <activity android:name=".View.DoubtsActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
+        <activity android:name=".View.AdvAnswerActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
 
     </application>
 

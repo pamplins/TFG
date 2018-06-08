@@ -149,6 +149,7 @@ public class NewDoubtFragment extends Fragment {
                     .show();
         }
     }
+
     /**
      * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
      */

@@ -2,37 +2,38 @@ package com.example.pamplins.apptfg.Model;
 
 import com.google.firebase.database.Exclude;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by Gustavo on 19/02/2018.
  */
 public class Doubt {
-    private User user;
     private String uid;
+    private String author;
+    private String urlProfileImage;
     private String title;
     private String description;
     private int likesCount = 0;
     private int dislikesCount = 0;
-
     private String date;
     public Map<String, Boolean> likes = new HashMap<>();
     public Map<String, Boolean> dislikes = new HashMap<>();
     private long nAnswers;
-    private ArrayList<String> urlsImages;
+    private List<String> urlsImages;
     private String subject;
 
     public Doubt() {
     }
 
-    public Doubt(String uid, String title, String description, String date, User user, ArrayList<String> urlsImages, String subject) {
+    public Doubt(String uid, String title, String description, String date, String author, String urlProfileImage, List<String> urlsImages, String subject) {
         this.uid = uid;
         this.title = title;
         this.description = description;
         this.date = date;
-        this.user = user;
+        this.author = author;
+        this.urlProfileImage = urlProfileImage;
         this.nAnswers = 0;
         this.urlsImages = urlsImages;
         this.subject = subject;
@@ -53,6 +54,22 @@ public class Doubt {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getUrlProfileImage() {
+        return urlProfileImage;
+    }
+
+    public void setUrlProfileImage(String urlProfileImage) {
+        this.urlProfileImage = urlProfileImage;
     }
 
     public String getDescription() {
@@ -103,13 +120,6 @@ public class Doubt {
         this.dislikes = dislikes;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public long getnAnswers() {
         return nAnswers;
@@ -119,11 +129,11 @@ public class Doubt {
         this.nAnswers = nAnswers;
     }
 
-    public ArrayList<String> getUrlsImages() {
+    public List<String> getUrlsImages() {
         return urlsImages;
     }
 
-    public void setUrlsImages(ArrayList<String> urlsImages) {
+    public void setUrlsImages(List<String> urlsImages) {
         this.urlsImages = urlsImages;
     }
 
@@ -138,7 +148,8 @@ public class Doubt {
     @Override
     public String toString() {
         return "Doubt{" +
-                "user=" + user +
+                "author=" + author + '\'' +
+                ", urlProfileImage='" + urlProfileImage + '\'' +
                 ", uid='" + uid + '\'' +
                 ", subject='" + subject + '\'' +
                 ", title='" + title + '\'' +
@@ -147,8 +158,8 @@ public class Doubt {
                 ", dislikesCount=" + dislikesCount +
                 ", date='" + date + '\'' +
                 ", likes=" + likes +
-                ", dislikes=" + dislikes +
-                ", nAnswers=" + nAnswers +
+                ", dislikes=" + dislikes + '\'' +
+                ", nAnswers=" + nAnswers + '\'' +
                 ", urlImage='" + urlsImages + '\'' +
                 '}';
     }
@@ -165,7 +176,8 @@ public class Doubt {
         doubt.put("likes", likes);
         doubt.put("dislikes", dislikes);
         doubt.put("nAnswers", nAnswers);
-        doubt.put("user", user);
+        doubt.put("author", author);
+        doubt.put("urlProfileImage", urlProfileImage);
         doubt.put("urlsImages", urlsImages);
         doubt.put("subject", subject);
         return doubt;

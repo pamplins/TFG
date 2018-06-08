@@ -151,7 +151,7 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
         });
     }
 
-    public static class AnswerViewHolder extends RecyclerView.ViewHolder {
+    public class AnswerViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvAuthor;
         TextView tvDescription;
@@ -180,10 +180,10 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
 
 
         public void bindToPost(final Answer answer, Activity activity, Controller ctrl) {
-            tvAuthor.setText(answer.getUser().getUserName());
+            tvAuthor.setText(answer.getAuthor());
             tvDescription.setText(answer.getText());
             date.setText(answer.getDate());
-            ctrl.showProfileImage(activity, answer, img);
+            ctrl.showProfileImage(activity, answer.getUrlProfileImage(), img);
         }
 
         public void bindLikes (Answer answer, View.OnClickListener clickListener){

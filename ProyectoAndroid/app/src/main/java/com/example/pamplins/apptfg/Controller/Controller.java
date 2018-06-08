@@ -65,6 +65,7 @@ public class Controller {
     private StorageReference storageRef;
     private DatabaseReference usersRef;
     private DatabaseReference doubtsRef;
+    private DatabaseReference answersRef;
     private DatabaseReference subjectsRef;
     private DatabaseReference coursesRef;
 
@@ -78,6 +79,7 @@ public class Controller {
         storageRef = FirebaseStorage.getInstance().getReference();
         usersRef = db.getReference(Constants.REF_USERS);
         doubtsRef = db.getReference(Constants.REF_DOUBTS);
+        answersRef = db.getReference(Constants.REF_POST_ANSWERS);
         subjectsRef = db.getReference(Constants.REF_SUBJECTS);
         coursesRef = db.getReference(Constants.REF_COURSES);
 
@@ -141,9 +143,9 @@ public class Controller {
                 .child(Constants.REF_DOUBTS).child(uid);
     }
 
-    public DatabaseReference getUserDoubtReference(String uidDoubt){
+    public DatabaseReference getUserDoubtReference(String uidAuthor, String uidDoubt){
         return db.getReference()
-                .child(Constants.REF_USER_DOUBTS).child(getUid()).child(uidDoubt);
+                .child(Constants.REF_USER_DOUBTS).child(uidAuthor ).child(uidDoubt);
     }
 
     public DatabaseReference getAnswerReference(String uid){
@@ -203,12 +205,35 @@ public class Controller {
                 }
                 else{
                     //TODO hacer multi-path updates -- INCREMENTO 4
-                    usersRef.child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
-                   // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
+                    updateUserProfileImage(downloadUrl.toString());
+                    //usersRef.child(getUid()).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl);
+
+                    // db.child(Constants.REF_USERS).child(uid).child(Constants.REF_PROFILE_NAME).setValue(downloadUrl.toString());
 
                 }
             }
         });
+    }
+
+    private void updateUserProfileImage(String downloadUrl) {
+        Map<String, Object> updateMap = new HashMap();
+        updateMap.put("/"+Constants.REF_USERS+"/"+getUid()+"/"+Constants.REF_PROFILE_NAME, downloadUrl); //users
+
+        // doubts
+        for(String ref: user.getUidDoubts()){
+            updateMap.put("/"+Constants.REF_DOUBTS+"/"+ref+"/"+Constants.REF_PROFILE_NAME, downloadUrl);
+            updateMap.put("/"+Constants.REF_USER_DOUBTS+"/"+getUid()+"/"+ref+"/"+Constants.REF_PROFILE_NAME, downloadUrl);
+        }
+        // answrs
+        String doubtRef;
+        List<String> answers = user.getUidAnswers();
+        for(int i = 1; i < answers.size(); i+=2){
+            doubtRef =answers.get(i-1);
+            updateMap.put("/"+Constants.REF_POST_ANSWERS+"/"+doubtRef+"/"+answers.get(i)+"/"+Constants.REF_PROFILE_NAME, downloadUrl);
+
+        }
+        db.getReference().updateChildren(updateMap);
+
     }
 
     /**
@@ -229,20 +254,12 @@ public class Controller {
      * comentario que le pertoca
      *
      * @param activity
-     * @param obj
+     * @param urlImageProfile
      * @param img
      */
-    public void showProfileImage(Activity activity, Object obj, ImageView img) {
-        String url;
-        if(obj.getClass().equals(Doubt.class)){
-            url = ((Doubt)obj).getUser().getUrlProfileImage();
-        }else if(obj.getClass().equals(Answer.class)){
-            url = ((Answer)obj).getUser().getUrlProfileImage();
-        }else{
-            url = obj.toString();
-        }
+    public void showProfileImage(Activity activity, String urlImageProfile, ImageView img) {
         Glide.with(activity)
-                .load(url)
+                .load(urlImageProfile)
                 .into(img);
     }
 
@@ -338,9 +355,9 @@ public class Controller {
      * @param tvNewDoubt
      * @param subjectName
      */
-    private void uploadNewDoubt(String title, String body, ArrayList<String> array, List<Bitmap> bits, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
+    private void uploadNewDoubt(String title, String body, List<String> array, List<Bitmap> bits, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
         final String key = doubtsRef.push().getKey();
-        Doubt doubt = new Doubt(getUid(), title, body, getDate(), user, array, subjectName);
+        Doubt doubt = new Doubt(getUid(), title, body, getDate(), user.getUserName(), user.getUrlProfileImage(), array, subjectName);
         Map<String, Object> postValues = doubt.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -348,6 +365,9 @@ public class Controller {
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
 
         db.getReference().updateChildren(childUpdates);
+
+        user.addNewDoubt(key);
+        usersRef.child(getUid()).setValue(user);
 
         addDoubtToSubject(subjectName, key);
         postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView);
@@ -480,24 +500,32 @@ public class Controller {
      * @param etAnswer
      * @param doubtReference
      * @param btnAnswer
-     * @param activity
      */
-    public void writeAnswerDB(final Doubt currentdDoubt, final String uidDoubt, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer, final DoubtDetailActivity activity) {
+    public void writeAnswerDB(final Doubt currentdDoubt, final String uidDoubt, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer) {
         final String uid = getUid();
         final String answerText = etAnswer.getText().toString();
         if(answerText.trim().isEmpty()){
            etAnswer.setError("Entra comentario");
         }else {
+            final String key = answersRef.push().getKey();
             btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
-            Answer answer = new Answer(uid, answerText, getDate(), user);
+            Answer answer = new Answer(uid, answerText, getDate(), user.getUserName(), user.getUrlProfileImage(), null);
             Map<String, Object> answerValues = answer.toMap();
-            getAnswerReference(uidDoubt).push().setValue(answerValues);
+            //getAnswerReference(uidDoubt).push().setValue(answerValues);
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/"+Constants.REF_POST_ANSWERS+"/"+uidDoubt+"/"+key, answerValues);
+            db.getReference().updateChildren(childUpdates);
+
+            user.addNewAnswr(uidDoubt);
+            user.addNewAnswr(key);
+            usersRef.child(getUid()).setValue(user);
+
             etAnswer.setText(null);
             currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
             doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
-            getUserDoubtReference(uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
+            getUserDoubtReference(currentdDoubt.getUid(), uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
 
-            Utils.hideKeyboard(activity);
             btnAnswer.setEnabled(true);
         }
     }
@@ -513,7 +541,7 @@ public class Controller {
             ArrayList<String> subjects = new ArrayList<>(Arrays.asList(s.substring(1,s.length()-1).split(",")));
             for(String sub : subjects){
                 sub = sub.replaceFirst("^ *", "");
-                if(user.getSubjects().get(0).equals("")){
+                if(user.getSubjects().get(0).equals("")){//TODO quizas hacer esto en user
                     user.getSubjects().set(0,sub);
                 }else{
                     if(!user.getSubjects().contains(sub)){
