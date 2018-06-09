@@ -45,28 +45,12 @@
             android:layout_height="match_parent"
             android:isScrollContainer="true">
 
-            <EditText
-                android:id="@+id/et_title_new_answer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="52dp"
-                android:background="@color/cardview_light_background"
-                android:hint="@string/title"
-                android:inputType="text"
-                android:maxLength="30"
-                android:padding="16dp"
-                android:textColor="@color/colorTextDoubt"
-                android:textColorHint="@color/colorButton"
-                android:theme="@style/MyEditText" />
+
 
             <View
                 android:id="@+id/v_line"
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:layout_below="@+id/et_title_new_answer"
                 android:background="@color/colorLine" />
 
             <EditText
@@ -78,7 +62,7 @@
                 android:layout_below="@+id/v_line"
                 android:background="@color/cardview_light_background"
                 android:gravity="left"
-                android:hint="@string/description"
+                android:hint="@string/response"
                 android:lines="10"
                 android:padding="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -105,7 +89,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/v_line2"
                 android:padding="16dp"
-                android:text="@string/optional"
+                android:text="@string/add_image_answer"
                 android:textColor="@color/colorTextDoubt" />
             <TextView
                 android:id="@+id/tv_upload_adv_res"

@@ -125,7 +125,7 @@
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="39dp"
             android:layout_height="35dp"
-            android:background="@mipmap/ic_advance_response" />
+            android:background="@mipmap/ic_select_images_doubt" />
 
         <EditText
             android:id="@+id/field_answer_text"
@@ -139,8 +139,8 @@
             android:minLines="1"
             android:scrollbars="vertical" />
 
-        <Button
-            android:id="@+id/button_post_answer"
+        <ImageView
+            android:id="@+id/iv_post_answer"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="39dp"
             android:layout_height="35dp"

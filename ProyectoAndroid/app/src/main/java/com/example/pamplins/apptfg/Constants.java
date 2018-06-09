@@ -15,6 +15,8 @@ public class Constants {
 
     public static final String REF_DOUBT_IMAGES = "doubt_images/";
     public static final String REF_DOUBT_NAME = "image-doubt";
+    public static final String REF_ANSWER_IMAGES = "answer_images/";
+    public static final String REF_ANSWER_NAME = "image-answer";
 
     public static final String REF_PROFILE_IMAGES = "user_images/";
     public static final String REF_PROFILE_NAME = "urlProfileImage";

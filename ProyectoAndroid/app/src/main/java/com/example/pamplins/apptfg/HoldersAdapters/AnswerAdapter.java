@@ -1,6 +1,7 @@
 package com.example.pamplins.apptfg.HoldersAdapters;
 
 import android.app.Activity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+
+import java.util.List;
 
 /**
  * Created by Gustavo on 12/03/2018.
@@ -52,6 +55,9 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
         checkLikesDisAnswer(answer, viewHolder);
         viewHolder.bindToPost(answer, activity, ctrl);
         votesDoubt(answer, viewHolder, postKeyAnswer);
+        if(answer.getUrlsImages() != null){
+            viewHolder.initCarousel(activity, answer);
+        }
     }
 
     private void votesDoubt(Answer answer, AnswerViewHolder viewHolder, final String postKeyAnswer) {
@@ -161,6 +167,7 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
         TextView numDisLikes;
         ImageView dislike;
         TextView date;
+        RecyclerView mRecycler_items;
 
         public AnswerViewHolder(View itemView) {
             super(itemView);
@@ -194,6 +201,15 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
         public void bindDisLikes (Answer answer, View.OnClickListener clickListener){
             numDisLikes.setText(String.valueOf(answer.getDislikesCount()));
             dislike.setOnClickListener(clickListener);
+        }
+
+        public void initCarousel(Activity activity, Answer answer){
+            mRecycler_items = itemView.findViewById(R.id.recycle_items_adv_res);
+            mRecycler_items.setHasFixedSize(true);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
+            mRecycler_items.setLayoutManager(linearLayoutManager);
+            ImageViewAdapter imageViewAdapter = new ImageViewAdapter(activity, answer.getUrlsImages());
+            mRecycler_items.setAdapter(imageViewAdapter);
         }
 
     }

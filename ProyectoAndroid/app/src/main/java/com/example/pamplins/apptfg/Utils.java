@@ -12,6 +12,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 /**
  * Created by gtenorio on 05/02/2018.
@@ -51,6 +55,23 @@ public class Utils {
         });
     }
 
+    public static boolean hasActiveInternetConnection(Activity activity) {
+        if (isNetworkAvailable(activity)) {
+            try {
+                HttpURLConnection urlc = (HttpURLConnection)
+                        (new URL("http://clients3.google.com/generate_204")
+                                .openConnection());
+                urlc.setRequestProperty("User-Agent", "Test");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1500);
+                urlc.connect();
+                return (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0);
+            } catch (IOException e) {
+            }
+        } else {
+        }
+        return false;
+    }
     public static boolean isNetworkAvailable(Activity activity) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -1,11 +1,14 @@
 package com.example.pamplins.apptfg.Fragments;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -27,10 +30,12 @@ import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 
+import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +64,7 @@ public class NewDoubtFragment extends Fragment {
     private ProgressBar progressBar;
     private List<String> subjects;
     private AutoCompleteTextView textView;
-
+    ImageViewAdapter imageViewAdapter;
     public NewDoubtFragment() {
     }
 
@@ -173,38 +178,46 @@ public class NewDoubtFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK){
-             Bitmap bitmap = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(data.getClipData() != null){
-                    int totalItemsSelected = data.getClipData().getItemCount();
-                    Uri fileUri;
-                    for(int i = 0; i < totalItemsSelected; i++){
-                        fileUri = data.getClipData().getItemAt(i).getUri();
+                if(urlsImages.size() != 8) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
+                    if (data.getClipData() != null) {
+                        int totalItemsSelected = data.getClipData().getItemCount();
+                        if (totalItemsSelected < 9) {
+                            Uri fileUri;
+                            for (int i = 0; i < totalItemsSelected; i++) {
+                                fileUri = data.getClipData().getItemAt(i).getUri();
+                                urlsImages.add(fileUri.toString());
+                                try {
+                                    bitImages.add(MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            createRecycleView();
+                        } else {
+                            Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_max_images, Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
+
+                    } else if (data.getData() != null) {
+                        Uri fileUri = data.getData();
                         urlsImages.add(fileUri.toString());
                         try {
-                            bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri);
+                            bitImages.add(MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        bitImages.add(bitmap);
-
+                        // bitImages.add(ctrl.getBitmapFromUri(fileUri, getActivity()));
+                        createRecycleView();
                     }
-                    createRecycleView();
-                }else if(data.getData() != null){
-                    Uri fileUri = data.getData();
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    urlsImages.add(fileUri.toString());
-                    bitImages.add(bitmap);
-                    createRecycleView();
+                }else{
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.limit_max_images, Snackbar.LENGTH_LONG)
+                            .show();
                 }
-
             }
         }
     }
+
 
     /**
      * Funcion encargada de craear el recycleView que es donde iran las imagenes seleccionadas
@@ -214,8 +227,34 @@ public class NewDoubtFragment extends Fragment {
         mRecycler_items.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycler_items.setLayoutManager(linearLayoutManager);
-        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
+        imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
         mRecycler_items.setAdapter(imageViewAdapter);
+        imageViewAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                if(urlsImages.isEmpty()){
+                    bitImages.clear();
+                }else{
+                    checkImagesDeleted();
+                }
+            }
+        });
+    }
+
+    private void checkImagesDeleted() {
+        for(String uri : urlsImages){
+            //Bitmap bit = ctrl.getBitmapFromUri(Uri.parse(uri), getActivity());
+            try {
+                Bitmap bit  = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(uri));
+                if(bitImages.indexOf(bit) == -1){
+                    bitImages.remove(bit);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
     }
 
     private void sendDoubt() {

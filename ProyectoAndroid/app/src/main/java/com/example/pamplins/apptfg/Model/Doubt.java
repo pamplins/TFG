@@ -2,6 +2,7 @@ package com.example.pamplins.apptfg.Model;
 
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Created by Gustavo on 19/02/2018.
  */
-public class Doubt {
+public class Doubt implements Serializable{
     private String uid;
     private String author;
     private String urlProfileImage;

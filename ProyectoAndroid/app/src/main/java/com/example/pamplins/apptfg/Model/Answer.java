@@ -41,6 +41,10 @@ public class Answer{
         this.urlsImages = urlsImages;
     }
 
+    public List<String> getUrlsImages() {
+        return urlsImages;
+    }
+
     public String getUid() {
         return uid;
     }

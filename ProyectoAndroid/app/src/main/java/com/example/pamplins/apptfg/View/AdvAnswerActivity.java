@@ -1,6 +1,5 @@
 package com.example.pamplins.apptfg.View;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -22,9 +21,9 @@ import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
+import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,8 +35,7 @@ import java.util.List;
 
 public class AdvAnswerActivity extends AppCompatActivity {
 
-    private EditText etTitle;
-    private EditText etDescription;
+    private EditText etAnswer;
     private Controller ctrl;
 
     private RecyclerView mRecycler_items;
@@ -45,19 +43,24 @@ public class AdvAnswerActivity extends AppCompatActivity {
     private List<Bitmap> bitImages;
 
     private ProgressBar progressBar;
-    private List<String> subjects;
     private TextView tvUpload;
     private ImageView tvNewAdvRes;
+    private Doubt currentDoubt;
+    private String doubtKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advance_response);
         initToolbar();
-
+        currentDoubt = (Doubt) getIntent().getSerializableExtra("currentDoubt");
+        doubtKey = (String) getIntent().getSerializableExtra("doubtKey");
+        if (currentDoubt == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
+        }
+        ctrl = Controller.getInstance();
         progressBar = findViewById(R.id.progressBar_naa);
-        etTitle = findViewById(R.id.et_title_new_answer);
-        etDescription = findViewById(R.id.et_description_new_answer);
+        etAnswer = findViewById(R.id.et_description_new_answer);
 
         tvUpload = findViewById(R.id.tv_upload_adv_res);
 
@@ -89,7 +92,7 @@ public class AdvAnswerActivity extends AppCompatActivity {
      */
     private void preWriteDoubt() {
         progressBar.setVisibility(View.VISIBLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, // bloquea la pantalla hasta que la duda se suba
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         Utils.hideKeyboard(this);
     }
@@ -97,19 +100,27 @@ public class AdvAnswerActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.tool_subject);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("RESPUESTA");
+        getSupportActionBar().setTitle(R.string.title_response);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 
     private void sendDoubt() {
-        final String title = etTitle.getText().toString();
-        final String description = etDescription.getText().toString();
+        final String answer = etAnswer.getText().toString();
         if(Utils.isNetworkAvailable(this)) {
-            if (checkInputs(title, description)) {
-                preWriteDoubt();
-                //ctrl.writeAnswerDB(currentDoubt, doubtKey, etAnswer, doubtReference, btnAnswer);
+            if (checkInputs(answer)) {
+                //preWriteDoubt();
+                final String answerText = etAnswer.getText().toString();
+                if (answerText.trim().isEmpty()) {
+                    etAnswer.setError(getResources().getString(R.string.empty_answer));
+                }else{
+                    if(bitImages.isEmpty()){
+                        ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, tvNewAdvRes, null, AdvAnswerActivity.this);
+                    }else{
+                        ctrl.uploadImages(bitImages, currentDoubt, doubtKey, answerText, tvNewAdvRes, AdvAnswerActivity.this);
+                    }
+                    Utils.hideKeyboard(AdvAnswerActivity.this);
+                }
 
-                //ctrl.writeDoubtDB(title, description, bitImages, getActivity(), etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
                 if (!urlsImages.isEmpty()) {
                     urlsImages.clear();
                     mRecycler_items.getAdapter().notifyDataSetChanged();
@@ -122,24 +133,17 @@ public class AdvAnswerActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkInputs(String title, String description){
-        boolean c_title = title.trim().length() < 7;
-        boolean c_descp = description.trim().length() < 10;
+    private boolean checkInputs(String answer){
+        boolean c_answer = answer.trim().length() < 10;
 
-        if(c_title){
-            etTitle.setError(getResources().getString(R.string.err_len_et));
+        if(c_answer){
+            etAnswer.setError(getResources().getString(R.string.err_len_et));
         }
-        if(title.trim().isEmpty()){
-            etTitle.setError(getResources().getString(R.string.err_title_empty));
-        }
-        if(c_descp){
-            etDescription.setError(getResources().getString(R.string.err_len_et));
-        }
-        if(description.trim().isEmpty()){
-            etDescription.setError(getResources().getString(R.string.err_description_empty));
+        if(answer.trim().isEmpty()){
+            etAnswer.setError(getResources().getString(R.string.empty_answer));
         }
 
-        if(!(c_title) && !(c_descp)){
+        if(!(c_answer)){
             return true;
         }
         return false;

@@ -2,8 +2,10 @@ package com.example.pamplins.apptfg.Controller;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.example.pamplins.apptfg.Constants;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.Utils;
+import com.example.pamplins.apptfg.View.AdvAnswerActivity;
 import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.example.pamplins.apptfg.Model.Answer;
 import com.example.pamplins.apptfg.Model.Doubt;
@@ -43,6 +46,8 @@ import com.google.firebase.storage.UploadTask;
 import org.w3c.dom.Comment;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -495,38 +500,37 @@ public class Controller {
 
     /**
      * Metodo encargado de escribir la respuesta en una duda en concreto
-     *  @param currentdDoubt
+     * @param currentdDoubt
      * @param uidDoubt
-     * @param etAnswer
-     * @param doubtReference
-     * @param btnAnswer
+     * @param answerText
+     * @param ivAnswer
+     * @param activity
      */
-    public void writeAnswerDB(final Doubt currentdDoubt, final String uidDoubt, final EditText etAnswer, final DatabaseReference doubtReference, final Button btnAnswer) {
+    public void writeAnswerDB(final Doubt currentdDoubt, final String uidDoubt, final String answerText, final ImageView ivAnswer, List<String> urlImages, Activity activity) {
         final String uid = getUid();
-        final String answerText = etAnswer.getText().toString();
-        if(answerText.trim().isEmpty()){
-           etAnswer.setError("Entra comentario");
-        }else {
-            final String key = answersRef.push().getKey();
-            btnAnswer.setEnabled(false); // evitar multiples creaciones de dudas
-            Answer answer = new Answer(uid, answerText, getDate(), user.getUserName(), user.getUrlProfileImage(), null);
-            Map<String, Object> answerValues = answer.toMap();
-            //getAnswerReference(uidDoubt).push().setValue(answerValues);
+        final String key = answersRef.push().getKey();
+        ivAnswer.setEnabled(false); // evitar multiples creaciones de dudas
 
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/"+Constants.REF_POST_ANSWERS+"/"+uidDoubt+"/"+key, answerValues);
-            db.getReference().updateChildren(childUpdates);
+        Answer answer = new Answer(uid, answerText, getDate(), user.getUserName(), user.getUrlProfileImage(), urlImages);
+        Map<String, Object> answerValues = answer.toMap();
+        //getAnswerReference(uidDoubt).push().setValue(answerValues);
 
-            user.addNewAnswr(uidDoubt);
-            user.addNewAnswr(key);
-            usersRef.child(getUid()).setValue(user);
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/"+Constants.REF_POST_ANSWERS+"/"+uidDoubt+"/"+key, answerValues);
+        db.getReference().updateChildren(childUpdates);
 
-            etAnswer.setText(null);
-            currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
-            doubtReference.child("nAnswers").setValue(currentdDoubt.getnAnswers());
-            getUserDoubtReference(currentdDoubt.getUid(), uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
+        user.addNewAnswr(uidDoubt);
+        user.addNewAnswr(key);
+        usersRef.child(getUid()).setValue(user);
 
-            btnAnswer.setEnabled(true);
+        currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
+        getDoubtReference(uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
+        getUserDoubtReference(currentdDoubt.getUid(), uidDoubt).child("nAnswers").setValue(currentdDoubt.getnAnswers());
+        ivAnswer.setEnabled(true);
+
+
+        if(activity.getClass().getName().contains("Answer")) {
+            activity.finish();
         }
     }
 
@@ -555,5 +559,48 @@ public class Controller {
         }
         usersRef.child(getUid()).setValue(user);
 
+    }
+
+    public void uploadImages(final List<Bitmap> bitImages, final Doubt currentdDoubt, final String uidDoubt, final String answerText, final ImageView ivAnswer, final Activity activity) {
+        StorageReference fileToUpload;
+        final ArrayList<String> finalUrl = new ArrayList<>();
+        for(int i = 0; i < bitImages.size(); i++){
+            String ref = Constants.REF_ANSWER_IMAGES + getUid() + "/" + Constants.REF_ANSWER_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
+            fileToUpload = storageRef.child(ref);
+            Bitmap bit = bitImages.get(i);
+            bit = getVerticalBit(bit);
+            final int finalI = i;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bit.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] fileInBytes = baos.toByteArray();
+            fileToUpload.putBytes(fileInBytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                    finalUrl.add(downloadUrl.toString());
+                    if(finalI == bitImages.size()-1) {
+                        writeAnswerDB(currentdDoubt, uidDoubt,answerText, ivAnswer, finalUrl, activity);
+
+                    }
+                }
+            });
+        }
+    }
+
+    public Bitmap getBitmapFromUri(Uri selectedFileUri, Activity activity) {
+        Bitmap bit = null;
+        try {
+            ParcelFileDescriptor parcelFileDescriptor =
+                    activity.getContentResolver().openFileDescriptor(selectedFileUri, "r");
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            bit = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+            parcelFileDescriptor.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bit;
     }
 }

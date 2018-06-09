@@ -54,7 +54,6 @@
     <string name="err_description_empty">Entra descripción</string>
     <string name="err_subject_empty">Entra asignatura</string>
     <string name="err_subject">Asignatura incorrecta</string>
-    <string name="err_conex">No dispones de conexión a internet</string>
     <string name="err_empty_subject">Esta asignatura no dispone de ninguna duda</string>
     <string name="alert_remove_image">¿Realmente quieres eliminar esta imagen?</string>
     <string name="yes">Sí</string>
@@ -77,5 +76,13 @@
     <string name="alert_exit">¿Estás seguro que quieres salir?</string>
 
     <string name="title_new_adv_answer">Respuesta avanzada</string>
+    <string name="response">Respuesta:</string>
+    <string name="slow_connection">Comprueba tu conexión a internet. En cuanto esté disponible, iniciaremos la aplicación</string>
+    <string name="add_image_answer">Añade alguna imagen a tu respuesta:</string>
+    <string name="err_conex">Comprueba tu conexión a internet y vuelve a intentarlo</string>
+    <string name="title_response">RESPUESTA</string>
+    <string name="empty_answer">Entra la respuesta</string>
+    <string name="err_max_images">Selecciona bloques de 5 imagenes a la vez por favor</string>
+    <string name="limit_max_images">Has llegado al límite de imagenes por duda</string>
 
 </resources>

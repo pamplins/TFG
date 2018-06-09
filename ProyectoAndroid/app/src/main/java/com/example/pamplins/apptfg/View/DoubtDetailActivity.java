@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,7 +52,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private TextView tvSubject;
     private EditText etAnswer;
     private ImageView img;
-    private Button btnAnswer;
+    private ImageView ivAnswer;
 
     public TextView numLikes;
     public ImageView like;
@@ -104,14 +105,23 @@ public class DoubtDetailActivity extends AppCompatActivity {
         etAnswer = findViewById(R.id.field_answer_text);
         mRecycler = this.findViewById(R.id.recycler_answers);
         mRecycler.setVisibility(View.GONE);
-        btnAnswer = findViewById(R.id.button_post_answer);
-        btnAnswer.setOnClickListener(new View.OnClickListener()
+        ivAnswer = findViewById(R.id.iv_post_answer);
+        ivAnswer.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                ctrl.writeAnswerDB(currentDoubt, doubtKey, etAnswer, doubtReference, btnAnswer);
-                Utils.hideKeyboard(DoubtDetailActivity.this);
+            public void onClick(View v) {
+                final String answerText = etAnswer.getText().toString();
+                if(Utils.isNetworkAvailable(DoubtDetailActivity.this)) {
+                    if (answerText.trim().isEmpty()) {
+                        etAnswer.setError("Entra comentario");
+                    } else {
+                        ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, ivAnswer, null, DoubtDetailActivity.this);
+                        Utils.hideKeyboard(DoubtDetailActivity.this);
+                    }
+                }else{
+                    Snackbar.make(DoubtDetailActivity.this.findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
+                            .show();
+                }
 
             }
         });
@@ -122,6 +132,8 @@ public class DoubtDetailActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 Intent i = new Intent(DoubtDetailActivity.this, AdvAnswerActivity.class);
+                i.putExtra("currentDoubt", currentDoubt);
+                i.putExtra("doubtKey", doubtKey);
                 startActivity(i);
             }
         });
