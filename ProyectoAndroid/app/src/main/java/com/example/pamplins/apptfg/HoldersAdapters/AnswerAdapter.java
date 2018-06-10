@@ -52,12 +52,16 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
     protected void onBindViewHolder(final AnswerViewHolder viewHolder, int position, final Answer answer) {
         final DatabaseReference postRefAnswer = getRef(viewHolder.getAdapterPosition());
         final String postKeyAnswer = postRefAnswer.getKey();
+        if(answer.getUrlsImages() != null){
+            viewHolder.initCarousel(activity, answer);
+
+        }else{
+            viewHolder.mRecycler_items.setVisibility(View.GONE);
+        }
         checkLikesDisAnswer(answer, viewHolder);
         viewHolder.bindToPost(answer, activity, ctrl);
         votesDoubt(answer, viewHolder, postKeyAnswer);
-        if(answer.getUrlsImages() != null){
-            viewHolder.initCarousel(activity, answer);
-        }
+
     }
 
     private void votesDoubt(Answer answer, AnswerViewHolder viewHolder, final String postKeyAnswer) {
@@ -183,6 +187,8 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
             dislike = itemView.findViewById(R.id.dislike_answer);
             numDisLikes = itemView.findViewById(R.id.num_dislikes_answer);
             date = itemView.findViewById(R.id.tv_date_answer);
+            mRecycler_items = itemView.findViewById(R.id.recycle_items_adv_res);
+
         }
 
 
@@ -204,7 +210,7 @@ public class AnswerAdapter extends FirebaseRecyclerAdapter<Answer, AnswerAdapter
         }
 
         public void initCarousel(Activity activity, Answer answer){
-            mRecycler_items = itemView.findViewById(R.id.recycle_items_adv_res);
+            mRecycler_items.setVisibility(View.VISIBLE);
             mRecycler_items.setHasFixedSize(true);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
             mRecycler_items.setLayoutManager(linearLayoutManager);

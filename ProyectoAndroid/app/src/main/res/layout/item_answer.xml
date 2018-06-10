@@ -79,6 +79,7 @@
         android:orientation="horizontal"
         android:paddingLeft="16dp"
         android:scrollbars="horizontal"
+        android:visibility="gone"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         tools:listitem="@layout/items_carousel" />
     </LinearLayout>

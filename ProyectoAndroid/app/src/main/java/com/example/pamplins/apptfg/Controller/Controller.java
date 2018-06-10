@@ -273,8 +273,7 @@ public class Controller {
      * Si esta duda no contiene ninguna imagen la crea directamente, sino,
      * primero sube las imagenes a storage y luego crea la duda con las urls
      * a estas imagenes
-     *
-     * @param title
+     *  @param title
      * @param body
      * @param bits
      * @param ac
@@ -286,19 +285,18 @@ public class Controller {
      * @param tvNewDoubt
      * @param subject
      */
-    public void writeDoubtDB(String title, String body, List<Bitmap> bits, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
+    public void writeDoubtDB(String title, String body, Map<String, Bitmap> bits, Activity ac, EditText etTitle, EditText etDescription, AutoCompleteTextView textView, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, String subject){
         if(!bits.isEmpty()){
             uploadImagesDoubt(title, body, bits, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }else{
-            uploadNewDoubt(title, body, new ArrayList<String>(), bits, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
+            uploadNewDoubt(title, body, new ArrayList<String>(), ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
         }
     }
 
     /**
      * Metodo encargado de subir las imagenes de la duda y una vez subidas,
      * crear la duda con las ulrs obtenidas de estas
-     *
-     * @param title
+     *  @param title
      * @param body
      * @param url1
      * @param ac
@@ -310,13 +308,14 @@ public class Controller {
      * @param tvNewDoubt
      * @param subject
      */
-    private void uploadImagesDoubt(final String title, final String body, final List<Bitmap> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
+    private void uploadImagesDoubt(final String title, final String body, final Map<String, Bitmap> url1, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subject) {
         StorageReference fileToUpload;
         final ArrayList<String> finalUrl = new ArrayList<>();
-        for(int i = 0; i < url1.size(); i++){
+        int i = 0;
+        for(String key: url1.keySet()){
             String ref = Constants.REF_DOUBT_IMAGES + getUid() + "/" + title + "/" + Constants.REF_DOUBT_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             fileToUpload = storageRef.child(ref);
-            Bitmap bit = url1.get(i);
+            Bitmap bit = url1.get(key);
             bit = getVerticalBit(bit);
             final int finalI = i;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -325,13 +324,14 @@ public class Controller {
             fileToUpload.putBytes(fileInBytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                    finalUrl.add(downloadUrl.toString());
-                    if(finalI == url1.size()-1) {
-                        uploadNewDoubt(title, body, finalUrl, url1, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
-                    }
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                finalUrl.add(downloadUrl.toString());
+                if(finalI == url1.keySet().size()-1) {
+                    uploadNewDoubt(title, body, finalUrl, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
+                }
                 }
             });
+            i++;
         }
     }
 
@@ -350,7 +350,6 @@ public class Controller {
      *  @param title
      * @param body
      * @param array
-     * @param bits
      * @param ac
      * @param etTitle
      * @param etDescription
@@ -360,7 +359,7 @@ public class Controller {
      * @param tvNewDoubt
      * @param subjectName
      */
-    private void uploadNewDoubt(String title, String body, List<String> array, List<Bitmap> bits, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
+    private void uploadNewDoubt(String title, String body, List<String> array, final Activity ac, final EditText etTitle, final EditText etDescription, final AutoCompleteTextView textView, final ProgressBar progressBar, final TextView tvUpload, final ImageView tvNewDoubt, final String subjectName){
         final String key = doubtsRef.push().getKey();
         Doubt doubt = new Doubt(getUid(), title, body, getDate(), user.getUserName(), user.getUrlProfileImage(), array, subjectName);
         Map<String, Object> postValues = doubt.toMap();
@@ -561,13 +560,14 @@ public class Controller {
 
     }
 
-    public void uploadImages(final List<Bitmap> bitImages, final Doubt currentdDoubt, final String uidDoubt, final String answerText, final ImageView ivAnswer, final Activity activity) {
+    public void uploadImages(final HashMap<String, Bitmap> bitImages, final Doubt currentdDoubt, final String uidDoubt, final String answerText, final ImageView ivAnswer, final Activity activity) {
         StorageReference fileToUpload;
         final ArrayList<String> finalUrl = new ArrayList<>();
-        for(int i = 0; i < bitImages.size(); i++){
+        int i = 0;
+        for(String key : bitImages.keySet()){
             String ref = Constants.REF_ANSWER_IMAGES + getUid() + "/" + Constants.REF_ANSWER_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             fileToUpload = storageRef.child(ref);
-            Bitmap bit = bitImages.get(i);
+            Bitmap bit = bitImages.get(key);
             bit = getVerticalBit(bit);
             final int finalI = i;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -584,23 +584,7 @@ public class Controller {
                     }
                 }
             });
+            i++;
         }
-    }
-
-    public Bitmap getBitmapFromUri(Uri selectedFileUri, Activity activity) {
-        Bitmap bit = null;
-        try {
-            ParcelFileDescriptor parcelFileDescriptor =
-                    activity.getContentResolver().openFileDescriptor(selectedFileUri, "r");
-            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-            bit = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-
-            parcelFileDescriptor.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bit;
     }
 }

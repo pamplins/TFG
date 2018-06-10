@@ -82,7 +82,7 @@
     <string name="err_conex">Comprueba tu conexión a internet y vuelve a intentarlo</string>
     <string name="title_response">RESPUESTA</string>
     <string name="empty_answer">Entra la respuesta</string>
-    <string name="err_max_images">Selecciona bloques de 5 imagenes a la vez por favor</string>
+    <string name="err_max_images">Selecciona un máximo de 9 imagenes</string>
     <string name="limit_max_images">Has llegado al límite de imagenes por duda</string>
 
 </resources>

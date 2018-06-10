@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -66,8 +67,10 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         viewHolder.img.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(activity.getClass().getName().contains("Answer") || activity.getClass().getName().contains("Main") ) {
-                    removeImage(viewHolder.getAdapterPosition());
+                if(activity.getClass().getName().contains("Answer") || activity.getClass().getName().contains("Main")) {
+                    viewHolder.img.setBackgroundColor(Color.RED);
+                    viewHolder.img.setAlpha(0.5f);
+                    removeImage(viewHolder.getAdapterPosition(), viewHolder);
                 }
                 return true;
 
@@ -75,8 +78,14 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         });
     }
 
-    private void removeImage(final int adapterPosition) {
-        new AlertDialog.Builder(activity)
+    private void removeImage(final int adapterPosition, final ImageViewHolder viewHolder) {
+        new AlertDialog.Builder(activity).setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                viewHolder.img.setAlpha(1f);
+                viewHolder.img.setBackgroundColor(Color.WHITE);
+            }
+        })
         .setMessage(R.string.alert_remove_image)
         .setIcon(android.R.drawable.ic_dialog_alert)
         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -86,7 +95,13 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
                 notifyItemRemoved(adapterPosition);
                 notifyItemRangeChanged(adapterPosition, urlImagesDoubt.size());
             }})
-        .setNegativeButton(R.string.not, null).show();
+        .setNegativeButton(R.string.not, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                viewHolder.img.setAlpha(1f);
+                viewHolder.img.setBackgroundColor(Color.WHITE);
+            }
+        }).show();
 
     }
 

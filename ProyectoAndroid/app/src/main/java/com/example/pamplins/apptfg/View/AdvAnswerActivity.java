@@ -27,7 +27,10 @@ import com.example.pamplins.apptfg.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Gustavo on 06/06/2018.
@@ -40,7 +43,7 @@ public class AdvAnswerActivity extends AppCompatActivity {
 
     private RecyclerView mRecycler_items;
     private List<String> urlsImages;
-    private List<Bitmap> bitImages;
+    private HashMap<String, Bitmap> bitImages;
 
     private ProgressBar progressBar;
     private TextView tvUpload;
@@ -84,7 +87,7 @@ public class AdvAnswerActivity extends AppCompatActivity {
             }
         });
         urlsImages = new ArrayList<>();
-        bitImages = new ArrayList<>();
+        bitImages = new HashMap<>();
     }
     /**
      * Funcion encargada de deshabilitar la pantalla una vez el usuario ha presionado el boton de subir la duda
@@ -108,7 +111,6 @@ public class AdvAnswerActivity extends AppCompatActivity {
         final String answer = etAnswer.getText().toString();
         if(Utils.isNetworkAvailable(this)) {
             if (checkInputs(answer)) {
-                //preWriteDoubt();
                 final String answerText = etAnswer.getText().toString();
                 if (answerText.trim().isEmpty()) {
                     etAnswer.setError(getResources().getString(R.string.empty_answer));
@@ -160,6 +162,27 @@ public class AdvAnswerActivity extends AppCompatActivity {
         mRecycler_items.setLayoutManager(linearLayoutManager);
         ImageViewAdapter imageViewAdapter = new ImageViewAdapter(this, urlsImages);
         mRecycler_items.setAdapter(imageViewAdapter);
+        imageViewAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                if(urlsImages.isEmpty()){
+                    bitImages.clear();
+                }else{
+                    checkImagesDeleted();
+                }
+            }
+        });
+    }
+
+    private void checkImagesDeleted() {
+        Iterator<Map.Entry<String,Bitmap>> iter = bitImages.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Bitmap> entry = iter.next();
+            if(!urlsImages.contains(entry.getKey())) {
+                bitImages.get(entry.getKey()).recycle();
+                iter.remove();
+
+            }
+        }
     }
 
     private void selectImage() {
@@ -194,36 +217,50 @@ public class AdvAnswerActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK){
-            Bitmap bitmap = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(data.getClipData() != null){
-                    int totalItemsSelected = data.getClipData().getItemCount();
-                    Uri fileUri;
-                    for(int i = 0; i < totalItemsSelected; i++){
-                        fileUri = data.getClipData().getItemAt(i).getUri();
+                if(urlsImages.size() < 9) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
+                    if (data.getClipData() != null) {
+                        int totalItemsSelected = data.getClipData().getItemCount();
+                        if (totalItemsSelected < 9 && (urlsImages.size()-1+totalItemsSelected) < 9) {
+                            Uri fileUri;
+                            for (int i = 0; i < totalItemsSelected; i++) {
+                                fileUri = data.getClipData().getItemAt(i).getUri();
+                                urlsImages.add(fileUri.toString());
+                                try {
+                                    bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            createRecycleView();
+                        } else {
+                            Snackbar.make(findViewById(android.R.id.content), R.string.err_max_images, Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
+
+                    } else if (data.getData() != null) {
+                        Uri fileUri = data.getData();
                         urlsImages.add(fileUri.toString());
                         try {
-                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri);
+                            bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        bitImages.add(bitmap);
-
+                        createRecycleView();
                     }
-                    createRecycleView();
-                }else if(data.getData() != null){
-                    Uri fileUri = data.getData();
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    urlsImages.add(fileUri.toString());
-                    bitImages.add(bitmap);
-                    createRecycleView();
+                }else{
+                    Snackbar.make(findViewById(android.R.id.content), R.string.limit_max_images, Snackbar.LENGTH_LONG)
+                            .show();
                 }
-
             }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(String key: bitImages.keySet()) {
+            bitImages.get(key).recycle();
         }
     }
 

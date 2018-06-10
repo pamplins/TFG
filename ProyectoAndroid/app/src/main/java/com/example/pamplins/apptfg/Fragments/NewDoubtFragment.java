@@ -38,7 +38,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -56,7 +60,7 @@ public class NewDoubtFragment extends Fragment {
 
     private RecyclerView mRecycler_items;
     private List<String> urlsImages;
-    private List<Bitmap> bitImages;
+    private Map<String, Bitmap> bitImages;
 
     private TextView tvUpload;
     private ImageView tvNewDoubt;
@@ -64,7 +68,6 @@ public class NewDoubtFragment extends Fragment {
     private ProgressBar progressBar;
     private List<String> subjects;
     private AutoCompleteTextView textView;
-    ImageViewAdapter imageViewAdapter;
     public NewDoubtFragment() {
     }
 
@@ -141,7 +144,7 @@ public class NewDoubtFragment extends Fragment {
             }
         });
         urlsImages = new ArrayList<>();
-        bitImages = new ArrayList<>();
+        bitImages = new HashMap<>();
 
         return view;
     }
@@ -179,16 +182,16 @@ public class NewDoubtFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(urlsImages.size() != 8) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
+                if(urlsImages.size() < 9) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
                     if (data.getClipData() != null) {
                         int totalItemsSelected = data.getClipData().getItemCount();
-                        if (totalItemsSelected < 9) {
+                        if (totalItemsSelected < 9 && (urlsImages.size()-1+totalItemsSelected) < 9) {
                             Uri fileUri;
                             for (int i = 0; i < totalItemsSelected; i++) {
                                 fileUri = data.getClipData().getItemAt(i).getUri();
                                 urlsImages.add(fileUri.toString());
                                 try {
-                                    bitImages.add(MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
+                                    bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -203,11 +206,10 @@ public class NewDoubtFragment extends Fragment {
                         Uri fileUri = data.getData();
                         urlsImages.add(fileUri.toString());
                         try {
-                            bitImages.add(MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
+                            bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        // bitImages.add(ctrl.getBitmapFromUri(fileUri, getActivity()));
                         createRecycleView();
                     }
                 }else{
@@ -227,7 +229,7 @@ public class NewDoubtFragment extends Fragment {
         mRecycler_items.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycler_items.setLayoutManager(linearLayoutManager);
-        imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
+        ImageViewAdapter imageViewAdapter = new ImageViewAdapter(getActivity(), urlsImages);
         mRecycler_items.setAdapter(imageViewAdapter);
         imageViewAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onItemRangeRemoved(int positionStart, int itemCount) {
@@ -241,20 +243,14 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private void checkImagesDeleted() {
-        for(String uri : urlsImages){
-            //Bitmap bit = ctrl.getBitmapFromUri(Uri.parse(uri), getActivity());
-            try {
-                Bitmap bit  = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(uri));
-                if(bitImages.indexOf(bit) == -1){
-                    bitImages.remove(bit);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        Iterator<Map.Entry<String,Bitmap>> iter = bitImages.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Bitmap> entry = iter.next();
+            if(!urlsImages.contains(entry.getKey())) {
+                bitImages.get(entry.getKey()).recycle();
+                iter.remove();
             }
-
-
         }
-
     }
 
     private void sendDoubt() {
@@ -268,7 +264,6 @@ public class NewDoubtFragment extends Fragment {
                 if (!urlsImages.isEmpty()) {
                     urlsImages.clear();
                     mRecycler_items.getAdapter().notifyDataSetChanged();
-
                 }
             }
         }else{
@@ -323,6 +318,13 @@ public class NewDoubtFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(String key: bitImages.keySet()) {
+            bitImages.get(key).recycle();
+        }
+    }
     private void setBtnDoubt(boolean enabled) {
         tvNewDoubt.setEnabled(enabled);
     }
