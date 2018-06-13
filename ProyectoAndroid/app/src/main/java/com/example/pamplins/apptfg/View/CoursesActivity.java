@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.GridLayout;
 
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 
 /**
  * Created by Gustavo on 21/04/2018.
@@ -46,6 +47,7 @@ public class CoursesActivity extends AppCompatActivity {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    view.startAnimation(Utils.getButtonAnimation());
                     Intent intent = new Intent(CoursesActivity.this,SubjectActivity.class);
                     intent.putExtra("course",String.valueOf(finalI));
                     startActivity(intent);

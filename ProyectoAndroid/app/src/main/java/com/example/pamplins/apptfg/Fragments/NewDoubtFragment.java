@@ -129,6 +129,7 @@ public class NewDoubtFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
+                v.startAnimation(Utils.getButtonAnimation());
                 selectImage();
             }
         });
@@ -140,6 +141,7 @@ public class NewDoubtFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
+                v.startAnimation(Utils.getButtonAnimation());
                 sendDoubt();
             }
         });
@@ -182,7 +184,7 @@ public class NewDoubtFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(urlsImages.size() < 9) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
+                if(urlsImages.size() < 9) {
                     if (data.getClipData() != null) {
                         int totalItemsSelected = data.getClipData().getItemCount();
                         if (totalItemsSelected < 9 && (urlsImages.size()-1+totalItemsSelected) < 9) {
@@ -254,22 +256,24 @@ public class NewDoubtFragment extends Fragment {
     }
 
     private void sendDoubt() {
+        tvNewDoubt.setEnabled(false);
         final String title = etTitle.getText().toString();
         final String description = etDescription.getText().toString();
         final String subject = textView.getText().toString();
+
         if(Utils.isNetworkAvailable(getActivity())) {
             if (checkInputs(title, description, subject)) {
                 preWriteDoubt();
-                ctrl.writeDoubtDB(title, description, bitImages, getActivity(), etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject);
-                if (!urlsImages.isEmpty()) {
-                    urlsImages.clear();
-                    mRecycler_items.getAdapter().notifyDataSetChanged();
-                }
+                ctrl.writeDoubtDB(title, description, bitImages, getActivity(), etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject, urlsImages, mRecycler_items);
+            }else{
+                tvNewDoubt.setEnabled(true);
             }
         }else{
+            tvNewDoubt.setEnabled(true);
             Snackbar.make(getActivity().findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
                     .show();
         }
+
     }
 
 
@@ -278,10 +282,12 @@ public class NewDoubtFragment extends Fragment {
      * para que asi no hayan errores al subirse
      */
     private void preWriteDoubt() {
+        Utils.hideKeyboard(getActivity());
         progressBar.setVisibility(View.VISIBLE);
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, // bloquea la pantalla hasta que la duda se suba
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Utils.hideKeyboard(getActivity());
+        tvNewDoubt.setEnabled(true);
+
     }
 
     private boolean checkInputs(String title, String description, String subject){

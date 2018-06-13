@@ -18,6 +18,7 @@ import android.widget.LinearLayout.LayoutParams;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Course;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 
 public class SubjectActivity extends AppCompatActivity {
     private String subject;
-    private final String [] courses = {"1o", "2o", "3o", "4o"};
+    private final String [] courses = {"1o", "2o", "3o", "4o", "Optativas", "Otros"}; //TODO hacerlo con strings para todos los idiomas
     private ArrayList<String> subjects;
     private ArrayList<String> firstSemester;
     private ArrayList<String> secondSemester;
@@ -57,7 +58,7 @@ public class SubjectActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Course course = dataSnapshot.getValue(Course.class);
-                firstSemester = course.getSubjects().get("1r semestre");// TODO ver si es siempre esta string o poner getResources().getString(R.string.first_semester)
+                firstSemester = course.getSubjects().get("1r semestre");
                 secondSemester = course.getSubjects().get("2o semestre");
 
                 LayoutParams params = new LayoutParams(
@@ -123,7 +124,7 @@ public class SubjectActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.tool_subject);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getResources().getString(R.string.subjects_of) +" " +courses[Integer.valueOf(subject)]);
+        getSupportActionBar().setTitle(courses[Integer.valueOf(subject)]);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 
@@ -160,6 +161,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     public void addSubject(View v){
+        v.startAnimation(Utils.getButtonAnimation());
         if(!subjects.isEmpty()){
             Intent i = new Intent(this, MainActivity.class);
             i.putExtra("main", subjects.toString());

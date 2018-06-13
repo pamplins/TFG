@@ -87,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
      * @param v
      */
     public void signIn(final View v) {
+        v.startAnimation(Utils.getButtonAnimation());
         email = etEmail.getText().toString().trim();
         if(Utils.isNetworkAvailable(this)) {
             if (checkInputs()) {
@@ -127,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
      * @param v
      */
     public void authentication(final View v){
+        v.startAnimation(Utils.getButtonAnimation());
         String password = etPassword.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -178,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
      * @param v
      */
     public void forgotPassword(View v){
+        v.startAnimation(Utils.getButtonAnimation());
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(R.string.email_registred);
         final EditText email = new EditText(this);
@@ -263,6 +266,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void openRegister(View v){
+        v.startAnimation(Utils.getButtonAnimation());
         Intent i = new Intent(this, RegisterActivity.class);
         startActivity(i);
     }

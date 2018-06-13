@@ -28,6 +28,7 @@ import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.Model.Course;
 import com.example.pamplins.apptfg.Model.Subject;
 import com.example.pamplins.apptfg.R;
+import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.View.LoginActivity;
 import com.example.pamplins.apptfg.View.RegisterActivity;
 import com.example.pamplins.apptfg.View.SubjectActivity;
@@ -82,6 +83,7 @@ public class ProfileFragment extends DoubtsFragment {
             @Override
             public void onClick(View v)
             {
+                v.startAnimation(Utils.getButtonAnimation());
                 confirmExit();
 
             }
@@ -90,12 +92,13 @@ public class ProfileFragment extends DoubtsFragment {
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(Utils.getButtonAnimation());
                 openAlert();
             }
         });
 
-        prueba =  rootView.findViewById(R.id.tv_empty_doubts_p);
-        prueba.setVisibility(View.VISIBLE);
+        //prueba =  rootView.findViewById(R.id.tv_empty_doubts_p);
+        //prueba.setVisibility(View.VISIBLE);
         return rootView;
 
     }

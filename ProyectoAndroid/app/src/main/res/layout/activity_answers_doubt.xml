@@ -60,7 +60,7 @@
                 android:layout_below="@+id/tv_attachedFiles"
                 android:layout_gravity="center"
                 android:orientation="horizontal"
-                android:paddingLeft="16dp"
+                android:padding="16dp"
                 android:scrollbars="horizontal"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 tools:listitem="@layout/items_carousel" />
@@ -102,7 +102,7 @@
                     android:id="@+id/recycler_answers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="16dp"
+                    android:padding="16dp"
                     tools:listitem="@layout/item_answer" />
 
             </LinearLayout>
@@ -120,6 +120,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         >
+
         <Button
             android:id="@+id/button_advance_answer"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
@@ -144,6 +145,7 @@
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="39dp"
             android:layout_height="35dp"
+            android:layout_marginTop="4dp"
             android:background="@mipmap/ic_send_answer" />
     </LinearLayout>
 

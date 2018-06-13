@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">APPTFG</string>
+    <string name="app_name">ShareDoubt</string>
 
     <!-- login and register names-->
     <string name="et_password">Contraseña</string>

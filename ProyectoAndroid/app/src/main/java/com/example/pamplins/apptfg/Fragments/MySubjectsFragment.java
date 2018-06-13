@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.HoldersAdapters.SubjectAdapter;
 import com.example.pamplins.apptfg.Model.Subject;
+import com.example.pamplins.apptfg.Utils;
 import com.example.pamplins.apptfg.View.CoursesActivity;
 import com.example.pamplins.apptfg.R;
 import com.google.firebase.database.DataSnapshot;
@@ -63,6 +64,7 @@ public class MySubjectsFragment extends Fragment {
         addNewCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(Utils.getButtonAnimation());
                 Intent i = new Intent(getActivity().getApplicationContext(), CoursesActivity.class);
                 startActivity(i);
             }
@@ -70,6 +72,7 @@ public class MySubjectsFragment extends Fragment {
         emptySubjects.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(Utils.getButtonAnimation());
                 Intent i = new Intent(getActivity().getApplicationContext(), CoursesActivity.class);
                 startActivity(i);
             }

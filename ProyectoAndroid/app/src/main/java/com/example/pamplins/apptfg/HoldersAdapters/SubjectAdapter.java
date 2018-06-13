@@ -3,12 +3,15 @@ package com.example.pamplins.apptfg.HoldersAdapters;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Constants;
@@ -46,7 +49,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.SubjectV
     @Override
     public void onBindViewHolder(final SubjectViewHolder holder, final int position) {
         final Subject subject = subjects.get(position);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.item_subject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!subject.getDoubts().get(0).equals("")){
@@ -60,10 +63,12 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.SubjectV
 
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.item_subject.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                removeSubject(holder.getAdapterPosition());
+                holder.item_subject.setBackgroundColor(activity.getResources().getColor(R.color.long_press));
+                holder.item_subject.setAlpha(0.5f);
+                removeSubject(holder.getAdapterPosition(), holder.item_subject);
                 return true;
             }
         });
@@ -79,8 +84,14 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.SubjectV
 
     }
 
-    private void removeSubject(final int adapterPosition) {
-        new AlertDialog.Builder(activity)
+    private void removeSubject(final int adapterPosition, final View item_subject) {
+        new AlertDialog.Builder(activity).setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                item_subject.setAlpha(1f);
+                item_subject.setBackgroundColor(Color.WHITE);
+            }
+        })
             .setMessage(R.string.alert_remove_subject)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -92,7 +103,13 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.SubjectV
                     notifyItemRangeChanged(adapterPosition, subjects.size());
 
                 }})
-            .setNegativeButton(R.string.not, null).show();
+            .setNegativeButton(R.string.not, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    item_subject.setAlpha(1f);
+                    item_subject.setBackgroundColor(Color.WHITE);
+                }
+            }).show();
 
     }
 
@@ -106,12 +123,14 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.SubjectV
         TextView name;
         TextView course;
         TextView nDoubts;
+        LinearLayout item_subject;
 
         public SubjectViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name_subject);
             course = itemView.findViewById(R.id.course_subject);
             nDoubts = itemView.findViewById(R.id.num_doubts);
+            item_subject = itemView.findViewById(R.id.ll_item_subject);
         }
     }
 }

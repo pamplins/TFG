@@ -84,7 +84,7 @@ public abstract class DoubtsFragment extends Fragment {
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 if(mAdapter.getItemCount() > 0 ){
                     progressBar.setVisibility(View.GONE);
-                    prueba.setVisibility(View.GONE);
+                    //prueba.setVisibility(View.GONE);
                     mRecycler.setVisibility(View.VISIBLE);
                 }
             }

@@ -78,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
      * @param v
      */
     public void createAccount(final View v){
+        v.startAnimation(Utils.getButtonAnimation());
         progressBar.setVisibility(View.VISIBLE);
         String name = etUserName.getText().toString().trim();
         if(Utils.isNetworkAvailable(this)) {
@@ -237,6 +238,7 @@ public class RegisterActivity extends AppCompatActivity {
      * @param v
      */
     public void openImage(View v){
+        v.startAnimation(Utils.getButtonAnimation());
         if(Utils.verifyPermissions(this)) {
             openAlert();
         }else{

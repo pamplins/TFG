@@ -68,9 +68,9 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
             @Override
             public boolean onLongClick(View v) {
                 if(activity.getClass().getName().contains("Answer") || activity.getClass().getName().contains("Main")) {
-                    viewHolder.img.setBackgroundColor(Color.RED);
+                    viewHolder.img.setBackgroundColor(activity.getResources().getColor(R.color.long_press));
                     viewHolder.img.setAlpha(0.5f);
-                    removeImage(viewHolder.getAdapterPosition(), viewHolder);
+                    removeImage(viewHolder.getAdapterPosition(), viewHolder.img);
                 }
                 return true;
 
@@ -78,12 +78,12 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         });
     }
 
-    private void removeImage(final int adapterPosition, final ImageViewHolder viewHolder) {
+    private void removeImage(final int adapterPosition, final ImageView img) {
         new AlertDialog.Builder(activity).setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                viewHolder.img.setAlpha(1f);
-                viewHolder.img.setBackgroundColor(Color.WHITE);
+                img.setAlpha(1f);
+                img.setBackgroundColor(Color.WHITE);
             }
         })
         .setMessage(R.string.alert_remove_image)
@@ -98,8 +98,8 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.Imag
         .setNegativeButton(R.string.not, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                viewHolder.img.setAlpha(1f);
-                viewHolder.img.setBackgroundColor(Color.WHITE);
+                img.setAlpha(1f);
+                img.setBackgroundColor(Color.WHITE);
             }
         }).show();
 

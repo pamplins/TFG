@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.R;
@@ -19,12 +22,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SplashActivity extends Activity {
-    Timer timer;
-
+    private Timer timer;
+    private ImageView splash;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        startAnimation();
         TimerTask timerTask = new TimerTask()
         {
             public void run()
@@ -40,7 +44,16 @@ public class SplashActivity extends Activity {
             }
         };
         timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 10000);
+        timer.scheduleAtFixedRate(timerTask, 1500, 10000);
+    }
+
+    private void startAnimation() {
+        splash = findViewById(R.id.iv_splash);
+        Animation mAnimation = new TranslateAnimation(0, 0, 0, 100);
+        mAnimation.setDuration(500);
+        mAnimation.setRepeatCount(-1);
+        mAnimation.setRepeatMode(Animation.REVERSE);
+        splash.setAnimation(mAnimation);
     }
 
     private void startSplash() {

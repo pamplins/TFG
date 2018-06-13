@@ -5,7 +5,6 @@ package com.example.pamplins.apptfg.View;
  */
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
@@ -37,14 +36,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
     private ValueEventListener doubtListener;
     private String doubtKey;
-
     private TextView tvAuthor;
     private TextView tvTitle;
     private TextView tvDate;
@@ -53,22 +49,18 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private EditText etAnswer;
     private ImageView img;
     private ImageView ivAnswer;
-
     public TextView numLikes;
     public ImageView like;
     public TextView numDisLikes;
     public ImageView dislike;
     public TextView numAnswers;
-
     private Controller ctrl;
-
     private Doubt currentDoubt;
     private RecyclerView mRecycler;
     private RecyclerView mRecycler_items;
     private LinearLayoutManager mManager;
     private FirebaseRecyclerAdapter<Answer, AnswerAdapter.AnswerViewHolder> mAdapter;
     private DatabaseReference mDatabase;
-
     private Button btnAdvAnswer;
 
 
@@ -110,12 +102,13 @@ public class DoubtDetailActivity extends AppCompatActivity {
         {
             @Override
             public void onClick(View v) {
+                v.startAnimation(Utils.getButtonAnimation());
                 final String answerText = etAnswer.getText().toString();
                 if(Utils.isNetworkAvailable(DoubtDetailActivity.this)) {
                     if (answerText.trim().isEmpty()) {
-                        etAnswer.setError("Entra comentario");
+                        etAnswer.setError(getString(R.string.empty_answer));
                     } else {
-                        ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, ivAnswer, null, DoubtDetailActivity.this);
+                        ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, null, DoubtDetailActivity.this, etAnswer);
                         Utils.hideKeyboard(DoubtDetailActivity.this);
                     }
                 }else{
@@ -131,6 +124,7 @@ public class DoubtDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
+                v.startAnimation(Utils.getButtonAnimation());
                 Intent i = new Intent(DoubtDetailActivity.this, AdvAnswerActivity.class);
                 i.putExtra("currentDoubt", currentDoubt);
                 i.putExtra("doubtKey", doubtKey);
@@ -153,7 +147,6 @@ public class DoubtDetailActivity extends AppCompatActivity {
         dislike = findViewById(R.id.dislike);
         numDisLikes = findViewById(R.id.num_dislikes);
         numAnswers = findViewById(R.id.num_answers);
-
     }
 
 
@@ -186,19 +179,11 @@ public class DoubtDetailActivity extends AppCompatActivity {
     private void showAnswersDoubt() {
         mManager = new LinearLayoutManager(this);
         mManager.setStackFromEnd(true);
-
         mManager.setReverseLayout(false);
         mRecycler.setLayoutManager(mManager);
-
-        /*options = new FirebaseRecyclerOptions.Builder<Answer>()
-                .setQuery(mDatabase.child(Constants.REF_POST_ANSWERS).child(doubtKey).orderByChild("likesCount"), Answer.class)
-                .build();
-        */
-
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Answer>()
                 .setQuery(mDatabase.child(Constants.REF_POST_ANSWERS).child(doubtKey), Answer.class)
                 .build();
-
         setAnswerAdapter(options);
     }
 
@@ -297,7 +282,5 @@ public class DoubtDetailActivity extends AppCompatActivity {
         }
 
     }
-
-
 
 }

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,11 +41,9 @@ public class AdvAnswerActivity extends AppCompatActivity {
 
     private EditText etAnswer;
     private Controller ctrl;
-
     private RecyclerView mRecycler_items;
     private List<String> urlsImages;
     private HashMap<String, Bitmap> bitImages;
-
     private ProgressBar progressBar;
     private TextView tvUpload;
     private ImageView tvNewAdvRes;
@@ -58,47 +57,41 @@ public class AdvAnswerActivity extends AppCompatActivity {
         initToolbar();
         currentDoubt = (Doubt) getIntent().getSerializableExtra("currentDoubt");
         doubtKey = (String) getIntent().getSerializableExtra("doubtKey");
-        if (currentDoubt == null) {
+        if (currentDoubt == null || doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
+        initElements();
+
+    }
+
+    private void initElements() {
         ctrl = Controller.getInstance();
         progressBar = findViewById(R.id.progressBar_naa);
         etAnswer = findViewById(R.id.et_description_new_answer);
-
         tvUpload = findViewById(R.id.tv_upload_adv_res);
-
         tvUpload.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
+                v.startAnimation(Utils.getButtonAnimation());
                 selectImage();
             }
         });
-
         tvNewAdvRes = findViewById(R.id.iv_new_adv_res);
-
         tvNewAdvRes.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                sendDoubt();
+                v.startAnimation(Utils.getButtonAnimation());
+                checkAnswer();
             }
         });
         urlsImages = new ArrayList<>();
         bitImages = new HashMap<>();
     }
-    /**
-     * Funcion encargada de deshabilitar la pantalla una vez el usuario ha presionado el boton de subir la duda
-     * para que asi no hayan errores al subirse
-     */
-    private void preWriteDoubt() {
-        progressBar.setVisibility(View.VISIBLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Utils.hideKeyboard(this);
-    }
+
     private void initToolbar(){
         Toolbar myToolbar = findViewById(R.id.tool_subject);
         setSupportActionBar(myToolbar);
@@ -107,49 +100,63 @@ public class AdvAnswerActivity extends AppCompatActivity {
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 
-    private void sendDoubt() {
+    private void checkAnswer() {
+        tvNewAdvRes.setEnabled(false);
         final String answer = etAnswer.getText().toString();
         if(Utils.isNetworkAvailable(this)) {
             if (checkInputs(answer)) {
-                final String answerText = etAnswer.getText().toString();
-                if (answerText.trim().isEmpty()) {
-                    etAnswer.setError(getResources().getString(R.string.empty_answer));
-                }else{
-                    if(bitImages.isEmpty()){
-                        ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, tvNewAdvRes, null, AdvAnswerActivity.this);
-                    }else{
-                        ctrl.uploadImages(bitImages, currentDoubt, doubtKey, answerText, tvNewAdvRes, AdvAnswerActivity.this);
-                    }
-                    Utils.hideKeyboard(AdvAnswerActivity.this);
-                }
+                sendAnswer();
 
-                if (!urlsImages.isEmpty()) {
-                    urlsImages.clear();
-                    mRecycler_items.getAdapter().notifyDataSetChanged();
-
-                }
+            }else{
+                tvNewAdvRes.setEnabled(true);
             }
         }else{
+            tvNewAdvRes.setEnabled(true);
             Snackbar.make(findViewById(android.R.id.content), R.string.err_conex, Snackbar.LENGTH_LONG)
                     .show();
         }
+
+    }
+
+    private void sendAnswer() {
+        preWritAnswer();
+        final String answerText = etAnswer.getText().toString();
+        if (answerText.trim().isEmpty()) {
+            etAnswer.setError(getResources().getString(R.string.empty_answer));
+        }else{
+            if(bitImages.isEmpty()){
+                ctrl.writeAnswerDB(currentDoubt, doubtKey, answerText, null, AdvAnswerActivity.this, etAnswer);
+            }else{
+                ctrl.uploadImages(bitImages, currentDoubt, doubtKey, answerText, AdvAnswerActivity.this, etAnswer);
+            }
+        }
+    }
+
+    /**
+     * Funcion encargada de deshabilitar la pantalla una vez el usuario ha presionado el boton de subir la duda
+     * para que asi no hayan errores al subirse
+     */
+    private void preWritAnswer() {
+        Utils.hideKeyboard(this);
+        progressBar.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, // bloquea la pantalla hasta que la duda se suba
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        tvNewAdvRes.setEnabled(true);
+
     }
 
     private boolean checkInputs(String answer){
         boolean c_answer = answer.trim().length() < 10;
-
         if(c_answer){
             etAnswer.setError(getResources().getString(R.string.err_len_et));
         }
         if(answer.trim().isEmpty()){
             etAnswer.setError(getResources().getString(R.string.empty_answer));
         }
-
         if(!(c_answer)){
             return true;
         }
         return false;
-
     }
 
     /**
@@ -218,41 +225,49 @@ public class AdvAnswerActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(urlsImages.size() < 9) { //TODO ver a cuanto limitamos y ponerlo como final mas quizas crear ImageController
+                if(urlsImages.size() < 9) {
                     if (data.getClipData() != null) {
-                        int totalItemsSelected = data.getClipData().getItemCount();
-                        if (totalItemsSelected < 9 && (urlsImages.size()-1+totalItemsSelected) < 9) {
-                            Uri fileUri;
-                            for (int i = 0; i < totalItemsSelected; i++) {
-                                fileUri = data.getClipData().getItemAt(i).getUri();
-                                urlsImages.add(fileUri.toString());
-                                try {
-                                    bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            createRecycleView();
-                        } else {
-                            Snackbar.make(findViewById(android.R.id.content), R.string.err_max_images, Snackbar.LENGTH_LONG)
-                                    .show();
-                        }
-
+                        multipleSelectionImages(data);
                     } else if (data.getData() != null) {
-                        Uri fileUri = data.getData();
-                        urlsImages.add(fileUri.toString());
-                        try {
-                            bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        createRecycleView();
+                        selectionImage(data);
                     }
                 }else{
                     Snackbar.make(findViewById(android.R.id.content), R.string.limit_max_images, Snackbar.LENGTH_LONG)
                             .show();
                 }
             }
+        }
+    }
+
+    private void selectionImage(Intent data) {
+        Uri fileUri = data.getData();
+        urlsImages.add(fileUri.toString());
+        try {
+            bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        createRecycleView();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void multipleSelectionImages(Intent data) {
+        int totalItemsSelected = data.getClipData().getItemCount();
+        if (totalItemsSelected < 9 && (urlsImages.size()-1+totalItemsSelected) < 9) {
+            Uri fileUri;
+            for (int i = 0; i < totalItemsSelected; i++) {
+                fileUri = data.getClipData().getItemAt(i).getUri();
+                urlsImages.add(fileUri.toString());
+                try {
+                    bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            createRecycleView();
+        } else {
+            Snackbar.make(findViewById(android.R.id.content), R.string.err_max_images, Snackbar.LENGTH_LONG)
+                    .show();
         }
     }
 

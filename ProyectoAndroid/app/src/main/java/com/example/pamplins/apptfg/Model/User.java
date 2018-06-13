@@ -57,11 +57,17 @@ public class User {
         return subjects;
     }
 
-    public void addNewSubjects(String subjectsName){
-        subjects.add(subjectsName);
+    public void addNewSubjects(String subjectName){
+        if(subjects.get(0).equals("")){
+            subjects.set(0,subjectName);
+        }else{
+            if(!subjects.contains(subjectName)){
+                subjects.add(subjectName);
+            }
+        }
     }
-    public void deleteSubject(String subjectsName) {
-        subjects.remove(subjectsName);
+    public void deleteSubject(String subjectName) {
+        subjects.remove(subjectName);
         if(subjects.isEmpty()){
             subjects.add("");
         }

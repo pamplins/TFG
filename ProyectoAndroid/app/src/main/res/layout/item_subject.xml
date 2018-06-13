@@ -13,7 +13,8 @@
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:orientation="vertical"
-            android:background="@color/borderColor" >
+            android:background="@color/borderColor"
+            android:id="@+id/ll_item_subject">
 
             <TextView
                 android:id="@+id/name_subject"

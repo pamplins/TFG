@@ -12,5 +12,6 @@
     <color name="colorLine">#d4d6da</color>
     <color name="cardViewPressed">#86c1ed</color>
     <color name="cardViewDisabled">#00000000</color>
+    <color name="long_press">#c6e12929</color>
 
 </resources>

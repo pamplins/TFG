@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -110,6 +111,12 @@ public class Utils {
             ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
             return false;
         }
+    }
+
+    public static AlphaAnimation getButtonAnimation(){
+        AlphaAnimation buttonAnimation = new AlphaAnimation(0.2f, 1.0f);
+        buttonAnimation.setDuration(500);
+        return buttonAnimation;
     }
 
 }
