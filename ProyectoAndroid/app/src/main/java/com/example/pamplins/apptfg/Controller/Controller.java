@@ -70,9 +70,7 @@ public class Controller {
     }
 
     private void initElements() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.setPersistenceEnabled(true);
-        db = firebaseDatabase.getInstance();
+        db = FirebaseDatabase.getInstance();
         initRefs();
         initCurrentUser();
     }

@@ -17,6 +17,7 @@ import com.example.pamplins.apptfg.Controller.Controller;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,7 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         startAnimation();
         TimerTask timerTask = new TimerTask()
         {
