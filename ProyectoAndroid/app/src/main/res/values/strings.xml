@@ -30,9 +30,9 @@
     <string name="err_send_email">Error al enviar correo</string>
     <string name="err_post">Este usuario ya no se encuentra en la base de datos"</string>
     <string name="email_not_registred">Correo no registrado en la base de datos</string>
-    <string name="email_registred">Entra tu correo electrónico registrado</string>
-    <string name="err_email_empty">Entra el usuario o correo</string>
-    <string name="err_pass_empty">Entra la contraseña</string>
+    <string name="email_registred">Introduce tu correo electrónico registrado</string>
+    <string name="err_email_empty">Introduce el usuario o correo</string>
+    <string name="err_pass_empty">Introduce la contraseña</string>
 
     <string name="permiss">Debes aceptar los permisos para hacer uso de esta función</string>
     <string name="open_camera">Hacer foto</string>
@@ -45,14 +45,14 @@
     <string name="title">Título</string>
     <string name="description">Descripción</string>
     <string name="subject">Asignatura</string>
-    <string name="optional">Opcional:</string>
+    <string name="optional">Opcional (máx 9):</string>
 
 
     <!-- doubts errors advices-->
     <string name="err_len_et">Deberías detallar más</string>
-    <string name="err_title_empty">Entra título</string>
-    <string name="err_description_empty">Entra descripción</string>
-    <string name="err_subject_empty">Entra asignatura</string>
+    <string name="err_title_empty">Introduce título</string>
+    <string name="err_description_empty">Introduce descripción</string>
+    <string name="err_subject_empty">Introduce asignatura</string>
     <string name="err_subject">Asignatura incorrecta</string>
     <string name="err_empty_subject">Esta asignatura no dispone de ninguna duda</string>
     <string name="alert_remove_image">¿Realmente quieres eliminar esta imagen?</string>
@@ -78,11 +78,13 @@
     <string name="title_new_adv_answer">Respuesta avanzada</string>
     <string name="response">Respuesta:</string>
     <string name="slow_connection">Comprueba tu conexión a internet. En cuanto esté disponible, iniciaremos la aplicación</string>
-    <string name="add_image_answer">Añade alguna imagen a tu respuesta:</string>
+    <string name="add_image_answer">Añade alguna imagen a tu respuesta (máx 9):</string>
     <string name="err_conex">Comprueba tu conexión a internet y vuelve a intentarlo</string>
     <string name="title_response">RESPUESTA</string>
-    <string name="empty_answer">Entra la respuesta</string>
+    <string name="empty_answer">Introduce la respuesta</string>
     <string name="err_max_images">Selecciona un máximo de 9 imagenes</string>
     <string name="limit_max_images">Has llegado al límite de imagenes por duda</string>
+    <string name="exit_with_adv_answer">No has subido tu respuesta. ¿Realmente quieres salir?</string>
+
 
 </resources>

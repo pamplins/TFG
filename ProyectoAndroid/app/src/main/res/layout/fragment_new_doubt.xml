@@ -5,10 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backGround"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
-
-
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,7 +52,6 @@
             android:id="@+id/et_title_new_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
             android:background="@color/cardview_light_background"
             android:hint="@string/title"
             android:maxLength="30"

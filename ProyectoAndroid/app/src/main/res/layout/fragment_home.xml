@@ -33,17 +33,7 @@
         android:scrollbars="vertical"
         android:visibility="gone"
         tools:listitem="@layout/item_doubt" />
-    <TextView
-        android:id="@+id/tv_empty_doubts_p"
-        android:visibility="gone"
-        android:text="Se el primero en compartir una duda"
-        android:layout_height="match_parent"
-        android:textAlignment="center"
-        android:textSize="30dp"
-        android:textStyle="bold"
-        android:textColor="@color/colorTextDoubt"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"/>
+
     <ProgressBar
         android:id="@+id/progressBar_h"
         android:visibility="visible"

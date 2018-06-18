@@ -71,7 +71,8 @@ public class ProfileFragment extends DoubtsFragment {
     public View setView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
         mRecycler = rootView.findViewById(R.id.messages_list);
-        progressBar = rootView.findViewById(R.id.progressBar_h);
+        mRecycler.setNestedScrollingEnabled(false);
+        //progressBar = rootView.findViewById(R.id.progressBar_h);
         TextView name = rootView.findViewById(R.id.tv_user_name_p);
 
         name.setText(ctrl.getUser().getUserName());
@@ -97,8 +98,6 @@ public class ProfileFragment extends DoubtsFragment {
             }
         });
 
-        //prueba =  rootView.findViewById(R.id.tv_empty_doubts_p);
-        //prueba.setVisibility(View.VISIBLE);
         return rootView;
 
     }

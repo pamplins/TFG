@@ -36,6 +36,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
+
 
 public class DoubtDetailActivity extends AppCompatActivity {
     private DatabaseReference doubtReference;
@@ -128,6 +130,10 @@ public class DoubtDetailActivity extends AppCompatActivity {
                 Intent i = new Intent(DoubtDetailActivity.this, AdvAnswerActivity.class);
                 i.putExtra("currentDoubt", currentDoubt);
                 i.putExtra("doubtKey", doubtKey);
+                if(!etAnswer.getText().toString().trim().isEmpty()){
+                    i.putExtra("etAnswer", etAnswer.getText().toString());
+                    etAnswer.setText("");
+                }
                 startActivity(i);
             }
         });
@@ -181,6 +187,8 @@ public class DoubtDetailActivity extends AppCompatActivity {
         mManager.setStackFromEnd(true);
         mManager.setReverseLayout(false);
         mRecycler.setLayoutManager(mManager);
+        mRecycler.setNestedScrollingEnabled(false);
+
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Answer>()
                 .setQuery(mDatabase.child(Constants.REF_POST_ANSWERS).child(doubtKey), Answer.class)
                 .build();

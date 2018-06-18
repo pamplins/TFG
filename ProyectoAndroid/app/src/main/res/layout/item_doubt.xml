@@ -64,7 +64,7 @@
             android:layout_below="@+id/doubt_description"
             android:autoSizeTextType="uniform"
             android:padding="16dp"
-            android:textColor="@color/colorName"
+            android:textColor="@color/colorTextDoubt"
             android:textStyle="bold"
             tools:text="Nombre de la asignatura" />
 

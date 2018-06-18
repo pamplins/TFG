@@ -84,7 +84,7 @@ public class User {
         }
     }
 
-    public void addNewAnswr(String uid){
+    public void addNewAnswer(String uid){
         if(getUidAnswers().get(0).equals("")){
             getUidAnswers().set(0,uid);
         }else{

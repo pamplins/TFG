@@ -25,11 +25,15 @@ import java.util.TimerTask;
 public class SplashActivity extends Activity {
     private Timer timer;
     private ImageView splash;
+    private static boolean firstTime = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if(!firstTime){
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            firstTime = true;
+        }
         startAnimation();
         TimerTask timerTask = new TimerTask()
         {

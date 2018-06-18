@@ -2,7 +2,6 @@ package com.example.pamplins.apptfg.Controller;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -37,7 +36,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +52,6 @@ import java.util.Map;
  */
 
 public class Controller {
-
     private static Controller ctrl = null;
     private User user;
     private FirebaseDatabase db;
@@ -163,7 +160,7 @@ public class Controller {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
-     public void uploadImageProfile(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
+    public void uploadImageProfile(String uid, String userName, String email, Bitmap bit, String imagePath, int action) {
         uploadImageProfile(uid, bit, imagePath, userName, email, action);
     }
 
@@ -207,6 +204,11 @@ public class Controller {
         });
     }
 
+    /**
+     * Metodo encargado de actualizar la imagen de perfil del usuario en todas las localizaciones
+     *
+     * @param downloadUrl
+     */
     private void updateUserProfileImage(String downloadUrl) {
         Map<String, Object> updateMap = new HashMap();
         // users
@@ -249,8 +251,8 @@ public class Controller {
      */
     public void showProfileImage(Activity activity, String urlImageProfile, ImageView img) {
         Glide.with(activity)
-                .load(urlImageProfile)
-                .into(img);
+            .load(urlImageProfile)
+            .into(img);
     }
 
     /**
@@ -305,7 +307,6 @@ public class Controller {
             String ref = Constants.REF_DOUBT_IMAGES + getUid() + "/" + title + "/" + Constants.REF_DOUBT_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             fileToUpload = storageRef.child(ref);
             Bitmap bit = bitImages.get(key);
-            bit = getVerticalBit(bit);
             final int finalI = i;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bit.compress(Bitmap.CompressFormat.JPEG, 25, baos);
@@ -313,22 +314,17 @@ public class Controller {
             fileToUpload.putBytes(fileInBytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                    finalUrl.add(downloadUrl.toString());
-                    if(finalI == bitImages.keySet().size()-1) {
-                        uploadNewDoubt(title, body, finalUrl, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject, urlsImages, mRecycler_items);
-                    }
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                finalUrl.add(downloadUrl.toString());
+                if(finalI == bitImages.keySet().size()-1) {
+                    uploadNewDoubt(title, body, finalUrl, ac, etTitle, etDescription, textView, progressBar, tvUpload, tvNewDoubt, subject, urlsImages, mRecycler_items);
+                }
                 }
             });
             i++;
         }
     }
 
-    private Bitmap getVerticalBit(Bitmap bit){
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        return Bitmap.createBitmap(bit, 0, 0, bit.getWidth(), bit.getHeight(), matrix, true);
-    }
 
 
     /**
@@ -354,22 +350,22 @@ public class Controller {
         final String key = doubtsRef.push().getKey();
         Doubt doubt = new Doubt(getUid(), title, body, getDate(), user.getUserName(), user.getUrlProfileImage(), array, subjectName);
         Map<String, Object> postValues = doubt.toMap();
-
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/"+Constants.REF_DOUBTS+"/" + key, postValues);
         childUpdates.put("/"+Constants.REF_USER_DOUBTS+"/" + doubt.getUid() + "/" + key, postValues);
-
         db.getReference().updateChildren(childUpdates);
-
         user.addNewDoubt(key);
         usersRef.child(getUid()).setValue(user);
-
         addDoubtToSubject(subjectName, key);
         postWriteDoubt(ac, etTitle, etDescription, progressBar, tvUpload, tvNewDoubt, textView, urlsImages, mRecycler_items);
     }
 
-
-
+    /**
+     * Metodo encargado hacer la transaccion del boton like
+     *
+     * @param postRef
+     * @param checkDisLike
+     */
     public void onLikeClicked(final DatabaseReference postRef, final boolean checkDisLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
@@ -402,7 +398,12 @@ public class Controller {
         });
     }
 
-
+    /**
+     * Metodo encargado de hacer la transaccion de dislike
+     *
+     * @param postRef
+     * @param checkLike
+     */
     public void onDisLikeClicked(final DatabaseReference postRef, final boolean checkLike) {
         postRef.runTransaction(new Transaction.Handler() {
             @Override
@@ -477,7 +478,7 @@ public class Controller {
      */
     private void postWriteDoubt(Activity ac, EditText etTitle, EditText etDescription, ProgressBar progressBar, TextView tvUpload, ImageView tvNewDoubt, AutoCompleteTextView textView, List<String> urlsImages, RecyclerView mRecycler_items) {
         Snackbar.make(ac.findViewById(android.R.id.content), "Tu duda se ha creado correctamente", Snackbar.LENGTH_LONG)
-                .show();
+            .show();
         ac.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.GONE);
         etTitle.setEnabled(true);
@@ -513,8 +514,8 @@ public class Controller {
         childUpdates.put("/"+Constants.REF_POST_ANSWERS+"/"+uidDoubt+"/"+key, answerValues);
         db.getReference().updateChildren(childUpdates);
 
-        user.addNewAnswr(uidDoubt);
-        user.addNewAnswr(key);
+        user.addNewAnswer(uidDoubt);
+        user.addNewAnswer(key);
         usersRef.child(getUid()).setValue(user);
 
         currentdDoubt.setnAnswers(currentdDoubt.getnAnswers() + 1);
@@ -532,6 +533,7 @@ public class Controller {
      * Si no tenia ninguna duda, se mete como primera posicion, sino se añade
      *
      * @param s
+     * @param add
      */
     public void updateUserSubjects(String s, boolean add) {
         if(add){
@@ -548,6 +550,16 @@ public class Controller {
 
     }
 
+    /**
+     * Metodo encargado de subir las imagenes de la respuesta
+     *
+     * @param bitImages
+     * @param currentdDoubt
+     * @param uidDoubt
+     * @param answerText
+     * @param activity
+     * @param etAnswer
+     */
     public void uploadImages(final HashMap<String, Bitmap> bitImages, final Doubt currentdDoubt, final String uidDoubt, final String answerText, final Activity activity, final EditText etAnswer) {
         StorageReference fileToUpload;
         final ArrayList<String> finalUrl = new ArrayList<>();
@@ -556,7 +568,6 @@ public class Controller {
             String ref = Constants.REF_ANSWER_IMAGES + getUid() + "/" + Constants.REF_ANSWER_NAME+"_"+i+".jpg"; // string de la ruta a la que ira
             fileToUpload = storageRef.child(ref);
             Bitmap bit = bitImages.get(key);
-            bit = getVerticalBit(bit);
             final int finalI = i;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bit.compress(Bitmap.CompressFormat.JPEG, 25, baos);
@@ -564,12 +575,11 @@ public class Controller {
             fileToUpload.putBytes(fileInBytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                    finalUrl.add(downloadUrl.toString());
-                    if(finalI == bitImages.size()-1) {
-                        writeAnswerDB(currentdDoubt, uidDoubt,answerText, finalUrl, activity, etAnswer);
-
-                    }
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                finalUrl.add(downloadUrl.toString());
+                if(finalI == bitImages.size()-1) {
+                    writeAnswerDB(currentdDoubt, uidDoubt,answerText, finalUrl, activity, etAnswer);
+                }
                 }
             });
             i++;

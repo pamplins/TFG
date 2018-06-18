@@ -46,6 +46,7 @@
             android:name=".View.MainActivity"
             android:parentActivityName=".View.MainActivity"
             android:label="MAIN"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
         </activity>
         <activity android:name=".View.DoubtDetailActivity"

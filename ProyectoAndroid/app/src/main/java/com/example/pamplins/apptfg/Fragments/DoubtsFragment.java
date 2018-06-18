@@ -35,7 +35,6 @@ public abstract class DoubtsFragment extends Fragment {
     protected LinearLayoutManager mManager;
     protected Controller ctrl;
     protected ProgressBar progressBar;
-    protected TextView prueba;
 
     public DoubtsFragment(){
 
@@ -58,12 +57,11 @@ public abstract class DoubtsFragment extends Fragment {
     /**
      * Metodo encargado de especificar el recycleview y configurar el adapter en optionns
      */
-    public void showDoubts() {
+    private void showDoubts() {
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-        // si quiero limitar los comentarios a mostrar en home poner mDatabase.limitToFirst(X)
         Query query = getQuery();
         final FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Doubt>()
                 .setQuery(query, Doubt.class)
@@ -83,8 +81,7 @@ public abstract class DoubtsFragment extends Fragment {
         mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 if(mAdapter.getItemCount() > 0 ){
-                    progressBar.setVisibility(View.GONE);
-                    //prueba.setVisibility(View.GONE);
+                    //progressBar.setVisibility(View.GONE);
                     mRecycler.setVisibility(View.VISIBLE);
                 }
             }

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class DoubtsActivity extends AppCompatActivity {
     private RecyclerView mRecycler;
-
+    private LinearLayoutManager mManager;
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -56,12 +56,12 @@ public class DoubtsActivity extends AppCompatActivity {
 
     }
     public void showDoubts(final List<String> doubtNames, final HashMap<String, Doubt> hashMap, Controller ctrl) {
-        LinearLayoutManager mManager = new LinearLayoutManager(this);
+        mManager = new LinearLayoutManager(this);
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
         for (final String key : doubtNames) {
-            ctrl.getDoubtsRef().child(key).addValueEventListener(new ValueEventListener() {
+            ctrl.getDoubtsRef().child(key).orderByKey().addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Doubt doubt = dataSnapshot.getValue(Doubt.class);
@@ -79,7 +79,6 @@ public class DoubtsActivity extends AppCompatActivity {
                             mRecycler.setAdapter(adapter);
                             mRecycler.setVisibility(View.VISIBLE);
                             adapter.notifyDataSetChanged();
-
                         }
                 }
                 @Override
@@ -88,7 +87,6 @@ public class DoubtsActivity extends AppCompatActivity {
                 }
             });
             }
-
     }
 
     private void initToolbar(String subject){
@@ -98,7 +96,6 @@ public class DoubtsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(subject);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
-
 
     @Override
     public boolean onSupportNavigateUp(){
@@ -110,6 +107,5 @@ public class DoubtsActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
     }
-
 
 }

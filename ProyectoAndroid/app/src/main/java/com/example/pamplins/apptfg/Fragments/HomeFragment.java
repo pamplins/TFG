@@ -40,7 +40,6 @@ public class HomeFragment extends DoubtsFragment {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         mRecycler = rootView.findViewById(R.id.messages_list);
         progressBar = rootView.findViewById(R.id.progressBar_h);
-        prueba = rootView.findViewById(R.id.tv_empty_doubts_p);
         return rootView;
     }
 

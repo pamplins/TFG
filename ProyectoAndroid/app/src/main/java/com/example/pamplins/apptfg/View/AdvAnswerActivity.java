@@ -1,5 +1,7 @@
 package com.example.pamplins.apptfg.View;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +29,7 @@ import com.example.pamplins.apptfg.Model.Doubt;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +53,7 @@ public class AdvAnswerActivity extends AppCompatActivity {
     private ImageView tvNewAdvRes;
     private Doubt currentDoubt;
     private String doubtKey;
+    private String answer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -57,6 +62,10 @@ public class AdvAnswerActivity extends AppCompatActivity {
         initToolbar();
         currentDoubt = (Doubt) getIntent().getSerializableExtra("currentDoubt");
         doubtKey = (String) getIntent().getSerializableExtra("doubtKey");
+        answer = "";
+        if(getIntent().getSerializableExtra("etAnswer") != null){
+            answer = (String) getIntent().getSerializableExtra("etAnswer");
+        }
         if (currentDoubt == null || doubtKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
@@ -68,6 +77,10 @@ public class AdvAnswerActivity extends AppCompatActivity {
         ctrl = Controller.getInstance();
         progressBar = findViewById(R.id.progressBar_naa);
         etAnswer = findViewById(R.id.et_description_new_answer);
+        if(!answer.isEmpty()){
+            etAnswer.setText(answer);
+            etAnswer.setSelection(answer.length());
+        }
         tvUpload = findViewById(R.id.tv_upload_adv_res);
         tvUpload.setOnClickListener(new View.OnClickListener()
         {
@@ -171,11 +184,11 @@ public class AdvAnswerActivity extends AppCompatActivity {
         mRecycler_items.setAdapter(imageViewAdapter);
         imageViewAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onItemRangeRemoved(int positionStart, int itemCount) {
-                if(urlsImages.isEmpty()){
-                    bitImages.clear();
-                }else{
-                    checkImagesDeleted();
-                }
+            if(urlsImages.isEmpty()){
+                bitImages.clear();
+            }else{
+                checkImagesDeleted();
+            }
             }
         });
     }
@@ -187,7 +200,6 @@ public class AdvAnswerActivity extends AppCompatActivity {
             if(!urlsImages.contains(entry.getKey())) {
                 bitImages.get(entry.getKey()).recycle();
                 iter.remove();
-
             }
         }
     }
@@ -203,13 +215,31 @@ public class AdvAnswerActivity extends AppCompatActivity {
 
     /**
      * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
-     */
+     *
+     * */
     private void openAlert() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+        final CharSequence[] items = {getResources().getString(R.string.open_camera), getResources().getString(R.string.select_gallery)};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.add_image);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(getResources().getString(R.string.open_camera))) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
+                    startActivityForResult(takePictureIntent, 0);
+
+                } else if (items[item].equals(getResources().getString(R.string.select_gallery))){
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+                }
+            }
+
+        });
+        builder.show();
     }
 
     /**
@@ -223,7 +253,18 @@ public class AdvAnswerActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == RESULT_OK){
+        if(requestCode == 0 && resultCode == Activity.RESULT_OK){
+            File file = new File("/sdcard/tmp");
+            try {
+                Uri fileUri = Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), null, null));
+                urlsImages.add(fileUri.toString());
+                bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            createRecycleView();
+        }
+        else if(requestCode == 1 && resultCode == RESULT_OK){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 if(urlsImages.size() < 9) {
                     if (data.getClipData() != null) {
@@ -271,6 +312,25 @@ public class AdvAnswerActivity extends AppCompatActivity {
         }
     }
 
+
+    private void confirmExit(){
+        if(!etAnswer.getText().toString().isEmpty()  || !bitImages.isEmpty()){
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.exit_with_adv_answer)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            finish();
+                        }})
+                    .setNegativeButton(R.string.not, null).show();
+        }else{
+            finish();
+        }
+
+    }
+
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -281,11 +341,13 @@ public class AdvAnswerActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp(){
-        finish();
+        confirmExit();
         return true;
     }
+
+
     @Override
     public void onBackPressed() {
-        finish();
+        confirmExit();
     }
 }

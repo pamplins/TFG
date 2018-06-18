@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class SubjectActivity extends AppCompatActivity {
     private String subject;
-    private final String [] courses = {"1o", "2o", "3o", "4o", "Optativas", "Otros"}; //TODO hacerlo con strings para todos los idiomas
+    private final String [] courses = {"1o", "2o", "3o", "4o", "Optativas", "Otros"};
     private ArrayList<String> subjects;
     private ArrayList<String> firstSemester;
     private ArrayList<String> secondSemester;

@@ -37,77 +37,77 @@
         android:layout_height="1dp"
         android:layout_below="@+id/tv_perfil"
         android:background="@color/colorLine"
+        android:id="@+id/view_line"
         />
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:id="@+id/ll_camera_p" >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/img_user_profile"
-        android:layout_width="120dp"
-        app:civ_border_width="0dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="16dp" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="-20dp"
-        android:paddingLeft="16dp"
-        android:src="@mipmap/ic_camera" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25dp"
-        android:id="@+id/tv_user_name_p"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
-        android:textColor="@color/colorTextDoubt"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorName"
-        android:padding="16dp"
-        android:textSize="16dp"
-        android:text="@string/tv_my_doubts"
-        android:textStyle="bold" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/messages_list"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        android:visibility="gone"
-        tools:listitem="@layout/item_doubt" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_line">
 
-    <TextView
-        android:id="@+id/tv_empty_doubts_p"
-        android:visibility="gone"
-        android:text="¿Todavía no tienes ninguna duda?\n¡Pregunta lo que quieras sin miedo!"
-        android:layout_height="match_parent"
-        android:textAlignment="center"
-        android:textSize="30dp"
-        android:textStyle="bold"
-        android:textColor="@color/colorTextDoubt"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"/>
-    <ProgressBar
-        android:id="@+id/progressBar_h"
-        android:visibility="visible"
-        android:scaleX="0.10"
-        android:scaleY="0.10"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_camera_p"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_centerHorizontal="true">
+
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/img_user_profile"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    app:civ_border_color="@color/colorTextDoubt"
+                    app:civ_border_width="0.5dp"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="-20dp"
+                    android:paddingLeft="16dp"
+                    android:src="@mipmap/ic_camera" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_user_name_p"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_camera_p"
+                android:layout_centerHorizontal="true"
+
+                android:layout_marginBottom="16dp"
+                android:textColor="@color/colorTextDoubt"
+                android:textSize="25dp" />
+
+            <TextView
+                android:id="@+id/tv_my_doubts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_user_name_p"
+                android:padding="16dp"
+                android:text="@string/tv_my_doubts"
+                android:textColor="@color/colorName"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messages_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tv_my_doubts"
+                android:layout_marginTop="25dp"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:visibility="visible"
+                tools:listitem="@layout/item_doubt" />
+
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

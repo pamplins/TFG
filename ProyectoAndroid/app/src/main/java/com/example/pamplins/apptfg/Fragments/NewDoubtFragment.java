@@ -2,16 +2,19 @@ package com.example.pamplins.apptfg.Fragments;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,6 +38,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,6 +78,8 @@ public class NewDoubtFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
         ctrl = Controller.getInstance();
         autocomplete();
     }
@@ -161,15 +167,40 @@ public class NewDoubtFragment extends Fragment {
     }
 
     /**
-     * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
      */
+   /* private void openAlert() {
+
+    }*/
+
+    /**
+     * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
+     *
+     * */
     private void openAlert() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+        final CharSequence[] items = {getResources().getString(R.string.open_camera), getResources().getString(R.string.select_gallery)};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.add_image);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(getResources().getString(R.string.open_camera))) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
+                    startActivityForResult(takePictureIntent, 0);
+
+                } else if (items[item].equals(getResources().getString(R.string.select_gallery))){
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+                }
+            }
+
+        });
+        builder.show();
     }
+
 
     /**
      *  Metodo encargado de obtener la imagen que el usuario
@@ -182,7 +213,17 @@ public class NewDoubtFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == RESULT_OK){
+        if(requestCode == 0 && resultCode == Activity.RESULT_OK){
+            File file = new File("/sdcard/tmp");
+            try {
+                Uri fileUri = Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), file.getAbsolutePath(), null, null));
+                urlsImages.add(fileUri.toString());
+                bitImages.put(fileUri.toString(), MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), fileUri));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            createRecycleView();
+        }else if(requestCode == 1 && resultCode == RESULT_OK){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 if(urlsImages.size() < 9) {
                     if (data.getClipData() != null) {
