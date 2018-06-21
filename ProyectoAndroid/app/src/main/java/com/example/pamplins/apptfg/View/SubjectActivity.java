@@ -52,6 +52,9 @@ public class SubjectActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo encargado de obtener de base de datos todas las asignaturas del curso seleccionado
+     */
     private void getSubjects() {
         String nameCourse = courses[Integer.valueOf(subject)];
         Controller.getInstance().getCoursesRef().child(nameCourse).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -82,6 +85,13 @@ public class SubjectActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Metodo encargado de crear las cartas para las asignaturas
+     *
+     * @param sem
+     * @param semester
+     * @param params
+     */
     private void createCardsViews(String sem, ArrayList<String> semester, LayoutParams params) {
         TextView tv = new TextView(getApplicationContext());
         tv.setPadding(30,16,16,16);
@@ -128,6 +138,9 @@ public class SubjectActivity extends AppCompatActivity {
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorButton), PorterDuff.Mode.SRC_ATOP);
     }
 
+    /**
+     * Metodo encargado de añadir el listener a cada carta, para asi seleccionarla
+     */
     private void setSingleEvent() {
         for (int i = 0; i < linearSubjects.getChildCount(); i++) {
 

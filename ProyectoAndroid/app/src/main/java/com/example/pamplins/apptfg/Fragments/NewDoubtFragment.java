@@ -166,11 +166,6 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
-    /**
-     */
-   /* private void openAlert() {
-
-    }*/
 
     /**
      * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
@@ -296,6 +291,9 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
+    /**
+     * Metodo encargado de enviar los datos de la duda al controlador para que este la suba al servidor
+     */
     private void sendDoubt() {
         tvNewDoubt.setEnabled(false);
         final String title = etTitle.getText().toString();

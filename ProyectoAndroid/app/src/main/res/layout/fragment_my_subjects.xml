@@ -58,13 +58,5 @@
         android:textColor="@color/colorButton"
         android:textSize="30dp"
         android:visibility="gone" />
-    <ProgressBar
-        android:id="@+id/progressBar_s"
-        android:visibility="visible"
-        android:scaleX="0.10"
-        android:scaleY="0.10"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"/>
 
 </LinearLayout>
