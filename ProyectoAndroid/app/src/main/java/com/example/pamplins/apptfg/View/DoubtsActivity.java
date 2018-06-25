@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gtenorio on 20/05/2018.
@@ -27,14 +28,16 @@ import java.util.List;
 public class DoubtsActivity extends AppCompatActivity {
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
+    private DoubtAdapterAct adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doubts);
         Controller ctrl = Controller.getInstance();
         mRecycler = findViewById(R.id.rv_doubts);
+        mRecycler.setNestedScrollingEnabled(false);
         List<String> doubtNames = new ArrayList<>();
-        HashMap<String, Doubt> hashMap = new HashMap<>();
+        Map<String, Doubt> hashMap = new HashMap<>();
         String response = "";
         String subject = "";
         if(getIntent() != null)
@@ -54,13 +57,14 @@ public class DoubtsActivity extends AppCompatActivity {
         initToolbar(subject);
     }
 
-    public void showDoubts(final List<String> doubtNames, final HashMap<String, Doubt> hashMap, Controller ctrl) {
+    public void showDoubts(final List<String> doubtNames, final Map<String, Doubt> hashMap, Controller ctrl) {
         mManager = new LinearLayoutManager(this);
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
+        mRecycler.setVisibility(View.VISIBLE);
         for (final String key : doubtNames) {
-            ctrl.getDoubtsRef().child(key).orderByKey().addValueEventListener(new ValueEventListener() {
+            ctrl.getDoubtsRef().child(key).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Doubt doubt = dataSnapshot.getValue(Doubt.class);
@@ -74,15 +78,13 @@ public class DoubtsActivity extends AppCompatActivity {
                         if (hashMap.keySet().size() == doubtNames.size()) {
                             List listDoubts = new ArrayList<>(hashMap.values());
                             List doubtNames = new ArrayList<>(hashMap.keySet());
-                            DoubtAdapterAct adapter= new DoubtAdapterAct(listDoubts, doubtNames, DoubtsActivity.this);
+                            adapter= new DoubtAdapterAct(listDoubts, doubtNames, DoubtsActivity.this);
                             mRecycler.setAdapter(adapter);
-                            mRecycler.setVisibility(View.VISIBLE);
                             adapter.notifyDataSetChanged();
                         }
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
             }

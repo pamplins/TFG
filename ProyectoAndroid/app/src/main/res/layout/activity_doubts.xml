@@ -20,12 +20,21 @@
         app:titleTextColor="@color/colorName">
 
     </android.support.v7.widget.Toolbar>
+
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:id="@+id/view_line"
         android:layout_below="@+id/tool_doubts"
         android:background="@color/colorLine" />
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_line">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_doubts"
@@ -35,16 +44,8 @@
             android:clipToPadding="false"
             android:scrollbars="vertical"
             tools:listitem="@layout/item_doubt"
-            android:visibility="gone"/>
-
-        <!--<ProgressBar
-            android:id="@+id/progressBar_doubts"
-            android:visibility="visible"
-            android:scaleX="0.10"
-            android:scaleY="0.10"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_gravity="center"/>-->
-
+            android:visibility="visible"/>
+    </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

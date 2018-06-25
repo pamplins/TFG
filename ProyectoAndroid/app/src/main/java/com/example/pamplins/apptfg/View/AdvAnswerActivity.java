@@ -131,6 +131,9 @@ public class AdvAnswerActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo encargado de enviar a controlador los datos de la respuesta avanzada para que este la suba al servidor
+     */
     private void sendAnswer() {
         preWritAnswer();
         final String answerText = etAnswer.getText().toString();
@@ -193,6 +196,10 @@ public class AdvAnswerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Metodo encargado de comprobar que imagenes e han eliminado en las urls del adapter de imagen
+     * para asi tambien eliminarlas de la hash de bits
+     */
     private void checkImagesDeleted() {
         Iterator<Map.Entry<String,Bitmap>> iter = bitImages.entrySet().iterator();
         while (iter.hasNext()) {

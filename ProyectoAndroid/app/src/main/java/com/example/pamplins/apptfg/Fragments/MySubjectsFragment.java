@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.pamplins.apptfg.Controller.Controller;
@@ -25,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Gustavo on 17/02/2018.
@@ -33,14 +33,10 @@ import java.util.List;
 public class MySubjectsFragment extends Fragment {
     private RecyclerView mRecycler;
     private Controller ctrl;
-    private ProgressBar progressBar;
     private ImageView addNewCourse;
     private SubjectAdapter mAdapter;
     private String subjects;
-    private HashMap<String, Subject> hashMap;
     private TextView emptySubjects;
-    private List listSubjects;
-    private List listKeys;
 
     public MySubjectsFragment() {
     }
@@ -67,9 +63,7 @@ public class MySubjectsFragment extends Fragment {
 
     private void initElements(View rootView) {
         mRecycler = rootView.findViewById(R.id.messages_list_s);
-        progressBar = rootView.findViewById(R.id.progressBar_s);
         addNewCourse = rootView.findViewById(R.id.tv_add_course);
-        hashMap = new HashMap<>();
         emptySubjects = rootView.findViewById(R.id.tv_empty_subjects);
         ctrl = Controller.getInstance();
 
@@ -107,32 +101,35 @@ public class MySubjectsFragment extends Fragment {
      * Metodo encargado de mostrar las asignaturas de un usuario en concreto
      */
     public void showSubjects() {
+        final Map<String, Subject> listSubjects = new HashMap<>();
         LinearLayoutManager mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-        listSubjects =  new ArrayList<>();
-        listKeys = new ArrayList<>();
-        int i = 0;
-
-        try {
+        if (ctrl.getUser().getSubjects().contains("")) {
+            emptySubjects.setVisibility(View.VISIBLE);
+        }else {
             for (String key : ctrl.getUser().getSubjects()) {
-                i++;
-                listKeys.add(key);
-                final int finalI = i;
                 ctrl.getSubjectsRef().child(key).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Subject subject = dataSnapshot.getValue(Subject.class);
-                        listSubjects.add(subject);
-                        if (finalI == ctrl.getUser().getSubjects().size()) {
-                            if(ctrl.getUser().getSubjects().contains("")){
-                                emptySubjects.setVisibility(View.VISIBLE);
-                            }else{
-                                progressBar.setVisibility(View.GONE);
+                        if (null != subject.getCourse()) {
+                            if (!listSubjects.keySet().contains(dataSnapshot.getKey())) {
+                                listSubjects.put(dataSnapshot.getKey(), subject);
+                            } else {
+                                listSubjects.put(dataSnapshot.getKey(), subject);
+                            }
+                        }
+                        if (ctrl.getUser().getSubjects().contains("")) {
+                            emptySubjects.setVisibility(View.VISIBLE);
+                        } else {
+                            if (listSubjects.keySet().size() == ctrl.getUser().getSubjects().size()) {
                                 mRecycler.setVisibility(View.VISIBLE);
                                 emptySubjects.setVisibility(View.GONE);
-                                mAdapter =  new SubjectAdapter(listSubjects, listKeys, getActivity(), ctrl);
+                                List listDoubts = new ArrayList<>(listSubjects.values());
+                                List doubtNames = new ArrayList<>(listSubjects.keySet());
+                                mAdapter = new SubjectAdapter(listDoubts, doubtNames, getActivity(), ctrl);
                                 mRecycler.setAdapter(mAdapter);
                                 mAdapter.notifyDataSetChanged();
                             }
@@ -146,9 +143,7 @@ public class MySubjectsFragment extends Fragment {
                     }
                 });
             }
-        }catch (Exception e){
-       }
-
+        }
     }
 }
 

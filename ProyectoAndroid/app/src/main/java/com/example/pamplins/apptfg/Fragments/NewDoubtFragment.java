@@ -284,6 +284,9 @@ public class NewDoubtFragment extends Fragment {
         }
     }
 
+    /**
+     * Metodo encargado de enviar los datos de la duda al controlador para que este la suba al servidor
+     */
     private void sendDoubt() {
         tvNewDoubt.setEnabled(false);
         final String title = etTitle.getText().toString();
