@@ -72,7 +72,6 @@ public class ProfileFragment extends DoubtsFragment {
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
         mRecycler = rootView.findViewById(R.id.messages_list);
         mRecycler.setNestedScrollingEnabled(false);
-        //progressBar = rootView.findViewById(R.id.progressBar_h);
         TextView name = rootView.findViewById(R.id.tv_user_name_p);
 
         name.setText(ctrl.getUser().getUserName());
@@ -86,7 +85,6 @@ public class ProfileFragment extends DoubtsFragment {
             {
                 v.startAnimation(Utils.getButtonAnimation());
                 confirmExit();
-
             }
         });
         LinearLayout camera = rootView.findViewById(R.id.ll_camera_p);

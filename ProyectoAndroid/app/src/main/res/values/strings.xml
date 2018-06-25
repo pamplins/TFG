@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShareDoubt</string>
+    <string name="app_name" translatable="false">ShareDoubt</string>
 
     <!-- login and register names-->
     <string name="et_password">Contraseña</string>
@@ -26,7 +26,7 @@
     <string name="err_user_exist">Nombre usuario existente</string>
     <string name="err_user_not_exist">Nombre usuario inexistente</string>
     <string name="err_notSend_email">No se ha enviado ningún correo electrónico</string>
-    <string name="restartP">Te hemos enviado las instrucciones para reestablecer la contraseña</string>
+    <string name="restartP">Te hemos enviado las instrucciones para restablecer la contraseña</string>
     <string name="err_send_email">Error al enviar correo</string>
     <string name="err_post">Este usuario ya no se encuentra en la base de datos"</string>
     <string name="email_not_registred">Correo no registrado en la base de datos</string>
@@ -45,7 +45,7 @@
     <string name="title">Título</string>
     <string name="description">Descripción</string>
     <string name="subject">Asignatura</string>
-    <string name="optional">Opcional (máx 9):</string>
+    <string name="optional">Opcional (máx 8):</string>
 
 
     <!-- doubts errors advices-->
@@ -57,14 +57,14 @@
     <string name="err_empty_subject">Esta asignatura no dispone de ninguna duda</string>
     <string name="alert_remove_image">¿Realmente quieres eliminar esta imagen?</string>
     <string name="yes">Sí</string>
-    <string name="not">No</string>
+    <string name="not" translatable="false">No</string>
     <string name="course">CURSOS</string>
     <string name="alert_remove_subject">¿Realmente quieres eliminar esta asignatura?</string>
     <string name="exit_with_selected_subjects">No has guardado las asignaturas seleccionadas. ¿Estás seguro que quieres salir?</string>
     <string name="select_any_subject">Selecciona alguna asignatura</string>
     <string name="subjects_of">ASIGNATURAS DE</string>
-    <string name="first_semester">1r semestre</string>
-    <string name="second_semester">2o semestre</string>
+    <string name="first_semester" translatable="false">1r semestre</string>
+    <string name="second_semester" translatable="false">2o semestre</string>
     <string name="string_images_doubts">Archivos adjuntos de la duda:</string>
     <string name="responses">Respuestas:</string>
     <string name="string_write_response">Escribe tu respuesta</string>
@@ -78,12 +78,12 @@
     <string name="title_new_adv_answer">Respuesta avanzada</string>
     <string name="response">Respuesta:</string>
     <string name="slow_connection">Comprueba tu conexión a internet. En cuanto esté disponible, iniciaremos la aplicación</string>
-    <string name="add_image_answer">Añade alguna imagen a tu respuesta (máx 9):</string>
+    <string name="add_image_answer">Añade alguna imagen a tu respuesta (máx 8):</string>
     <string name="err_conex">Comprueba tu conexión a internet y vuelve a intentarlo</string>
     <string name="title_response">RESPUESTA</string>
     <string name="empty_answer">Introduce la respuesta</string>
-    <string name="err_max_images">Selecciona un máximo de 9 imagenes</string>
-    <string name="limit_max_images">Has llegado al límite de imagenes por duda</string>
+    <string name="err_max_images">Selecciona un máximo de 8 imagenes</string>
+    <string name="limit_max_images">Has llegado al límite de imágenes por duda</string>
     <string name="exit_with_adv_answer">No has subido tu respuesta. ¿Realmente quieres salir?</string>
 
 

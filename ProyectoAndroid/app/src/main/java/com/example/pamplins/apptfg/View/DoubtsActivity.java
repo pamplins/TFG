@@ -52,9 +52,8 @@ public class DoubtsActivity extends AppCompatActivity {
             showDoubts(doubtNames, hashMap, ctrl);
         }
         initToolbar(subject);
-
-
     }
+
     public void showDoubts(final List<String> doubtNames, final HashMap<String, Doubt> hashMap, Controller ctrl) {
         mManager = new LinearLayoutManager(this);
         mManager.setReverseLayout(true);

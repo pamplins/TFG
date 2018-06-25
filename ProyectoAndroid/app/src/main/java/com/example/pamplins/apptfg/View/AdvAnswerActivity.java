@@ -312,7 +312,6 @@ public class AdvAnswerActivity extends AppCompatActivity {
         }
     }
 
-
     private void confirmExit(){
         if(!etAnswer.getText().toString().isEmpty()  || !bitImages.isEmpty()){
             new AlertDialog.Builder(this)
@@ -328,8 +327,6 @@ public class AdvAnswerActivity extends AppCompatActivity {
         }
 
     }
-
-
 
     @Override
     public void onDestroy() {

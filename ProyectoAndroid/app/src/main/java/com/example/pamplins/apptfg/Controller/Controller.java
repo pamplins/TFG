@@ -325,8 +325,6 @@ public class Controller {
         }
     }
 
-
-
     /**
      * Metodo encargado de crear una nueva duda en la tabla de
      * doubts y en la de user doubts. Ademas, limpia todos los

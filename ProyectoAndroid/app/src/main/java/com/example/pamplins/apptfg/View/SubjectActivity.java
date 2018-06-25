@@ -165,6 +165,7 @@ public class SubjectActivity extends AppCompatActivity {
         if(!subjects.isEmpty()){
             Intent i = new Intent(this, MainActivity.class);
             i.putExtra("main", subjects.toString());
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
             finish();
         }else{

@@ -108,6 +108,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         }
                                     });
                         } else {
+                            enableElements(v);
                             etUserName.setError(getString(R.string.err_user_exist));
                             progressBar.setVisibility(View.INVISIBLE);
                         }

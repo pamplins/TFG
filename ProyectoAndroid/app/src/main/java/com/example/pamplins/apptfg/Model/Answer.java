@@ -1,9 +1,5 @@
 package com.example.pamplins.apptfg.Model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 

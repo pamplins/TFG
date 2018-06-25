@@ -34,25 +34,7 @@ public class MainActivity extends AppCompatActivity {
         final Fragment profileFragment = new ProfileFragment();
         bottomNavigationView =  findViewById(R.id.bottomNavigationView);
 
-        if (getIntent().hasExtra("main"))
-        {
-            String prueba = getIntent().getExtras().getString("main");
-            Bundle bundle = new Bundle();
-            bundle.putString("subjects", prueba);
-            mySubjectsFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentContainer, mySubjectsFragment).commit();
-            bottomNavigationView.setSelectedItemId(R.id.my_subjects_item);
-            getIntent().removeExtra("main");
-
-        }
-        else{
-            if(savedInstanceState == null) {
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragmentContainer, homeFragment).commit();
-            }
-        }
-
+        checkIntent(savedInstanceState, mySubjectsFragment, homeFragment);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -74,5 +56,27 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void checkIntent(Bundle savedInstanceState, Fragment mySubjectsFragment, Fragment homeFragment) {
+        if (getIntent().hasExtra("main"))
+        {
+            String prueba = getIntent().getExtras().getString("main");
+            Bundle bundle = new Bundle();
+            bundle.putString("subjects", prueba);
+            mySubjectsFragment.setArguments(bundle);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragmentContainer, mySubjectsFragment).commit();
+            bottomNavigationView.setSelectedItemId(R.id.my_subjects_item);
+            getIntent().removeExtra("main");
+
+        }
+        else{
+            if(savedInstanceState == null) {
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentContainer, homeFragment).commit();
+            }
+        }
+
     }
 }

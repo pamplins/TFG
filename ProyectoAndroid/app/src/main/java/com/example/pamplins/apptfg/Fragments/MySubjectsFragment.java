@@ -1,6 +1,5 @@
 package com.example.pamplins.apptfg.Fragments;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -54,6 +53,19 @@ public class MySubjectsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_my_subjects, container, false);
+        initElements(rootView);
+        if(getArguments() != null){
+            subjects = getArguments().getString("subjects");
+            if(null != subjects) {
+                addNewCourse(subjects);
+                getArguments().remove("subjects");
+            }
+        }
+
+        return rootView;
+    }
+
+    private void initElements(View rootView) {
         mRecycler = rootView.findViewById(R.id.messages_list_s);
         progressBar = rootView.findViewById(R.id.progressBar_s);
         addNewCourse = rootView.findViewById(R.id.tv_add_course);
@@ -77,16 +89,6 @@ public class MySubjectsFragment extends Fragment {
                 startActivity(i);
             }
         });
-
-        if(getArguments() != null){
-            subjects = getArguments().getString("subjects");
-            if(null != subjects) {
-                addNewCourse(subjects);
-                getArguments().remove("subjects");
-            }
-        }
-
-        return rootView;
     }
 
     @Override
@@ -101,6 +103,9 @@ public class MySubjectsFragment extends Fragment {
     }
 
 
+    /**
+     * Metodo encargado de mostrar las asignaturas de un usuario en concreto
+     */
     public void showSubjects() {
         LinearLayoutManager mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);

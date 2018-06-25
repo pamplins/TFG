@@ -5,12 +5,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -33,20 +30,17 @@ import com.example.pamplins.apptfg.HoldersAdapters.ImageViewAdapter;
 import com.example.pamplins.apptfg.R;
 import com.example.pamplins.apptfg.Utils;
 
-import com.example.pamplins.apptfg.View.DoubtDetailActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -165,12 +159,6 @@ public class NewDoubtFragment extends Fragment {
                     .show();
         }
     }
-
-    /**
-     */
-   /* private void openAlert() {
-
-    }*/
 
     /**
      * Funcion encargada de abrir el dialogo para escoger entre la galeria o camara para subir una imagen
