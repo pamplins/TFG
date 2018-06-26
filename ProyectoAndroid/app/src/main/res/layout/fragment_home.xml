@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:text="ÚLTIMOS FOROS"
+        android:text="@string/last_doubts"
         android:textStyle="bold"
 
         android:textSize="24sp"
